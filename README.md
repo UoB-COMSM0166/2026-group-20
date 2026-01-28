@@ -1,6 +1,3 @@
-# 2026-group-20
-2026 COMSM0166 group 20
-
 # P5.js Interactive Painting Tool
 This is a p5.js-based web drawing application that supports custom brush colors and stroke thickness, complete with a built-in eraser function.
 # Online Demo
