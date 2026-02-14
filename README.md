@@ -43,6 +43,15 @@ GROUP PHOTO. Add a group photo here.
 
 ### Requirements 
 
+#### Our Stakeholders:
+
+* Platformer game players
+* Casual game players
+* Software Engineering module lecturers
+* Classmates
+* Other academic staff/Bristol students
+
+
 - 15% ~750 words
 - Early stages design. Ideation process. How did you decide as a team what to develop? Use case diagrams, user stories. 
 
