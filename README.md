@@ -27,12 +27,12 @@ VIDEO. Include a demo video of your game here (you don't have to wait until the 
 
 GROUP PHOTO. Add a group photo here.
 
-- Group member 1, name, email, role
-- Group member 2, name, email, role
-- Group member 3, name, email, role
-- Group member 4, name, email, role
-- Group member 5, name, email, role
-- Group member 6, name, email, role
+- Megi, jd25841@bristol.ac.uk, role
+- Maran, ilamaran.magesh.2025@bristol.ac.uk, role
+- Jacqueline, oz25232@bristol.ac.uk, role
+- Jinwang, ut25234@bristol.ac.uk, role
+- Mengxiao, dh25275@bristol.ac.uk, role
+- Eira, xz25553@bristol.ac.uk, role
 
 ## Project Report
 
