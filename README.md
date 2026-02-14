@@ -13,7 +13,7 @@ You will be developing your game using [P5.js](https://p5js.org) a javascript li
 - [P5.js tutorials](https://p5js.org/tutorials/) 
 - [Coding Train P5.js](https://thecodingtrain.com/tracks/code-programming-with-p5-js) course - go here for enthusiastic video tutorials from Dan Shiffman (recommended!)
 
-## Your Game (change to title of your game)
+## The Ultimate Chicken Horse (provisional name) 
 
 STRAPLINE. Add an exciting one sentence description of your game here.
 
@@ -27,12 +27,12 @@ VIDEO. Include a demo video of your game here (you don't have to wait until the 
 
 GROUP PHOTO. Add a group photo here.
 
-- Group member 1, name, email, role
-- Group member 2, name, email, role
-- Group member 3, name, email, role
-- Group member 4, name, email, role
-- Group member 5, name, email, role
-- Group member 6, name, email, role
+- Megi, jd25841@bristol.ac.uk, role
+- Maran, ilamaran.magesh.2025@bristol.ac.uk, role
+- Jacqueline, oz25232@bristol.ac.uk, role
+- Jinwang, ut25234@bristol.ac.uk, role
+- Mengxiao, dh25275@bristol.ac.uk, role
+- Eira, xz25553@bristol.ac.uk, role
 
 ## Project Report
 
@@ -44,7 +44,54 @@ GROUP PHOTO. Add a group photo here.
 ### Requirements 
 
 - 15% ~750 words
-- Early stages design. Ideation process. How did you decide as a team what to develop? Use case diagrams, user stories. 
+- Early stages design. Ideation process. How did you decide as a team what to develop? Use case diagrams, user stories.
+
+#### Our Stakeholders:
+
+* Platformer game players
+* Casual game players
+* Software Engineering module lecturers
+* Classmates
+* Other academic staff/Bristol students
+ 
+To begin our game design process, we identified all possible individuals that needed to be taken into account when making our game. Building on the Onion Model we learned about in the lecture, we then split our list into three big categories (gamers, lecturers and other students), to better identify what qualities each one would look for in a game. 
+Coming up with the epics (high level requirements) and subsequently, the user stories, was a very similar process to the Running app exercise we did during the workshop. Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users, which we had direct access to. This allowed us to come up with feedback-based requirements.
+
+#### Epics:
+
+-<i>Gamer Group</i>
+* Retro/Nostalgic Visuals
+* Twists/added features
+* Visually stimulating
+* Audio background/effects
+* Game lore
+* Core features (wallet system, scoreboard, intro tutorial)
+* Good UX
+* Multi device compatibility 
+
+
+-<i>Lecturer Group</i>
+* Learning concepts integration and application
+* Clear challenge(s) demonstration
+* Achievable within the project timeline
+* Collaborative work 
+* Continuous progress updates
+* Unique
+
+-<i>Student Group</i> 
+* Social features
+* Easy to pick up
+* Short game runs 
+
+
+#### User Stories 
+
+-<i>Students</i>
+* As a student, I want the game to have a multiplayer mode, so that I can play with my friends.
+* As a student, I want the game to have intuitive controls/mechanics, so that I can start playing right away.
+* As a student, I want a game run/level to be short enough so that I can play between class breaks. 
+
+TBC
 
 ### Design
 
