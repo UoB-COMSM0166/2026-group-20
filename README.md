@@ -65,7 +65,7 @@ Coming up with the epics (high level requirements) and subsequently, the user st
 * Visually stimulating
 * Audio background/effects
 * Game lore
-* Core featues (wallet system, scoreboard, intro tutorial)
+* Core features (wallet system, scoreboard, intro tutorial)
 * Good UX
 * Multi device compatibility 
 
