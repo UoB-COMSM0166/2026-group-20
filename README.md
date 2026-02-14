@@ -54,6 +54,10 @@ GROUP PHOTO. Add a group photo here.
 * Classmates
 * Other academic staff/Bristol students
  
+To begin our game design process, we identified all possible individuals that needed to be taken into account when making our game. Building on the Onion Model we learned about in the lecture, we then split our list into three big categories (gamers, lecturers and other students), to better identify what qualities each one would look for in a game. 
+Coming up with the epics (high level requirements) and subsequently, the user stories, was a very similar process to the Jogging app exercise we did during the workshop. Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users, which we had direct access to. This allowed us to come up with feedback-based requirements.
+
+
 
 ### Design
 
