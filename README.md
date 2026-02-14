@@ -59,7 +59,7 @@ Coming up with the epics (high level requirements) and subsequently, the user st
 
 #### Epics:
 
--Gamer Group
+-<i>Gamer Group</i>
 * Retro/Nostalgic Visuals
 * Twists/added features
 * Visually stimulating
@@ -70,7 +70,7 @@ Coming up with the epics (high level requirements) and subsequently, the user st
 * Multi device compatibility 
 
 
--Lecturer Group 
+-<i>Lecturer Group</i>
 * Learning concepts integration and application
 * Clear challenge(s) demonstration
 * Achievable within the project timeline
@@ -78,7 +78,7 @@ Coming up with the epics (high level requirements) and subsequently, the user st
 * Continuous progress updates
 * Unique
 
--Student Group 
+-<i>Student Group</i> 
 * Social features
 * Easy to pick up
 * Short game runs 
