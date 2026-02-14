@@ -57,7 +57,36 @@ GROUP PHOTO. Add a group photo here.
 To begin our game design process, we identified all possible individuals that needed to be taken into account when making our game. Building on the Onion Model we learned about in the lecture, we then split our list into three big categories (gamers, lecturers and other students), to better identify what qualities each one would look for in a game. 
 Coming up with the epics (high level requirements) and subsequently, the user stories, was a very similar process to the Jogging app exercise we did during the workshop. Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users, which we had direct access to. This allowed us to come up with feedback-based requirements.
 
+#### Epics:
 
+-Gamer Group
+* Retro/Nostalgic Visuals
+* Twists/added features
+* Visually stimulating
+* Audio background/effects
+* Game lore
+* Core featues (wallet system, scoreboard, intro tutorial)
+* Good UX
+* Multi device compatibility 
+
+
+-Lecturer Group 
+* Learning concepts integration and application
+* Clear challenge(s) demonstration
+* Achievable within the project timeline
+* Collaborative work 
+* Continuous progress updates
+* Unique
+
+-Student Group 
+* Social features
+* Easy to pick up
+* Short game runs 
+
+
+#### User Stories 
+
+TBC
 
 ### Design
 
