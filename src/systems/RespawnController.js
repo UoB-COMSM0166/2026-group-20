@@ -1,5 +1,5 @@
-import { GAME_CONFIG } from "../config/constant";
-import { PlayerState } from "../config/playerState";
+import { GameConfig } from "../config/gameConfig.js";
+import { PlayerState } from "../config/playerState.js";
 
 export class RespawnController {
     constructor() {
@@ -17,8 +17,8 @@ export class RespawnController {
 
             setTimeout(() => {
                 player.finishRespawn();
-            }, GAME_CONFIG.RESPAWN_TIME);
-        }, GAME_CONFIG.RESPAWN_TIME);
+            }, GameConfig.RESPAWN_TIME);
+        }, GameConfig.RESPAWN_TIME);
     }
 
     

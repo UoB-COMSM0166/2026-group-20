@@ -1,4 +1,4 @@
-import { PlayerState } from "./PlayerState.js";
+import { PlayerState } from "../config/playerState.js";
 
 export class Player {
     constructor(startX, startY) {
