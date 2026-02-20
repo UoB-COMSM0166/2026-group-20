@@ -7,7 +7,10 @@ export class HandleInput {
 
    handleKeyPressed(k) {
       k = k.toLowerCase();
-      this.pressedKeys.push(k);
+      if (this.validKeys.includes(k) && !this.pressedKeys.includes(k)) {
+         this.pressedKeys.push(k);
+      }
+      
    }
 
    handleKeyReleased(k) {
@@ -37,11 +40,5 @@ export class HandleInput {
 
 }
 
-function keyPressed(event) {
-  playerInput.handleKeyPressed(event.key);
-}
 
-function keyReleased(event) {
-  playerInput.handleKeyReleased(event.key);
-}
 

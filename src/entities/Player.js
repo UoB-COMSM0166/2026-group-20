@@ -1,12 +1,14 @@
 //is this correct?
-import {HandleInput} from "../systems/HandleInput.js";
+// import {HandleInput} from "../systems/HandleInput.js";
+import { PlayerMovementState } from "../states/PlayerMovementState";
 
 export class Player{
   
-  constructor(ground){
+  constructor(p, ground, input){
       //Placeholder player object 
+      this.input = input;
       this.side=50;
-      this.colour=color(255, 192,203);
+      this.colour=p.color(255, 192,203);
       //
       this.posX=0;
       this.posY=ground-this.side;
@@ -15,18 +17,19 @@ export class Player{
       this.gravity=0.8;
       this.ground=ground;
       this.defaultJumpSpeed=12;
+      this.state = PlayerMovementState.STATIC;
    }
   
   //also provisional
-  drawPlayer(){
-      fill(this.colour);
-      noStroke();
-      square(this.posX, this.posY, this.side);
+  drawPlayer(p){
+      p.fill(this.colour);
+      p.noStroke();
+      p.square(this.posX, this.posY, this.side);
    }
   
   //move 
-   movePlayer(){ 
-      let keys=playerInput.getLast2Pressed();
+   movePlayer(p){ 
+      const keys=this.input.getLast2Pressed();
       for(let k of keys){
          if (k==='a'){
             if(this.posX<=0){
@@ -36,7 +39,7 @@ export class Player{
             }
          }
          else if(k==='d'){
-            if (this.posX>=width-this.side){
+            if (this.posX>=p.width-this.side){
                this.posX+=0;
             }
             else{this.posX+=this.speedX;
@@ -48,11 +51,13 @@ export class Player{
          }
          
       }
+      this.state = PlayerMovementState.MOVE;
+      console.log(this.state);
 
    }
   
    jumpUp(){
-      let keys=HandleInput.getLast2Pressed();
+      const keys=this.input.getLast2Pressed();
       for(let k of keys){
          if (k==='w' && this.posY>=this.ground){
          if(this.posY<=0){
@@ -66,6 +71,8 @@ export class Player{
             }
          }
       }
+      this.state = PlayerMovementState.JUMP;
+      console.log(this.state);
    }
   
    comeDown(){
@@ -76,6 +83,8 @@ export class Player{
          this.posY = this.ground;
          this.speedY = 0;
       }
+      this.state = PlayerMovementState.STATIC;
+      console.log(this.state);
    }
 
    
