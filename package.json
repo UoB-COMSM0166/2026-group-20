@@ -9,10 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/p5": "^1.7.7",
     "p5": "^1.11.11",
     "vite": "^7.3.1"
-  },
-  "dependencies": {
-    "serve": "^14.2.5"
   }
 }

@@ -2,12 +2,15 @@
 export class HandleInput {
    constructor(validKeys) {
       this.validKeys = validKeys;
-      this.pressedKeys = [];
+      this.pressedKeys = []; 
    }
 
    handleKeyPressed(k) {
       k = k.toLowerCase();
-      this.pressedKeys.push(k);
+      // this check prevents duplicates so the array won't increase forever
+      if (this.validKeys.includes(k) && !this.pressedKeys.includes(k)) {
+         this.pressedKeys.push(k);
+      }
    }
 
    handleKeyReleased(k) {
@@ -34,7 +37,6 @@ export class HandleInput {
          return [];
       }
    }
-
 }
 
 

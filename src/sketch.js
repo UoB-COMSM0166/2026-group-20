@@ -1,29 +1,27 @@
+import { Player } from "./entities/Player.js";
+import { HandleInput } from "./systems/HandleInput.js";
 
+export const sketch = (p) => {
+  let playerInput;
+  let player;
 
-import {Player} from "./entities/Player.js";
-import {HandleInput} from "./systems/HandleInput.js";
+  p.setup = () =>{
+    p.createCanvas(400, 400);
+    playerInput = new HandleInput(['w', 'a', 'd']);
+    player = new Player(p, p.height/2, playerInput);
+  }
 
-let playerInput; 
-let player; 
+  p.draw = () => {
+    p.background(220);
+    player.update(p); 
+  }
 
-window.setup = function () {
-  createCanvas(400, 400);
-  playerInput=new HandleInput(['w', 'a', 'd']);  
-  player=new Player(width/2, playerInput);
+  p.keyPressed = (event) => {
+    playerInput.handleKeyPressed(event.key);
+  }
+
+  p.keyReleased = (event) => {
+    playerInput.handleKeyReleased(event.key);
+  }
 }
 
-window.draw = function () {
-  background(220);
-  player.movePlayer();
-  player.drawPlayer();
-  player.jumpUp();
-  player.comeDown();
-}
-
-window.keyPressed = function(event) {
-  playerInput.handleKeyPressed(event.key);
-}
-
-window.keyReleased = function(event) {
-  playerInput.handleKeyReleased(event.key);
-}
