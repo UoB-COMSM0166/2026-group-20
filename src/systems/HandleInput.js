@@ -37,11 +37,5 @@ export class HandleInput {
 
 }
 
-function keyPressed(event) {
-  playerInput.handleKeyPressed(event.key);
-}
 
-function keyReleased(event) {
-  playerInput.handleKeyReleased(event.key);
-}
 

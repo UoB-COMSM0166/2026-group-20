@@ -3,8 +3,9 @@ import {HandleInput} from "../systems/HandleInput.js";
 
 export class Player{
   
-  constructor(ground){
+  constructor(ground, input){
       //Placeholder player object 
+      this.input=input; 
       this.side=50;
       this.colour=color(255, 192,203);
       //
@@ -26,7 +27,7 @@ export class Player{
   
   //move 
    movePlayer(){ 
-      let keys=playerInput.getLast2Pressed();
+      let keys=this.input.getLast2Pressed();
       for(let k of keys){
          if (k==='a'){
             if(this.posX<=0){
@@ -52,7 +53,7 @@ export class Player{
    }
   
    jumpUp(){
-      let keys=HandleInput.getLast2Pressed();
+      let keys=this.input.getLast2Pressed();
       for(let k of keys){
          if (k==='w' && this.posY>=this.ground){
          if(this.posY<=0){
@@ -77,7 +78,4 @@ export class Player{
          this.speedY = 0;
       }
    }
-
-   
-
 }
