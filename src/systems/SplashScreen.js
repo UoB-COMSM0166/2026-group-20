@@ -1,12 +1,28 @@
 import { RectButton } from "../utilities/RectButton.js"
+/**
+ * @description splash screen display 
+ * Handles rendering of the start menu UI
+ * @class
+ */
 
 export class SplashScreen{
+    /**
+    * @description creates splash screen
+    *
+    * @param {p5} p - The p5 instance 
+    * @param {string} stage - Current game stage
+    */
     constructor(p, stage) {
         this.stage=stage;
         this.button1 = new RectButton(p, 110, 300, 60, 25, "option1");
         this.button2 = new RectButton(p, 210, 300, 60, 25, "option2");
 
     }
+     /**
+    * @description renders start menu UI
+    *
+    * @param {p5} p - The p5 instance 
+    */
     render(p){
         // placeholder title 
         p.textAlign(p.LEFT, p.BASELINE);
