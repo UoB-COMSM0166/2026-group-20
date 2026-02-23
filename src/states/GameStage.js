@@ -1,13 +1,15 @@
 /**
  * A list of all valid game stages
  *
- * @typedef {"MENU" | "MAP" | "OPTION1" | "OPTION2"} GameStage
+ * @enum {string} 
  */
 
 export const GameStage = Object.freeze({
     MENU: "MENU",
-    MAP: "MAP",
+    MAPMENU: "MAP",
     OPTION1: "OPTION1", // change this
-    OPTION2: "OPTION2"
+    OPTION2: "OPTION2", 
+    MAP1: "MAP1",
+    MAP2: "MAP2"
     // add more
 })

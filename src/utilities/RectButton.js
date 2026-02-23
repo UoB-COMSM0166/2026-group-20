@@ -19,14 +19,12 @@ export class RectButton extends Button{
     constructor(p, x, y, w, h, label){
         super(p, x, y, w, h); 
         this.label=label;
-        this.radius=15; 
+        this.radius=10; 
         this.defaultColour={r:100, g:100, b:225}; // blue background
         this.changedColour={r:0, g:100, b:225}; // purple background 
         this.textFont="Monaco"; 
         this.textSize=10;
     }
-    // super(p, x, y, diameter, diameter); for a circular button 
-    // override isHovered for a circular button
 
     /**
     * @description draw button and display 
@@ -40,9 +38,9 @@ export class RectButton extends Button{
         else{
             this.p.fill(this.changedColour.r, this.changedColour.g, this.changedColour.b);
         }
-        p.rect(this.x, currentY, this.w, this.h, 10);
+        p.rect(this.x, currentY, this.w, this.h, this.radius);
 
-        // text
+        // text inside the button 
         this.p.fill(250);
         this.p.textFont(this.textFont);
         this.p.textSize(this.textSize);

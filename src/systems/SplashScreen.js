@@ -1,4 +1,5 @@
 import { RectButton } from "../utilities/RectButton.js"
+
 /**
  * @description splash screen display 
  * Handles rendering of the start menu UI
@@ -12,14 +13,15 @@ export class SplashScreen{
     * @param {p5} p - The p5 instance 
     * @param {string} stage - Current game stage
     */
-    constructor(p, stage) {
-        this.stage=stage;
+    constructor(p) {
+        //this.stage=stage;
         this.button1 = new RectButton(p, 110, 300, 60, 25, "option1");
         this.button2 = new RectButton(p, 210, 300, 60, 25, "option2");
+        //this.button3 = new RoundButton(p, 35, 40, 30, "↩");
 
     }
-     /**
-    * @description renders start menu UI
+    /**
+    * @description renders splash screen 
     *
     * @param {p5} p - The p5 instance 
     */
@@ -42,7 +44,7 @@ export class SplashScreen{
         // placeholder option buttons
         this.button1.drawButton(p);
         this.button2.drawButton(p);
-
+    
         this.button1.updateCursor();
         this.button2.updateCursor();
     }
