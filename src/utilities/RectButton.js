@@ -24,6 +24,7 @@ export class RectButton extends Button{
         this.changedColour={r:0, g:100, b:225}; // purple background 
         this.textFont="Monaco"; 
         this.textSize=10;
+        this.textColour=250;
     }
 
     /**
@@ -41,7 +42,7 @@ export class RectButton extends Button{
         p.rect(this.x, currentY, this.w, this.h, this.radius);
 
         // text inside the button 
-        this.p.fill(250);
+        this.p.fill(this.textColour);
         this.p.textFont(this.textFont);
         this.p.textSize(this.textSize);
         this.p.textAlign(this.p.CENTER, this.p.CENTER);

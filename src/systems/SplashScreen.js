@@ -1,4 +1,5 @@
 import { RectButton } from "../utilities/RectButton.js"
+import { GameConfig } from '../config/gameConfig.js';
 
 /**
  * @description splash screen display 
@@ -14,11 +15,18 @@ export class SplashScreen{
     * @param {string} stage - Current game stage
     */
     constructor(p) {
-        //this.stage=stage;
-        this.button1 = new RectButton(p, 110, 300, 60, 25, "option1");
-        this.button2 = new RectButton(p, 210, 300, 60, 25, "option2");
-        //this.button3 = new RoundButton(p, 35, 40, 30, "↩");
-
+        this.button1 = new RectButton(p, 
+                            GameConfig.BUTTON1_X, 
+                            GameConfig.BUTTON1_Y, 
+                            GameConfig.BUTTON1_W, 
+                            GameConfig.BUTTON1_H, 
+                            "option1");
+        this.button2 = new RectButton(p, 
+                            GameConfig.BUTTON2_X, 
+                            GameConfig.BUTTON2_Y, 
+                            GameConfig.BUTTON2_W, 
+                            GameConfig.BUTTON2_H, 
+                            "option2");
     }
     /**
     * @description renders splash screen 
@@ -28,15 +36,15 @@ export class SplashScreen{
     render(p){
         // placeholder title 
         p.textAlign(p.LEFT, p.BASELINE);
-        p.textFont('Monaco', 20);
-        p.fill(143,57,133); // purple
-        p.text("Ultimate Chicken Horse", p.width/6, p.height/3); 
+        p.textFont(GameConfig.FONT, GameConfig.TITLE_FONTSIZE);
+        p.fill(GameConfig.TITLE_COLOUR.r, GameConfig.TITLE_COLOUR.g, GameConfig.TITLE_COLOUR.b); 
+        p.text("Ultimate Chicken Horse", GameConfig.TITLE_X, GameConfig.TITLE_Y); 
         
         // placeholder "press space to start"
         if(p.frameCount % 120 < 80) {
-            p.textFont('Monaco', 15);
-            p.fill(0, 0, 225); 
-            p.text("Press Space to Start", 100, 250);
+            p.textFont(GameConfig.FONT, GameConfig.PRESS_FONTSIZE);
+            p.fill(GameConfig.PRESS_COLOUR.r, GameConfig.PRESS_COLOUR.g, GameConfig.PRESS_COLOUR.b); 
+            p.text("Press Space to Start", GameConfig.PRESS_X, GameConfig.PRESS_Y);
         } 
         
         p.cursor(p.ARROW); // default cursor

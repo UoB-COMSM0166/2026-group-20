@@ -2,19 +2,21 @@ import { GameStage } from "./states/GameStage.js";
 import { MapMenu } from "./systems/MapMenu.js";
 import { SplashScreen } from "./systems/SplashScreen.js";
 
+
 export const sketch = (p) => {
   let stage;
   let splashScreen; 
   let mapMenu; 
 
   p.setup = function(){
-    p.createCanvas(400, 400);
+    p.createCanvas(p.windowWidth, p.windowHeight);
     stage = GameStage.MENU; 
     splashScreen = new SplashScreen(p);
   }
 
   p.draw= function(){
     p.background(220);
+
     if (stage == GameStage.MENU){
       splashScreen.render(p); 
     }

@@ -11,8 +11,9 @@ export class RoundButton extends Button{
         this.diameter = diameter;
         this.defaultColour={r:100, g:100, b:225}; // blue background
         this.changedColour={r:0, g:100, b:225}; // purple background 
-        this.label = label; 
-        this.textSize = 25; 
+        this.label=label; 
+        this.textSize=25; 
+        this.textColour=250;//white 
     }
     /**
     * @description draw button and display 
@@ -30,7 +31,7 @@ export class RoundButton extends Button{
         p.circle(this.x, currentY, this.diameter);
         
         // text inside the button 
-        this.p.fill(250);
+        this.p.fill(this.textColour);
         this.p.textSize(this.textSize);
         this.p.textAlign(this.p.CENTER, this.p.CENTER);
         this.p.text(this.label, this.x, currentY);
@@ -38,6 +39,10 @@ export class RoundButton extends Button{
     /**
     * @description mouse GUI to show the button is clickable 
     */
+    isHovered() {
+        return this.p.dist(this.p.mouseX, this.p.mouseY, this.x, this.y)<this.diameter;
+    }
+
     updateCursor(){
         super.updateCursor();
     }
