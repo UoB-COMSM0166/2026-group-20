@@ -1,18 +1,28 @@
+/**
+ * A class to handle key press input 
+ * The input corresponds to the player movement 
+ */
 
 export class HandleInput {
    constructor(validKeys) {
       this.validKeys = validKeys;
       this.pressedKeys = []; 
    }
-
+   /**
+    * Add current key presses into the tracking list 
+    * Also Check duplicates so the array won't increase forever
+    * @param {string} k - The key string 
+    */
    handleKeyPressed(k) {
       k = k.toLowerCase();
-      // this check prevents duplicates so the array won't increase forever
       if (this.validKeys.includes(k) && !this.pressedKeys.includes(k)) {
          this.pressedKeys.push(k);
       }
    }
-
+   /**
+    * Removes a key from the tracking list when it is released.
+    * @param {string} k - The key string
+    */
    handleKeyReleased(k) {
       k = k.toLowerCase();
       const index = this.pressedKeys.indexOf(k);
@@ -24,7 +34,12 @@ export class HandleInput {
    //getLastPressed() {
    //   return this.pressedKeys[this.pressedKeys.length - 1];
    //}
-  
+
+   /**
+   * Get the 2 most recent unique presses.
+   * @returns {string[]} An array of the last 2 keys
+   */
+
    getLast2Pressed() {
       const len = this.pressedKeys.length;
       if (len >= 2) {

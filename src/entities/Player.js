@@ -1,7 +1,16 @@
+/**
+ * Player class 
+ * @class
+ * @description create an instance of a player 
+ */
 import { PlayerMovementState } from "../states/PlayerMovementState";
 
 export class Player{
-  
+  /** 
+  * @param {*} p - The p5.js instance 
+  * @param {number} ground - The platform where the player stands on 
+  * @param {string[]} input - A list of valid keypresses (e.g. ['w', 'a', 'd'])
+  */
   constructor(p, ground, input){
       //Placeholder player object 
       this.input = input;
@@ -19,13 +28,23 @@ export class Player{
    }
   
   //also provisional
+  /**
+   * Draws the player character to the canvas
+   * @param {*} p - The p5.js instance   
+   */
   drawPlayer(p){
       p.fill(this.colour);
       p.noStroke();
       p.square(this.posX, this.posY, this.side);
    }
    
-   //move 
+   /**
+    * Move right if the 'a' key is pressed 
+    * Move left if the 'd' key is pressed 
+    * 
+    * @param {*} p  - The p5.js instance 
+    * @param {*} keys - A list of currently pressed keys
+    */
    movePlayer(p, keys){ 
       if (keys.includes("a") && this.posX>0){
          this.posX-=this.speedX;
@@ -38,7 +57,10 @@ export class Player{
          console.log(this.state);
       }
    }
-
+   /**
+    * Jump if the 'w' key is pressed and the player is grounded
+    * @param {string[]} keys - A list of currently pressed keys
+    */
    jumpUp(keys){
       if (keys.includes("w") && this.posY>=this.ground){
          this.speedY= -this.defaultJumpSpeed;
@@ -48,7 +70,9 @@ export class Player{
          console.log(this.state);
       }
    }
-  
+   /**
+    * Apply gravity for the player to come down 
+    */
    comeDown(){
       this.speedY += this.gravity;  
       this.posY += this.speedY;    
@@ -62,6 +86,12 @@ export class Player{
          }
       }
    }
+   /**
+    * Update player's physics, input state and renders them to the canvas
+    * Runs once per frame within the main draw loop
+    * 
+    * @param {*} p  - The p5.js instance 
+    */
    update(p){
       const keys=this.input.getLast2Pressed();
       this.movePlayer(p,keys);
