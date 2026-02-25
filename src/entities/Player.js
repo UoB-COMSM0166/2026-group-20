@@ -19,11 +19,16 @@ export class Player{
       //
       this.posX=0;
       this.posY=ground-this.side;
-      this.speedX=10; //width%speedX needs to be 0
+      this.friction=0.85; // 1.0 is no friction
+      this.basedSpeedX=2; //width%speedX needs to be 0
       this.speedY=0;
-      this.gravity=0.8;
+      this.speedX=this.basedSpeedX*this.friction; 
+      this.gravity=0.6;
+      this.defaultJumpSpeed=8; 
+      this.maxJumps=3; 
+      this.jumpLeft=this.maxJumps; 
+      this.wasJumpPressed=false; 
       this.ground=ground;
-      this.defaultJumpSpeed=12;
       this.state=PlayerMovementState.STATIC;
    }
   
@@ -45,7 +50,7 @@ export class Player{
     * @param {*} p  - The p5.js instance 
     * @param {*} keys - A list of currently pressed keys
     */
-   movePlayer(p, keys){ 
+    movePlayer(p, keys){ 
       if (keys.includes("a") && this.posX>0){
          this.posX-=this.speedX;
          this.state=PlayerMovementState.MOVE;
@@ -58,38 +63,57 @@ export class Player{
       }
    }
    /**
+    * check if the player is above the ground
+    * will be extended to platform in the future 
+    * 
+    * @returns boolean 
+    */
+   isAboveGround(){
+      return this.posY >= this.ground;
+   }
+
+   /**
     * Jump if the 'w' key is pressed and the player is grounded
     * @param {string[]} keys - A list of currently pressed keys
     */
+
    jumpUp(keys){
-      if (keys.includes("w") && this.posY>=this.ground){
+      const jumpPressed = keys.includes("w"); 
+
+      if (this.isAboveGround()){
+         this.jumpLeft=this.maxJumps; 
+      }
+
+      if (jumpPressed&&!this.wasJumpPressed&&this.jumpLeft>0){
          this.speedY= -this.defaultJumpSpeed;
-         this.speedY-=this.gravity;
          this.posY+=this.speedY;
          this.state = PlayerMovementState.JUMP;
-         console.log(this.state);
+         this.jumpLeft--; 
+         console.log(this.state); 
       }
+      this.wasJumpPressed = jumpPressed;
+ 
    }
    /**
     * Apply gravity for the player to come down 
     */
+
    comeDown(){
       this.speedY += this.gravity;  
       this.posY += this.speedY;    
-
-      if(this.posY >= this.ground){
+      
+      if(this.isAboveGround()){
          this.posY = this.ground;
          this.speedY = 0;
          if(this.state !== PlayerMovementState.MOVE){
             this.state = PlayerMovementState.STATIC; 
-            //console.log(this.state);
          }
       }
    }
    /**
     * Update player's physics, input state and renders them to the canvas
     * Runs once per frame within the main draw loop
-    * 
+    * w
     * @param {*} p  - The p5.js instance 
     */
    update(p){

@@ -6,9 +6,9 @@ export const sketch = (p) => {
   let player;
 
   p.setup = () =>{
-    p.createCanvas(400, 400);
+    p.createCanvas(p.windowWidth, p.windowHeight);
     playerInput = new HandleInput(['w', 'a', 'd']);
-    player = new Player(p, p.height/2, playerInput);
+    player = new Player(p, p.windowHeight/2, playerInput);
   }
 
   p.draw = () => {
