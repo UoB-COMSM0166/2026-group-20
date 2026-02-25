@@ -80,7 +80,7 @@ export class Player{
       if(this.posY >= this.ground){
          this.posY = this.ground;
          this.speedY = 0;
-         if(this.state !== PlayerMovementState.Move){
+         if(this.state !== PlayerMovementState.MOVE){
             this.state = PlayerMovementState.STATIC; 
             //console.log(this.state);
          }
