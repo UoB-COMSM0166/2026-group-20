@@ -1,5 +1,5 @@
-import { GameConfig } from "../config/gameConfig.js";
-import { PlayerState } from "../config/playerState.js";
+import { GameConfig } from "../config/GameConfig.js";
+import { PlayerState } from "../config/PlayerState.js";
 
 export class RespawnController {
     constructor() {
