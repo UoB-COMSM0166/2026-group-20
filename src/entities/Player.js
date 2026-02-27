@@ -19,13 +19,13 @@ export class Player{
       //
       this.posX=0;
       this.posY=ground-this.side;
-      this.friction=0.85; // 1.0 is no friction
-      this.basedSpeedX=2; //width%speedX needs to be 0
+      this.friction=1; // 1.0 is no friction
+      this.basedSpeedX=5; //width%speedX needs to be 0
       this.speedY=0;
       this.speedX=this.basedSpeedX*this.friction; 
       this.gravity=0.6;
-      this.defaultJumpSpeed=8; 
-      this.maxJumps=3; 
+      this.defaultJumpSpeed=10; 
+      this.maxJumps=2; // double jump = 2, triple jump = 3 
       this.jumpLeft=this.maxJumps; 
       this.wasJumpPressed=false; 
       this.ground=ground;
