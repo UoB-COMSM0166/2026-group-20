@@ -1,158 +1,206 @@
-import { TILE, isSolid, isSpike } from "../utils/tiles.js";
-import { aabbIntersects } from "../utils/collision.js";
+import { GameConfig } from "../config/GameConfig.js";
+import { HandleInput } from "../systems/HandleInput.js";
+import { PlayerMovementState } from "../config/PlayerMovementState.js";
+import { PlayerState } from "../config/PlayerState.js";
+import { PlayerGameState } from '../config/PlayerGameState.js';
+import { DeathReason } from "../config/DeathReason.js";
+
+
+import { moveAndCollideX, moveAndCollideY, checkSpikeCollision } from "../systems/PhysicsSystem.js";
+
 
 export class Player {
-  constructor(p, x, y, idx) {
-    this.p = p;
-    this.idx = idx;
-    this.spawnX = x;
-    this.spawnY = y;
-    this.x = x; this.y = y;
-    this.w = 28; this.h = 34;
-    this.vx = 0; this.vy = 0;
-    this.onGround = false;
+    constructor(p, x, y, idx) {
+        this.p = p;
+        this.idx = idx;
+        this.spawnX = x;
+        this.spawnY = y;
+        this.x = x; this.y = y;
+        this.w = 28; this.h = 34;
+        this.vx = 0; this.vy = 0;
+        this.onGround = false;
 
-    this.speed = 3.2;
-    this.jumpVel = 10.5;
-    this.gravity = 0.7;
-    this.maxFall = 18;
-    this.skin = 0.01;
-  }
+        this.speed = GameConfig.PLAYERSPEED;
+        this.jumpVel = GameConfig.JUMP_VELOCITY;
+        this.gravity = GameConfig.GRAVITY;
+        this.maxFall = GameConfig.MAX_FALL_SPEED;
+        this.skin = GameConfig.SKIN_WIDTH;
 
-  respawn() {
-    this.x = this.spawnX; this.y = this.spawnY;
-    this.vx = 0; this.vy = 0;
-    this.onGround = false;
-  }
+        this.lifeState = PlayerState.ALIVE;
+        this.movementState = PlayerMovementState.IDLE;
+        this.gameState = PlayerGameState.PLAYING;
+        this.lastDeathReason = null;
 
-  handleInput() {
-    const p = this.p;
-    let left, right, jump;
-    if (this.idx === 0) {
-      left = p.keyIsDown(65); right = p.keyIsDown(68); jump = p.keyIsDown(87);
-    } else {
-      left = p.keyIsDown(p.LEFT_ARROW); right = p.keyIsDown(p.RIGHT_ARROW); jump = p.keyIsDown(p.UP_ARROW);
+        this.input = new HandleInput(p, idx);
+        this.state = PlayerMovementState.IDLE;
+        this.facingRight = true;
+
+        this.respawnCountdown = 0;
     }
-    this.vx = 0;
-    if (left)  this.vx -= this.speed;
-    if (right) this.vx += this.speed;
-    if (jump && this.onGround) {
-      this.vy = -this.jumpVel;
-      this.onGround = false;
-    }
-  }
 
-  getTileRange() {
-    return {
-      left:   this.p.floor(this.x / TILE),
-      right:  this.p.floor((this.x + this.w) / TILE),
-      top:    this.p.floor(this.y / TILE),
-      bottom: this.p.floor((this.y + this.h) / TILE),
-    };
-  }
+    /**
+     *
+     *
+     * @memberof Player
+     */
+    handleInput() {
+        this.vx = 0;
+        if (this.input.left) this.vx -= this.speed;
+        if (this.input.right) this.vx += this.speed;
 
-  update(allPlayers) {
-    this.handleInput();
-    this.vy += this.gravity;
-    if (this.vy > this.maxFall) this.vy = this.maxFall;
-
-    this.moveAndCollideX(this.vx, allPlayers);
-    this.moveAndCollideY(this.vy, allPlayers);
-
-    if (this.touchesSpike()) this.respawn();
-  }
-
-  collideTilesX(dx) {
-    const { left, right, top, bottom } = this.getTileRange();
-    const tx = dx > 0 ? right : left;
-    for (let ty = top; ty <= bottom; ty++) {
-      if (!isSolid(tx, ty)) continue;
-      const tileX = tx * TILE, tileY = ty * TILE;
-      if (aabbIntersects(this.x, this.y, this.w, this.h, tileX, tileY, TILE, TILE)) {
-        this.x = dx > 0 ? (tileX - this.w - this.skin) : (tileX + TILE + this.skin);
-      }
-    }
-  }
-
-  collideTilesY(dy) {
-    const { left, right, top, bottom } = this.getTileRange();
-    const ty = dy > 0 ? bottom : top;
-    for (let tx = left; tx <= right; tx++) {
-      if (!isSolid(tx, ty)) continue;
-      const tileX = tx * TILE, tileY = ty * TILE;
-      if (aabbIntersects(this.x, this.y, this.w, this.h, tileX, tileY, TILE, TILE)) {
-        if (dy > 0) {
-          this.y = tileY - this.h - this.skin;
-          this.vy = 0;
-          this.onGround = true;
-        } else {
-          this.y = tileY + TILE + this.skin;
-          this.vy = 0;
+        if (this.input.jump && this.onGround) {
+            this.vy = -this.jumpVel;
+            this.onGround = false;
         }
-      }
     }
-  }
 
-  collidePlayersX(dx, allPlayers) {
-    for (const other of allPlayers) {
-      if (other === this) continue;
-      if (!aabbIntersects(this.x, this.y, this.w, this.h, other.x, other.y, other.w, other.h)) continue;
-      if (dx > 0) this.x = other.x - this.w - this.skin;
-      else if (dx < 0) this.x = other.x + other.w + this.skin;
+    /**
+     *
+     *
+     * @param {*} allPlayers
+     * @param {*} respawnManager
+     * @return {*} 
+     * @memberof Player
+     */
+    update(allPlayers, respawnManager) {
+        if (this.lifeState !== PlayerState.ALIVE) {
+            return;
+        }
+
+        this.handleInput();
+
+        this.vy += this.gravity;
+        if (this.vy > this.maxFall) this.vy = this.maxFall;
+
+        moveAndCollideX(this, this.vx, allPlayers, this.p);
+        moveAndCollideY(this, this.vy, allPlayers, this.p);
+
+        if (checkSpikeCollision(this, this.p)) {
+            respawnManager.triggerDeath(this, DeathReason.TRAP);
+        }
+
+        this.updateMovementState();
     }
-  }
 
-  collidePlayersY(dy, allPlayers) {
-    for (const other of allPlayers) {
-      if (other === this) continue;
-      if (!aabbIntersects(this.x, this.y, this.w, this.h, other.x, other.y, other.w, other.h)) continue;
-      if (dy > 0) {
-        this.y = other.y - this.h - this.skin;
+    /**
+     *
+     *
+     * @memberof Player
+     */
+    updateMovementState() {
+        if (this.vx > 0) this.facingRight = true;
+        if (this.vx < 0) this.facingRight = false;
+
+        if (!this.onGround) {
+            this.movementState = this.vy < 0 ? PlayerMovementState.JUMP : PlayerMovementState.FALL;
+        } else {
+            this.movementState = this.vx === 0 ? PlayerMovementState.IDLE : PlayerMovementState.RUN;
+        }
+    }
+
+    /**
+     *
+     *
+     * @return {*} 
+     * @memberof Player
+     */
+    display() {
+        if (!this.isVisible) return;
+
+        const p = this.p;
+        p.noStroke();
+
+        let alpha = this.lifeState === PlayerState.RESPAWNING ? 120 : 255;
+
+        let playerColor;
+        if (this.idx === 0) {
+            playerColor = p.color(90, 170, 255, alpha);
+        } else {
+            playerColor = p.color(255, 200, 80, alpha);
+        }
+        p.fill(playerColor);
+
+        p.rect(this.x, this.y, this.w, this.h, 6);
+
+        if (this.onGround) {
+            p.fill(255, 255, 255, Math.min(alpha, 120));
+            p.rect(this.x + 4, this.y + this.h - 6, this.w - 8, 3, 2);
+        }
+
+        p.fill(255);
+        p.textAlign(p.CENTER, p.BOTTOM);
+        p.textSize(16);
+        p.textFont('Arial');
+
+        if (this.lifeState === PlayerState.RESPAWNING) {
+            p.fill(255, 100, 100);
+            p.text(Math.ceil(this.respawnCountdown) + "s", this.x + this.w / 2, this.y - 5);
+        } else {
+            p.text(this.movementState, this.x + this.w / 2, this.y - 5);
+        }
+    }
+
+    /**
+     *
+     *
+     * @param {*} reason
+     * @return {*} 
+     * @memberof Player
+     */
+    die(reason) {
+        if (this.lifeState === PlayerState.DEAD) return;
+        this.lifeState = PlayerState.DEAD;
+        this.lastDeathReason = reason;
+
+        this.vx = 0;
         this.vy = 0;
-        this.onGround = true;
-      } else if (dy < 0) {
-        this.y = other.y + other.h + this.skin;
-        this.vy = 0;
-      }
+
+        console.log(`Player ${this.idx} died due to: ${reason}`);
     }
-  }
 
-  moveAndCollideX(dx, allPlayers) {
-    if (dx === 0) return;
-    this.x += dx;
-    this.collideTilesX(dx);
-    this.collidePlayersX(dx, allPlayers);
-  }
-
-  moveAndCollideY(dy, allPlayers) {
-    this.onGround = false;
-    if (dy === 0) return;
-    this.y += dy;
-    this.collideTilesY(dy);
-    this.collidePlayersY(dy, allPlayers);
-  }
-
-  touchesSpike() {
-    const { left, right, top, bottom } = this.getTileRange();
-    for (let ty = top; ty <= bottom; ty++) {
-      for (let tx = left; tx <= right; tx++) {
-        if (!isSpike(tx, ty)) continue;
-        const tileX = tx * TILE, tileY = ty * TILE;
-        if (aabbIntersects(this.x, this.y, this.w, this.h, tileX, tileY, TILE, TILE)) return true;
-      }
+    /**
+     *
+     *
+     * @memberof Player
+     */
+    prepareRespawn() {
+        this.lifeState = PlayerState.RESPAWNING;
+        this.x = this.spawnX;
+        this.y = this.spawnY;
+        console.log(`Player ${this.idx} is preparing to respawn`);
     }
-    return false;
-  }
 
-  display() {
-    const p = this.p;
-    p.noStroke();
-    p.fill(this.idx === 0 ? p.color(90, 170, 255) : p.color(255, 200, 80));
-    p.rect(this.x, this.y, this.w, this.h, 6);
-
-    if (this.onGround) {
-      p.fill(255, 255, 255, 120);
-      p.rect(this.x + 4, this.y + this.h - 6, this.w - 8, 3, 2);
+    /**
+     *
+     *
+     * @memberof Player
+     */
+    finishRespawn() {
+        this.lifeState = PlayerState.ALIVE;
+        this.movementState = PlayerMovementState.IDLE;
+        console.log(`Player ${this.idx} has respawned completely`);
     }
-  }
+
+    /**
+     *
+     *
+     * @readonly
+     * @memberof Player
+     */
+    get isVisible() {
+        // Player is visible only when alive
+        return this.lifeState === PlayerState.ALIVE || this.lifeState === PlayerState.RESPAWNING;
+        // Player is invisible when dead 
+        // but could be transparent when respawning
+    }
+
+    /**
+     *
+     *
+     * @param {*} newState
+     * @memberof Player
+     */
+    setGameState(newState) {
+        this.gameState = newState;
+    }
 }
