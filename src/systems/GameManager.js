@@ -1,7 +1,7 @@
 import { GameConfig } from '../config/GameConfig.js';
 
 
-export default class GameManager {
+export class GameManager {
   constructor(players) {
     this.timeLimit = GameConfig.TIME_LIMIT;      
     this.timeLeft = GameConfig.TIME_LIMIT;      

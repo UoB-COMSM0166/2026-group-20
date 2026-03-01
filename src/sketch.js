@@ -2,6 +2,7 @@ import { Player } from './entities/Player.js';
 import { RespawnManager } from './systems/RespawnManager.js';
 import { PlayerState } from './config/PlayerState.js';
 import { GameConfig } from './config/GameConfig.js';
+import { GameManager } from './systems/GameManager.js';
 
 let gameManager;
 let allPlayers = [];

@@ -1,6 +1,6 @@
 import { PlayerState } from "../config/PlayerState.js";
-import { PlayerGameState } from '../config/PlayerGameState.js';
-import { DeathReason } from "./config/DeathReason.js";
+import { GameState } from '../config/PlayerGameState.js';
+import { DeathReason } from "../config/DeathReason.js";
 
 export class Player {
     constructor(startX, startY) {
@@ -8,7 +8,7 @@ export class Player {
         this.x = startX;
         this.y = startY;
         this.state = PlayerState.ALIVE;
-        this.gameState = PlayerGameState.PLAYING;
+        this.gameState = GameState.PLAYING;
         this.lastDeathReason = null;
     }
 
