@@ -33,9 +33,9 @@ export const sketch = (p) => {
 
   p.draw = () => {
     let size = myInput.value();
-    let red = 0;
-    let green = 0;
-    let blue = 0;
+    let red;
+    let green;
+    let blue;
     p.noStroke();
     if(flag) {
       red = backgroundColour;
@@ -49,7 +49,7 @@ export const sketch = (p) => {
     }
     p.fill(red, green, blue);
     if(p.mouseIsPressed && p.mouseY <= 500){
-        p.ellipse(p.pmouseX,p.pmouseY,size,size);
+        p.ellipse(p.pmouseX, p.pmouseY, size, size);
     }
   }
   p.eraser = function () {
