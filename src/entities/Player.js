@@ -15,9 +15,13 @@ export class Player {
         this.idx = idx;
         this.spawnX = x;
         this.spawnY = y;
-        this.x = x; this.y = y;
-        this.w = 28; this.h = 34;
-        this.vx = 0; this.vy = 0;
+        this.x = x; 
+        this.y = y;
+        this.w = 28; 
+        this.h = 34;
+
+        this.vx = 0; 
+        this.vy = 0;
         this.onGround = false;
 
         this.speed = GameConfig.PLAYERSPEED;
@@ -26,6 +30,11 @@ export class Player {
         this.maxFall = GameConfig.MAX_FALL_SPEED;
         this.skin = GameConfig.SKIN_WIDTH;
 
+        //Double jump 
+        this.maxJumps=2;
+        this.jumpsLeft=this.maxJumps;
+        this.secondJump=false;
+         //
         this.lifeState = PlayerState.ALIVE;
         this.movementState = PlayerMovementState.IDLE;
         this.gameState = PlayerGameState.PLAYING;
@@ -43,15 +52,26 @@ export class Player {
      *
      * @memberof Player
      */
-    handleInput() {
+    horizontalMovement() {
         this.vx = 0;
-        if (this.input.left) this.vx -= this.speed;
-        if (this.input.right) this.vx += this.speed;
+        if (this.input.left) {
+            this.vx -= this.speed;
+        }
+        if (this.input.right) {
+            this.vx += this.speed;
+        }
+    }
 
-        if (this.input.jump && this.onGround) {
+    jumpUp(){
+         if(this.onGround){
+            this.jumpsLeft=this.maxJumps;
+         }
+         if (this.input.jump  && !this.secondJump && this.jumpsLeft>0) {
             this.vy = -this.jumpVel;
+            this.jumpsLeft--;
             this.onGround = false;
         }
+        this.secondJump=this.input.jump;
     }
 
     /**
@@ -67,14 +87,11 @@ export class Player {
             return;
         }
 
-        this.handleInput();
-
-        this.vy += this.gravity;
-        if (this.vy > this.maxFall) this.vy = this.maxFall;
-
-        moveAndCollideX(this, this.vx, allPlayers, this.p);
-        moveAndCollideY(this, this.vy, allPlayers, this.p);
-
+        this.horizontalMovement();
+        this.jumpUp();
+        this.comeDown();
+        this.moveAndCollide(allPlayers);
+        
         if (checkSpikeCollision(this, this.p)) {
             respawnManager.triggerDeath(this, DeathReason.TRAP);
         }
@@ -82,14 +99,31 @@ export class Player {
         this.updateMovementState();
     }
 
+     comeDown(){
+        this.vy += this.gravity;
+        if (this.vy > this.maxFall) {
+            this.vy = this.maxFall;
+        }
+     }
+
+     //change name this is horrible
+     moveAndCollide(allPlayers){
+        moveAndCollideX(this, this.vx, allPlayers, this.p);
+        moveAndCollideY(this, this.vy, allPlayers, this.p);
+     }
+
     /**
      *
      *
      * @memberof Player
      */
     updateMovementState() {
-        if (this.vx > 0) this.facingRight = true;
-        if (this.vx < 0) this.facingRight = false;
+        if (this.vx > 0) {
+         this.facingRight = true;
+        }
+        if (this.vx < 0) {
+         this.facingRight = false;
+        }
 
         if (!this.onGround) {
             this.movementState = this.vy < 0 ? PlayerMovementState.JUMP : PlayerMovementState.FALL;
@@ -115,17 +149,20 @@ export class Player {
         let playerColor;
         if (this.idx === 0) {
             playerColor = p.color(90, 170, 255, alpha);
-        } else {
+        } 
+        else {
             playerColor = p.color(255, 200, 80, alpha);
         }
         p.fill(playerColor);
 
         p.rect(this.x, this.y, this.w, this.h, 6);
 
-        if (this.onGround) {
-            p.fill(255, 255, 255, Math.min(alpha, 120));
-            p.rect(this.x + 4, this.y + this.h - 6, this.w - 8, 3, 2);
-        }
+        //Literally why do we need this??????
+        //if (this.onGround) {
+            //p.fill(255, 255, 255, Math.min(alpha, 120));
+            
+            //p.rect(this.x + 4, this.y + this.h - 6, this.w - 8, 3, 2);
+        //}
 
         p.fill(255);
         p.textAlign(p.CENTER, p.BOTTOM);
@@ -135,7 +172,8 @@ export class Player {
         if (this.lifeState === PlayerState.RESPAWNING) {
             p.fill(255, 100, 100);
             p.text(Math.ceil(this.respawnCountdown) + "s", this.x + this.w / 2, this.y - 5);
-        } else {
+        } 
+        else {
             p.text(this.movementState, this.x + this.w / 2, this.y - 5);
         }
     }

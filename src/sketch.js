@@ -32,8 +32,8 @@ export const sketch = (p) => {
 
         respawnManager = new RespawnManager();
         players = [
-            new Player(p, 11 * TILE, 7 * TILE - 40, 0),
-            new Player(p, 13 * TILE, 7 * TILE - 40, 1),
+            new Player(p, 11 * TILE,( 7 * TILE) - 40, 0),
+            new Player(p, 13 * TILE, (7 * TILE) - 40, 1),
         ];
 
         gameManager = new GameManager(players);

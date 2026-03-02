@@ -10,10 +10,16 @@ export const MAP = [
   "..............S.........",
   ".....###................",
   "........................",
-  "########################",
+  "##########  ############",
 ];
 
 export function tileAt(tx, ty) {
+  if(ty===NaN){
+      ty=0;
+  }
+  if(tx===NaN){
+      tx=0;
+  }
   if (ty < 0 || ty >= MAP.length || tx < 0 || tx >= MAP[0].length) return "#";
   return MAP[ty][tx];
 }

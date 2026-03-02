@@ -1,16 +1,18 @@
-/**
- * Global game configuration settings
- *
- * @constant
- * @type {Object}
- *  
- */
-
 export const GameConfig ={
     GAME_WIDTH: 1920,
     GAME_HEIGHT: 1080,
 
-    // Start Screen 
+    RESPAWN_TIME: 2000, // 2 seconds
+    SPAWN_POSITION: {x: 100, y: 100},
+    TIME_LIMIT: 120, // 2 minutes
+
+    PLAYERSPEED: 3.2,
+    JUMP_VELOCITY: 12,
+    GRAVITY: 0.7,
+    MAX_FALL_SPEED: 18,
+    SKIN_WIDTH: 0.01,
+
+        // Start Screen 
     FONT: 'Monaco', 
     TITLE_FONTSIZE: 20, 
     TITLE_X: 310,
