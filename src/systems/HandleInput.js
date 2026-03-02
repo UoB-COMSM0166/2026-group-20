@@ -1,44 +1,21 @@
-
 export class HandleInput {
-   constructor(validKeys) {
-      this.validKeys = validKeys;
-      this.pressedKeys = [];
-   }
+    constructor(p, playerIndex) {
+        this.p = p;
+        this.idx = playerIndex;
+    }
 
-   handleKeyPressed(k) {
-      k = k.toLowerCase();
-      if (this.validKeys.includes(k) && !this.pressedKeys.includes(k)) {
-         this.pressedKeys.push(k);
-      }
-      
-   }
+    get left() {
+        if (this.idx === 0) return this.p.keyIsDown(65);
+        return this.p.keyIsDown(this.p.LEFT_ARROW);
+    }
 
-   handleKeyReleased(k) {
-      k = k.toLowerCase();
-      const index = this.pressedKeys.indexOf(k);
-      if (index !== -1) {
-         this.pressedKeys.splice(index, 1);
-      }
-   }
+    get right() {
+        if (this.idx === 0) return this.p.keyIsDown(68);
+        return this.p.keyIsDown(this.p.RIGHT_ARROW);
+    }
 
-   //getLastPressed() {
-   //   return this.pressedKeys[this.pressedKeys.length - 1];
-   //}
-  
-   getLast2Pressed() {
-      const len = this.pressedKeys.length;
-      if (len >= 2) {
-         return [this.pressedKeys[len - 2], this.pressedKeys[len - 1]];
-      } 
-      else if (len === 1) {
-         return [this.pressedKeys[0]];
-      } 
-      else {
-         return [];
-      }
-   }
-
+    get jump() {
+        if (this.idx === 0) return this.p.keyIsDown(87);
+        return this.p.keyIsDown(this.p.UP_ARROW);
+    }
 }
-
-
-

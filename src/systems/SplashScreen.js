@@ -1,5 +1,5 @@
-import { RectButton } from "../utilities/RectButton.js"
-import { GameConfig } from '../config/gameConfig.js';
+import { RectButton } from "../utils/RectButton.js"
+import { GameConfig } from '../config/GameConfig.js';
 
 /**
  * @description splash screen display 
@@ -32,8 +32,10 @@ export class SplashScreen{
     * @description renders splash screen 
     *
     * @param {p5} p - The p5 instance 
+    * @param {number} mx - Mouse X position
+    * @param {number} my - Mouse Y position
     */
-    render(p){
+    render(p, mx, my) {
         // placeholder title 
         p.textAlign(p.LEFT, p.BASELINE);
         p.textFont(GameConfig.FONT, GameConfig.TITLE_FONTSIZE);
@@ -50,11 +52,11 @@ export class SplashScreen{
         p.cursor(p.ARROW); // default cursor
 
         // placeholder option buttons
-        this.button1.drawButton(p);
-        this.button2.drawButton(p);
+        this.button1.drawButton(p, mx, my);
+        this.button2.drawButton(p, mx, my);
     
-        this.button1.updateCursor();
-        this.button2.updateCursor();
+        this.button1.updateCursor(mx, my);
+        this.button2.updateCursor(mx, my);
     }
 }
 
