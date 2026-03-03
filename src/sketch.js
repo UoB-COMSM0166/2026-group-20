@@ -2,6 +2,7 @@ export const sketch = (p) => {
     let flag = false;
     let backgroundColour = 225;
     let myInput, slider1, slider2, slider3;
+    let a;
     p.setup = () => {
         p.createCanvas(700, 500);
         p.background(backgroundColour);
