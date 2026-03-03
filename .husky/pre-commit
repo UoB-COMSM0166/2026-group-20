@@ -1,0 +1,7 @@
+# Runs below scripts on git-hooks -> https://git-scm.com/docs/githooks
+# To disable, set HUSKY=0 in your environment variables
+# before running any git-hook supported commands
+
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
+prettier $FILES --write --ignore-unknown
+git update-index --again
