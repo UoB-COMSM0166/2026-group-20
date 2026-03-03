@@ -1,5 +1,5 @@
 import { Player } from "./entities/Player.js";
-import { MAP, TILE } from "./utils/tiles.js";
+//import { MAP, TILE } from "./utils/tiles.js";
 import { RespawnManager } from "./systems/RespawnManager.js";
 import { GameStage } from "./config/GameStage.js";
 import { MapMenu } from "./systems/MapMenu.js";
@@ -7,6 +7,9 @@ import { SplashScreen } from "./systems/SplashScreen.js";
 
 import { GameManager } from "./systems/GameManager.js"; 
 import { PlayerGameState } from "./config/PlayerGameState.js"; 
+
+import { drawMap, MAP } from "./systems/MapGeneration.js";
+import { GameConfig } from './config/GameConfig.js';
 
 export const sketch = (p) => {
     let players = [];
@@ -27,13 +30,14 @@ export const sketch = (p) => {
     p.setup = function () {
         p.createCanvas(p.windowWidth, p.windowHeight);
 
-        gameWidth = MAP[0].length * TILE;
-        gameHeight = MAP.length * TILE;
+        gameWidth = MAP[0].length * GameConfig.TILE;
+        gameHeight = MAP.length * GameConfig.TILE;
 
         respawnManager = new RespawnManager();
+        //mapGeneration= new MapGeneration();
         players = [
-            new Player(p, 11 * TILE,( 7 * TILE) - 40, 0),
-            new Player(p, 13 * TILE, (7 * TILE) - 40, 1),
+            new Player(p, 11 * GameConfig.TILE,( 7 * GameConfig.TILE) - 40, 0),
+            new Player(p, 13 * GameConfig.TILE, (7 * GameConfig.TILE) - 40, 1),
         ];
 
         gameManager = new GameManager(players);
@@ -87,7 +91,7 @@ export const sketch = (p) => {
 
     function playMap1Loop(p) {
         p.background(25);
-        drawMap();
+        drawMap(p);
 
         let deltaTime = p.deltaTime || 16.6;
         respawnManager.update(deltaTime);
@@ -99,8 +103,8 @@ export const sketch = (p) => {
                 if (player.gameState !== PlayerGameState.SUCCESS) {
                     player.update(players, respawnManager);
 
-                    let tx = p.floor((player.x + player.w / 2) / TILE);
-                    let ty = p.floor((player.y + player.h / 2) / TILE);
+                    let tx = p.floor((player.x + player.w / 2) / GameConfig.TILE);
+                    let ty = p.floor((player.y + player.h / 2) / GameConfig.TILE);
 
                     if (MAP[ty] && MAP[ty][tx] === "F") {
                         gameManager.onPlayerReachFinish(player);
@@ -130,7 +134,7 @@ export const sketch = (p) => {
             p.textSize(24);
             if (gameManager.rankings.length > 0) {
                 let winner = gameManager.rankings[0];
-                p.text(`Winner: Player ${winner.idx + 1} !`, gameWidth / 2, gameHeight / 2 + 10);
+                p.text(`Winner: Player ${winner.playerNo + 1} !`, gameWidth / 2, gameHeight / 2 + 10);
             } else {
                 p.text("Time's Up! Everyone Failed.", gameWidth / 2, gameHeight / 2 + 10);
             }
@@ -193,27 +197,28 @@ export const sketch = (p) => {
         }
     }
 
-    function drawMap() {
-        p.noStroke();
-        for (let y = 0; y < MAP.length; y++) {
-            for (let x = 0; x < MAP[0].length; x++) {
-                const c = MAP[y][x];
-                if (c === "#") {
-                    p.fill(80);
-                    p.rect(x * TILE, y * TILE, TILE, TILE);
-                } else if (c === "S") {
-                    p.fill(220, 80, 80);
-                    const px = x * TILE, py = y * TILE;
-                    p.triangle(px, py + TILE, px + TILE / 2, py + 6, px + TILE, py + TILE);
-                } else if (c === "F") {
-                    p.fill(100, 220, 100);
-                    p.rect(x * TILE, y * TILE, TILE, TILE);
-                    p.fill(255);
-                    p.textAlign(p.CENTER, p.CENTER);
-                    p.textSize(12);
-                    p.text("GOAL", x * TILE + TILE/2, y * TILE + TILE/2);
-                }
-            }
-        }
-    }
+
+   //  function drawMap() {
+   //      p.noStroke();
+   //      for (let y = 0; y < MAP.length; y++) {
+   //          for (let x = 0; x < MAP[0].length; x++) {
+   //              const c = MAP[y][x];
+   //              if (c === "#") {
+   //                  p.fill(80);
+   //                  p.rect(x * TILE, y * TILE, TILE, TILE);
+   //              } else if (c === "S") {
+   //                  p.fill(220, 80, 80);
+   //                  const px = x * TILE, py = y * TILE;
+   //                  p.triangle(px, py + TILE, px + TILE / 2, py + 6, px + TILE, py + TILE);
+   //              } else if (c === "F") {
+   //                  p.fill(100, 220, 100);
+   //                  p.rect(x * TILE, y * TILE, TILE, TILE);
+   //                  p.fill(255);
+   //                  p.textAlign(p.CENTER, p.CENTER);
+   //                  p.textSize(12);
+   //                  p.text("GOAL", x * TILE + TILE/2, y * TILE + TILE/2);
+   //              }
+   //          }
+   //      }
+   //  }
 };

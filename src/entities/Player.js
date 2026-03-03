@@ -10,9 +10,9 @@ import { moveAndCollideX, moveAndCollideY, checkSpikeCollision } from "../system
 
 
 export class Player {
-    constructor(p, x, y, idx) {
+    constructor(p, x, y, playerNo) {
         this.p = p;
-        this.idx = idx;
+        this.playerNo = playerNo;
         this.spawnX = x;
         this.spawnY = y;
         this.x = x; 
@@ -40,7 +40,7 @@ export class Player {
         this.gameState = PlayerGameState.PLAYING;
         this.lastDeathReason = null;
 
-        this.input = new HandleInput(p, idx);
+        this.input = new HandleInput(p, playerNo);
         this.state = PlayerMovementState.IDLE;
         this.facingRight = true;
 
@@ -106,7 +106,8 @@ export class Player {
         }
      }
 
-     //change name this is horrible
+     //change name this is horrible 
+     //move to sparate file; handle collisions and the world
      moveAndCollide(allPlayers){
         moveAndCollideX(this, this.vx, allPlayers, this.p);
         moveAndCollideY(this, this.vy, allPlayers, this.p);
@@ -135,19 +136,27 @@ export class Player {
     /**
      *
      *
-     * @return {*} 
+     * @return {*} //???
      * @memberof Player
      */
     display() {
-        if (!this.isVisible) return;
+        if (!this.isVisible) {
+            return;
+        }
 
         const p = this.p;
         p.noStroke();
-
-        let alpha = this.lifeState === PlayerState.RESPAWNING ? 120 : 255;
+        let alpha;
+        //let alpha = this.lifeState === PlayerState.RESPAWNING ? 120 : 255;
+        if(PlayerState.RESPAWNING===this.lifeState){
+            alpha=120;
+        }
+        else{
+            alpha=255;
+        }
 
         let playerColor;
-        if (this.idx === 0) {
+        if (this.playerNo === 0) {
             playerColor = p.color(90, 170, 255, alpha);
         } 
         else {
@@ -193,7 +202,7 @@ export class Player {
         this.vx = 0;
         this.vy = 0;
 
-        console.log(`Player ${this.idx} died due to: ${reason}`);
+        console.log(`Player ${this.playerNo} died due to: ${reason}`);
     }
 
     /**
@@ -205,7 +214,7 @@ export class Player {
         this.lifeState = PlayerState.RESPAWNING;
         this.x = this.spawnX;
         this.y = this.spawnY;
-        console.log(`Player ${this.idx} is preparing to respawn`);
+        console.log(`Player ${this.playerNo} is preparing to respawn`);
     }
 
     /**
@@ -213,11 +222,13 @@ export class Player {
      *
      * @memberof Player
      */
-    finishRespawn() {
+    //Needs to be moved to a separate class 
+     finishRespawn() {
         this.lifeState = PlayerState.ALIVE;
         this.movementState = PlayerMovementState.IDLE;
-        console.log(`Player ${this.idx} has respawned completely`);
+        console.log(`Player ${this.playerNo} has respawned completely`);
     }
+    
 
     /**
      *
