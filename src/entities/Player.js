@@ -6,6 +6,7 @@ import { PlayerGameState } from '../config/PlayerGameState.js';
 import { DeathReason } from "../config/DeathReason.js";
 
 
+
 import { moveAndCollideX, moveAndCollideY, checkSpikeCollision } from "../systems/PhysicsSystem.js";
 
 
@@ -66,7 +67,8 @@ export class Player {
          if(this.onGround){
             this.jumpsLeft=this.maxJumps;
          }
-         if (this.input.jump  && !this.secondJump && this.jumpsLeft>0) {
+         if (this.input.jump  && !this.secondJump
+             && this.jumpsLeft>0) {
             this.vy = -this.jumpVel;
             this.jumpsLeft--;
             this.onGround = false;
@@ -82,6 +84,8 @@ export class Player {
      * @return {*} 
      * @memberof Player
      */
+
+    //move
     update(allPlayers, respawnManager) {
         if (this.lifeState !== PlayerState.ALIVE) {
             return;
@@ -108,6 +112,7 @@ export class Player {
 
      //change name this is horrible 
      //move to sparate file; handle collisions and the world
+     //move
      moveAndCollide(allPlayers){
         moveAndCollideX(this, this.vx, allPlayers, this.p);
         moveAndCollideY(this, this.vy, allPlayers, this.p);
@@ -139,53 +144,43 @@ export class Player {
      * @return {*} //???
      * @memberof Player
      */
-    display() {
-        if (!this.isVisible) {
-            return;
-        }
 
-        const p = this.p;
-        p.noStroke();
-        let alpha;
-        //let alpha = this.lifeState === PlayerState.RESPAWNING ? 120 : 255;
-        if(PlayerState.RESPAWNING===this.lifeState){
-            alpha=120;
-        }
-        else{
-            alpha=255;
-        }
+   //  display() {
+   //      if (!this.isVisible) {
+   //          return;
+   //      }
+   //      const p = this.p;
+   //      p.noStroke();
+   //      let alpha;
+   //      if(PlayerState.RESPAWNING===this.lifeState){
+   //          alpha=120;
+   //      }
+   //      else{
+   //          alpha=255;
+   //      }
 
-        let playerColor;
-        if (this.playerNo === 0) {
-            playerColor = p.color(90, 170, 255, alpha);
-        } 
-        else {
-            playerColor = p.color(255, 200, 80, alpha);
-        }
-        p.fill(playerColor);
+   //      let playerColor;
+   //      if (this.playerNo === 0) {
+   //          playerColor = p.color(90, 170, 255, alpha);
+   //      } 
+   //      else {
+   //          playerColor = p.color(255, 200, 80, alpha);
+   //      }
+   //      p.fill(playerColor);
+   //      p.rect(this.x, this.y, this.w, this.h, 6);
+   //      p.fill(255);
+   //      p.textAlign(p.CENTER, p.BOTTOM);
+   //      p.textSize(16);
+   //      p.textFont('Arial');
 
-        p.rect(this.x, this.y, this.w, this.h, 6);
-
-        //Literally why do we need this??????
-        //if (this.onGround) {
-            //p.fill(255, 255, 255, Math.min(alpha, 120));
-            
-            //p.rect(this.x + 4, this.y + this.h - 6, this.w - 8, 3, 2);
-        //}
-
-        p.fill(255);
-        p.textAlign(p.CENTER, p.BOTTOM);
-        p.textSize(16);
-        p.textFont('Arial');
-
-        if (this.lifeState === PlayerState.RESPAWNING) {
-            p.fill(255, 100, 100);
-            p.text(Math.ceil(this.respawnCountdown) + "s", this.x + this.w / 2, this.y - 5);
-        } 
-        else {
-            p.text(this.movementState, this.x + this.w / 2, this.y - 5);
-        }
-    }
+   //      if (this.lifeState === PlayerState.RESPAWNING) {
+   //          p.fill(255, 100, 100);
+   //          p.text(Math.ceil(this.respawnCountdown) + "s", this.x + this.w / 2, this.y - 5);
+   //      } 
+   //      else {
+   //          p.text(this.movementState, this.x + this.w / 2, this.y - 5);
+   //      }
+   //  }
 
     /**
      *
@@ -195,7 +190,9 @@ export class Player {
      * @memberof Player
      */
     die(reason) {
-        if (this.lifeState === PlayerState.DEAD) return;
+        if (this.lifeState === PlayerState.DEAD) {
+            return;
+        }
         this.lifeState = PlayerState.DEAD;
         this.lastDeathReason = reason;
 

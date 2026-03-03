@@ -2,7 +2,7 @@ import { GameConfig } from '../config/GameConfig.js';
 import { PlayerGameState } from '../config/PlayerGameState.js';
 
 
-export class GameManager {
+export class TimeManager {
     constructor(players) {
         this.timeLimit = GameConfig.TIME_LIMIT;
         this.timeLeft = GameConfig.TIME_LIMIT;
@@ -16,7 +16,7 @@ export class GameManager {
      *
      * @param {*} deltaTime
      * @return {*} 
-     * @memberof GameManager
+     * @memberof TimeManager
      */
     update(deltaTime) {
         if (this.isGameOver) return;
@@ -34,7 +34,7 @@ export class GameManager {
      *
      * @param {*} player
      * @return {*} 
-     * @memberof GameManager
+     * @memberof TimeManager
      */
     onPlayerReachFinish(player) {
         if (this.isGameOver || player.gameState !== PlayerGameState.PLAYING) return;

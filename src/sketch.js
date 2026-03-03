@@ -5,16 +5,17 @@ import { GameStage } from "./config/GameStage.js";
 import { MapMenu } from "./systems/MapMenu.js";
 import { SplashScreen } from "./systems/SplashScreen.js";
 
-import { GameManager } from "./systems/GameManager.js"; 
+import { TimeManager } from "./systems/TimeManager.js"; 
 import { PlayerGameState } from "./config/PlayerGameState.js"; 
 
 import { drawMap, MAP } from "./systems/MapGeneration.js";
 import { GameConfig } from './config/GameConfig.js';
+import { DrawPlayer } from "./utils/DrawPlayer.js";
 
 export const sketch = (p) => {
     let players = [];
     let respawnManager;
-    let gameManager;
+    let timeManager;
     
     let gameWidth;
     let gameHeight;
@@ -40,9 +41,9 @@ export const sketch = (p) => {
             new Player(p, 13 * GameConfig.TILE, (7 * GameConfig.TILE) - 40, 1),
         ];
 
-        gameManager = new GameManager(players);
+        timeManager = new TimeManager(players);
 
-        gameManager.reset(); 
+        timeManager.reset(); 
 
         stage = GameStage.MENU;
         splashScreen = new SplashScreen(p, gameWidth, gameHeight);
@@ -96,9 +97,9 @@ export const sketch = (p) => {
         let deltaTime = p.deltaTime || 16.6;
         respawnManager.update(deltaTime);
 
-        gameManager.update(deltaTime);
+        timeManager.update(deltaTime);
 
-        if (!gameManager.isGameOver) {
+        if (!timeManager.isGameOver) {
             for (const player of players) {
                 if (player.gameState !== PlayerGameState.SUCCESS) {
                     player.update(players, respawnManager);
@@ -107,22 +108,22 @@ export const sketch = (p) => {
                     let ty = p.floor((player.y + player.h / 2) / GameConfig.TILE);
 
                     if (MAP[ty] && MAP[ty][tx] === "F") {
-                        gameManager.onPlayerReachFinish(player);
+                        timeManager.onPlayerReachFinish(player);
                     }
                 }
             }
         }
 
         for (const player of players) {
-            player.display();
+            DrawPlayer(player);
         }
 
         p.fill(255);
         p.textSize(24);
         p.textAlign(p.CENTER, p.TOP);
-        p.text(`Time: ${Math.ceil(gameManager.timeLeft)}s`, gameWidth / 2, 20);
+        p.text(`Time: ${Math.ceil(timeManager.timeLeft)}s`, gameWidth / 2, 20);
 
-        if (gameManager.isGameOver) {
+        if (timeManager.isGameOver) {
             p.fill(0, 0, 0, 150); 
             p.rect(0, 0, gameWidth, gameHeight);
             
@@ -132,8 +133,8 @@ export const sketch = (p) => {
             p.text("GAME OVER", gameWidth / 2, gameHeight / 2 - 50);
 
             p.textSize(24);
-            if (gameManager.rankings.length > 0) {
-                let winner = gameManager.rankings[0];
+            if (timeManager.rankings.length > 0) {
+                let winner = timeManager.rankings[0];
                 p.text(`Winner: Player ${winner.playerNo + 1} !`, gameWidth / 2, gameHeight / 2 + 10);
             } else {
                 p.text("Time's Up! Everyone Failed.", gameWidth / 2, gameHeight / 2 + 10);
@@ -186,8 +187,8 @@ export const sketch = (p) => {
     function resetGame() {
         respawnManager.clear();
         
-        if (gameManager) {
-            gameManager.reset();
+        if (timeManager) {
+            timeManager.reset();
         }
 
         for (const player of players) {
