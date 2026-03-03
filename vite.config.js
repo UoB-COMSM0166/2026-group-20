@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 
 export default defineConfig({
     // Project root directory
@@ -7,5 +7,5 @@ export default defineConfig({
     base: '/',
     build: {
         outDir: 'dist',
-    }
-})
+    },
+});

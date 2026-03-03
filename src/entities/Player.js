@@ -1,13 +1,15 @@
-import { GameConfig } from "../config/GameConfig.js";
-import { HandleInput } from "../systems/HandleInput.js";
-import { PlayerMovementState } from "../config/PlayerMovementState.js";
-import { PlayerState } from "../config/PlayerState.js";
+import { GameConfig } from '../config/GameConfig.js';
+import { HandleInput } from '../systems/HandleInput.js';
+import { PlayerMovementState } from '../config/PlayerMovementState.js';
+import { PlayerState } from '../config/PlayerState.js';
 import { PlayerGameState } from '../config/PlayerGameState.js';
-import { DeathReason } from "../config/DeathReason.js";
+import { DeathReason } from '../config/DeathReason.js';
 
-
-import { moveAndCollideX, moveAndCollideY, checkSpikeCollision } from "../systems/PhysicsSystem.js";
-
+import {
+    moveAndCollideX,
+    moveAndCollideY,
+    checkSpikeCollision,
+} from '../systems/PhysicsSystem.js';
 
 export class Player {
     constructor(p, x, y, idx) {
@@ -15,9 +17,12 @@ export class Player {
         this.idx = idx;
         this.spawnX = x;
         this.spawnY = y;
-        this.x = x; this.y = y;
-        this.w = 28; this.h = 34;
-        this.vx = 0; this.vy = 0;
+        this.x = x;
+        this.y = y;
+        this.w = 28;
+        this.h = 34;
+        this.vx = 0;
+        this.vy = 0;
         this.onGround = false;
 
         this.speed = GameConfig.PLAYERSPEED;
@@ -59,7 +64,7 @@ export class Player {
      *
      * @param {*} allPlayers
      * @param {*} respawnManager
-     * @return {*} 
+     * @return {*}
      * @memberof Player
      */
     update(allPlayers, respawnManager) {
@@ -92,16 +97,22 @@ export class Player {
         if (this.vx < 0) this.facingRight = false;
 
         if (!this.onGround) {
-            this.movementState = this.vy < 0 ? PlayerMovementState.JUMP : PlayerMovementState.FALL;
+            this.movementState =
+                this.vy < 0
+                    ? PlayerMovementState.JUMP
+                    : PlayerMovementState.FALL;
         } else {
-            this.movementState = this.vx === 0 ? PlayerMovementState.IDLE : PlayerMovementState.RUN;
+            this.movementState =
+                this.vx === 0
+                    ? PlayerMovementState.IDLE
+                    : PlayerMovementState.RUN;
         }
     }
 
     /**
      *
      *
-     * @return {*} 
+     * @return {*}
      * @memberof Player
      */
     display() {
@@ -134,7 +145,11 @@ export class Player {
 
         if (this.lifeState === PlayerState.RESPAWNING) {
             p.fill(255, 100, 100);
-            p.text(Math.ceil(this.respawnCountdown) + "s", this.x + this.w / 2, this.y - 5);
+            p.text(
+                Math.ceil(this.respawnCountdown) + 's',
+                this.x + this.w / 2,
+                this.y - 5,
+            );
         } else {
             p.text(this.movementState, this.x + this.w / 2, this.y - 5);
         }
@@ -144,7 +159,7 @@ export class Player {
      *
      *
      * @param {*} reason
-     * @return {*} 
+     * @return {*}
      * @memberof Player
      */
     die(reason) {
@@ -189,8 +204,11 @@ export class Player {
      */
     get isVisible() {
         // Player is visible only when alive
-        return this.lifeState === PlayerState.ALIVE || this.lifeState === PlayerState.RESPAWNING;
-        // Player is invisible when dead 
+        return (
+            this.lifeState === PlayerState.ALIVE ||
+            this.lifeState === PlayerState.RESPAWNING
+        );
+        // Player is invisible when dead
         // but could be transparent when respawning
     }
 
