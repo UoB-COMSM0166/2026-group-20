@@ -38,6 +38,8 @@ git update-index --again
 # For multiple flags, "--quiet --max-warnings"
 # To remove ESLINT_FLAGS, run 'unset ESLINT_FLAGS'
 
+set +e
+
 printf "${CYAN}Stage 2: Linting using ESlint${NC}\n" > /dev/tty
 OUTPUT=$(npx eslint $ESLINT_FLAGS --color src/**/*.js)
 printf "$OUTPUT\n" > /dev/tty
@@ -54,8 +56,10 @@ if [[ -n $OUTPUT ]] && grep -sq -e "--fix" <<< "$OUTPUT"; then
     fi
 fi
 
+set -e
+
 # Stage-3 (Testing)
-printf "\n${CYAN}Stage 3: Testing using Vitest${NC}\n" > /dev/tty
+printf "${CYAN}Stage 3: Testing using Vitest${NC}" > /dev/tty
 npm test
 
 # Stage-4 (Building)
