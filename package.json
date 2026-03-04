@@ -5,8 +5,9 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "prettier": "prettier --write ./*.js src/**/*.js tests/**/.js",
+        "prettier": "prettier --write ./*.js src/**/*.js tests/**/*.js",
         "lint": "eslint src/**/*.js",
+        "lint-dry-run": "eslint --fix-dry-run src/**/*.js",
         "test": "vitest run",
         "build": "vite build",
         "run-all": "npm run prettier && npm run lint && npm run test && npm run build",
