@@ -1,7 +1,8 @@
 import { GameConfig } from '../config/GameConfig.js';
 import { PlayerGameState } from '../config/PlayerGameState.js';
 
-export class GameManager {
+
+export class TimeManager {
     constructor(players) {
         this.timeLimit = GameConfig.TIME_LIMIT;
         this.timeLeft = GameConfig.TIME_LIMIT;
@@ -14,8 +15,8 @@ export class GameManager {
      *
      *
      * @param {*} deltaTime
-     * @return {*}
-     * @memberof GameManager
+     * @return {*} 
+     * @memberof TimeManager
      */
     update(deltaTime) {
         if (this.isGameOver) return;
@@ -32,12 +33,11 @@ export class GameManager {
      *
      *
      * @param {*} player
-     * @return {*}
-     * @memberof GameManager
+     * @return {*} 
+     * @memberof TimeManager
      */
     onPlayerReachFinish(player) {
-        if (this.isGameOver || player.gameState !== PlayerGameState.PLAYING)
-            return;
+        if (this.isGameOver || player.gameState !== PlayerGameState.PLAYING) return;
 
         player.setGameState(PlayerGameState.SUCCESS);
         this.rankings.push(player);
@@ -47,15 +47,16 @@ export class GameManager {
 
         if (currentRank === this.players.length) {
             this.isGameOver = true;
-            console.log('All players have finished! Game over.');
+            console.log("All players have finished! Game over.");
         }
+
     }
 
     handleTimeUp() {
         this.isGameOver = true;
         console.log("Time's up! Game over.");
 
-        this.players.forEach((player) => {
+        this.players.forEach(player => {
             if (!player.hasFinished) {
                 player.setGameState(PlayerGameState.FAILED);
             }
