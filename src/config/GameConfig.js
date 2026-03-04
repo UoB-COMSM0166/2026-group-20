@@ -51,5 +51,8 @@ export const GameConfig ={
 
     MAP_RETURN_X: 50, 
     MAP_RETURN_Y: 50, 
-    MAP_RETURN_R: 30
+    MAP_RETURN_R: 30, 
+
+    // tile
+    TILE: 40
 }
