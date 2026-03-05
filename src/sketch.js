@@ -1,22 +1,22 @@
-import { Player } from "./entities/Player.js";
+import { Player } from './entities/Player.js';
 //import { MAP, TILE } from "./utils/tiles.js";
-import { RespawnManager } from "./systems/RespawnManager.js";
-import { GameStage } from "./config/GameStage.js";
-import { MapMenu } from "./systems/MapMenu.js";
-import { SplashScreen } from "./systems/SplashScreen.js";
+import { RespawnManager } from './systems/RespawnManager.js';
+import { GameStage } from './config/GameStage.js';
+import { MapMenu } from './ui/MapMenu.js';
+import { SplashScreen } from './ui/SplashScreen.js';
 
-import { TimeManager } from "./systems/TimeManager.js"; 
-import { PlayerGameState } from "./config/PlayerGameState.js"; 
+import { TimeManager } from './systems/TimeManager.js';
+import { PlayerGameState } from './config/PlayerGameState.js';
 
-import { drawMap, MAP } from "./systems/MapGeneration.js";
+import { drawMap, MAP } from './maps/MapLoader.js';
 import { GameConfig } from './config/GameConfig.js';
-import { DrawPlayer } from "./utils/DrawPlayer.js";
+import { DrawPlayer } from './utils/DrawPlayer.js';
 
 export const sketch = (p) => {
     let players = [];
     let respawnManager;
     let timeManager;
-    
+
     let gameWidth;
     let gameHeight;
 
@@ -37,13 +37,13 @@ export const sketch = (p) => {
         respawnManager = new RespawnManager();
         //mapGeneration= new MapGeneration();
         players = [
-            new Player(p, 11 * GameConfig.TILE,( 7 * GameConfig.TILE) - 40, 0),
-            new Player(p, 13 * GameConfig.TILE, (7 * GameConfig.TILE) - 40, 1),
+            new Player(p, 11 * GameConfig.TILE, 7 * GameConfig.TILE - 40, 0),
+            new Player(p, 13 * GameConfig.TILE, 7 * GameConfig.TILE - 40, 1),
         ];
 
         timeManager = new TimeManager(players);
 
-        timeManager.reset(); 
+        timeManager.reset();
 
         stage = GameStage.MENU;
         splashScreen = new SplashScreen(p, gameWidth, gameHeight);
@@ -68,23 +68,24 @@ export const sketch = (p) => {
         if (stage === GameStage.MENU) {
             p.background(30);
             splashScreen.render(p, realMouseX, realMouseY);
-        }
-        else if (stage === GameStage.MAPMENU) {
+        } else if (stage === GameStage.MAPMENU) {
             p.background(40);
             if (!mapMenu) mapMenu = new MapMenu(p, gameWidth, gameHeight);
             mapMenu.render(p, realMouseX, realMouseY);
-        }
-        else if (stage === GameStage.MAP1) {
+        } else if (stage === GameStage.MAP1) {
             playMap1Loop(p);
-        }
-        else if (stage === GameStage.MAP2) {
+        } else if (stage === GameStage.MAP2) {
             p.background(50);
             p.fill(255);
             p.textAlign(p.CENTER, p.CENTER);
             p.textSize(24);
-            p.text("Map 2 is coming soon...", gameWidth / 2, gameHeight / 2);
+            p.text('Map 2 is coming soon...', gameWidth / 2, gameHeight / 2);
             p.textSize(14);
-            p.text("Press ESC to return to Map Menu", gameWidth / 2, gameHeight / 2 + 40);
+            p.text(
+                'Press ESC to return to Map Menu',
+                gameWidth / 2,
+                gameHeight / 2 + 40,
+            );
         }
 
         p.pop();
@@ -104,10 +105,14 @@ export const sketch = (p) => {
                 if (player.gameState !== PlayerGameState.SUCCESS) {
                     player.update(players, respawnManager);
 
-                    let tx = p.floor((player.x + player.w / 2) / GameConfig.TILE);
-                    let ty = p.floor((player.y + player.h / 2) / GameConfig.TILE);
+                    let tx = p.floor(
+                        (player.x + player.w / 2) / GameConfig.TILE,
+                    );
+                    let ty = p.floor(
+                        (player.y + player.h / 2) / GameConfig.TILE,
+                    );
 
-                    if (MAP[ty] && MAP[ty][tx] === "F") {
+                    if (MAP[ty] && MAP[ty][tx] === 'F') {
                         timeManager.onPlayerReachFinish(player);
                     }
                 }
@@ -124,27 +129,39 @@ export const sketch = (p) => {
         p.text(`Time: ${Math.ceil(timeManager.timeLeft)}s`, gameWidth / 2, 20);
 
         if (timeManager.isGameOver) {
-            p.fill(0, 0, 0, 150); 
+            p.fill(0, 0, 0, 150);
             p.rect(0, 0, gameWidth, gameHeight);
-            
+
             p.fill(255);
             p.textAlign(p.CENTER, p.CENTER);
             p.textSize(48);
-            p.text("GAME OVER", gameWidth / 2, gameHeight / 2 - 50);
+            p.text('GAME OVER', gameWidth / 2, gameHeight / 2 - 50);
 
             p.textSize(24);
             if (timeManager.rankings.length > 0) {
                 let winner = timeManager.rankings[0];
-                p.text(`Winner: Player ${winner.playerNo + 1} !`, gameWidth / 2, gameHeight / 2 + 10);
+                p.text(
+                    `Winner: Player ${winner.playerNo + 1} !`,
+                    gameWidth / 2,
+                    gameHeight / 2 + 10,
+                );
             } else {
-                p.text("Time's Up! Everyone Failed.", gameWidth / 2, gameHeight / 2 + 10);
+                p.text(
+                    "Time's Up! Everyone Failed.",
+                    gameWidth / 2,
+                    gameHeight / 2 + 10,
+                );
             }
         }
 
         p.fill(255);
         p.textSize(14);
         p.textAlign(p.LEFT, p.BOTTOM);
-        p.text("P1: A/D + W   P2: ←/→ + ↑   (Press ESC to Return)", 10, gameHeight - 10);
+        p.text(
+            'P1: A/D + W   P2: ←/→ + ↑   (Press ESC to Return)',
+            10,
+            gameHeight - 10,
+        );
     }
 
     p.mousePressed = function () {
@@ -152,30 +169,32 @@ export const sketch = (p) => {
         let realMouseY = (p.mouseY - offsetY) / scaleFactor;
 
         if (stage === GameStage.MENU) {
-            if (splashScreen.button1 && splashScreen.button1.isHovered(realMouseX, realMouseY)) {
-                console.log("Splash Button 1 Clicked");
+            if (
+                splashScreen.button1 &&
+                splashScreen.button1.isHovered(realMouseX, realMouseY)
+            ) {
+                console.log('Splash Button 1 Clicked');
             }
-        }
-        else if (stage === GameStage.MAPMENU) {
+        } else if (stage === GameStage.MAPMENU) {
             if (mapMenu.buttonReturn.isHovered(realMouseX, realMouseY)) {
                 stage = GameStage.MENU;
-            }
-            else if (mapMenu.buttonMap1.isHovered(realMouseX, realMouseY)) {
-                resetGame(); 
+            } else if (mapMenu.buttonMap1.isHovered(realMouseX, realMouseY)) {
+                resetGame();
                 stage = GameStage.MAP1;
-            }
-            else if (mapMenu.buttonMap2.isHovered(realMouseX, realMouseY)) {
+            } else if (mapMenu.buttonMap2.isHovered(realMouseX, realMouseY)) {
                 stage = GameStage.MAP2;
             }
         }
     };
 
     p.keyPressed = function () {
-        if (stage === GameStage.MENU && p.key === " ") {
+        if (stage === GameStage.MENU && p.key === ' ') {
             stage = GameStage.MAPMENU;
-            mapMenu = new MapMenu(p, gameWidth, gameHeight); 
-        }
-        else if ((stage === GameStage.MAP1 || stage === GameStage.MAP2) && p.keyCode === p.ESCAPE) {
+            mapMenu = new MapMenu(p, gameWidth, gameHeight);
+        } else if (
+            (stage === GameStage.MAP1 || stage === GameStage.MAP2) &&
+            p.keyCode === p.ESCAPE
+        ) {
             stage = GameStage.MAPMENU;
         }
     };
@@ -186,7 +205,7 @@ export const sketch = (p) => {
 
     function resetGame() {
         respawnManager.clear();
-        
+
         if (timeManager) {
             timeManager.reset();
         }
@@ -194,32 +213,31 @@ export const sketch = (p) => {
         for (const player of players) {
             player.prepareRespawn();
             player.finishRespawn();
-            player.setGameState(PlayerGameState.PLAYING); 
+            player.setGameState(PlayerGameState.PLAYING);
         }
     }
 
-
-   //  function drawMap() {
-   //      p.noStroke();
-   //      for (let y = 0; y < MAP.length; y++) {
-   //          for (let x = 0; x < MAP[0].length; x++) {
-   //              const c = MAP[y][x];
-   //              if (c === "#") {
-   //                  p.fill(80);
-   //                  p.rect(x * TILE, y * TILE, TILE, TILE);
-   //              } else if (c === "S") {
-   //                  p.fill(220, 80, 80);
-   //                  const px = x * TILE, py = y * TILE;
-   //                  p.triangle(px, py + TILE, px + TILE / 2, py + 6, px + TILE, py + TILE);
-   //              } else if (c === "F") {
-   //                  p.fill(100, 220, 100);
-   //                  p.rect(x * TILE, y * TILE, TILE, TILE);
-   //                  p.fill(255);
-   //                  p.textAlign(p.CENTER, p.CENTER);
-   //                  p.textSize(12);
-   //                  p.text("GOAL", x * TILE + TILE/2, y * TILE + TILE/2);
-   //              }
-   //          }
-   //      }
-   //  }
+    //  function drawMap() {
+    //      p.noStroke();
+    //      for (let y = 0; y < MAP.length; y++) {
+    //          for (let x = 0; x < MAP[0].length; x++) {
+    //              const c = MAP[y][x];
+    //              if (c === "#") {
+    //                  p.fill(80);
+    //                  p.rect(x * TILE, y * TILE, TILE, TILE);
+    //              } else if (c === "S") {
+    //                  p.fill(220, 80, 80);
+    //                  const px = x * TILE, py = y * TILE;
+    //                  p.triangle(px, py + TILE, px + TILE / 2, py + 6, px + TILE, py + TILE);
+    //              } else if (c === "F") {
+    //                  p.fill(100, 220, 100);
+    //                  p.rect(x * TILE, y * TILE, TILE, TILE);
+    //                  p.fill(255);
+    //                  p.textAlign(p.CENTER, p.CENTER);
+    //                  p.textSize(12);
+    //                  p.text("GOAL", x * TILE + TILE/2, y * TILE + TILE/2);
+    //              }
+    //          }
+    //      }
+    //  }
 };
