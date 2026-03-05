@@ -1,6 +1,15 @@
+//export const 
+// tile
+export const TILE = 40
+//gameWidth = MAP[0].length * GameConfig.TILE; 24
+//gameHeight = MAP.length * GameConfig.TILE; 10
+const MAP_COL = 24
+const MAP_ROW = 10
+
+
 export const GameConfig = {
-    GAME_WIDTH: 1920,
-    GAME_HEIGHT: 1080,
+    GAME_WIDTH: MAP_COL*TILE,
+    GAME_HEIGHT: MAP_ROW*TILE,
 
     RESPAWN_TIME: 2000, // 2 seconds
     SPAWN_POSITION: { x: 100, y: 100 },
@@ -53,6 +62,5 @@ export const GameConfig = {
     MAP_RETURN_Y: 50,
     MAP_RETURN_R: 30,
 
-    // tile
-    TILE: 40,
+    TILE:40
 };

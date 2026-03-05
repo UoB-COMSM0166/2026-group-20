@@ -1,6 +1,5 @@
 //import { MAP, TILE } from "../utils/tiles.js";
-import { GameConfig } from '../config/GameConfig.js';
-//export const TILE = 40;
+import { GameConfig, TILE } from '../config/GameConfig.js';
 
 //Make the map more difficult (and map 2 the easier one)
 export const MAP = [
@@ -42,18 +41,18 @@ export function drawMap(p) {
                 const c = MAP[y][x];
                 if (c === "#") {
                     p.fill(80);
-                    p.rect(x * GameConfig.TILE, y * GameConfig.TILE, GameConfig.TILE, GameConfig.TILE);
+                    p.rect(x * TILE, y * TILE, TILE, TILE);
                 } else if (c === "S") {
                     p.fill(220, 80, 80);
-                    const px = x * GameConfig.TILE, py = y * GameConfig.TILE;
-                    p.triangle(px, py + GameConfig.TILE, px + GameConfig.TILE / 2, py + 6, px + GameConfig.TILE, py + GameConfig.TILE);
+                    const px = x * TILE, py = y * TILE;
+                    p.triangle(px, py + TILE, px + TILE / 2, py + 6, px + TILE, py + TILE);
                 } else if (c === "F") {
                     p.fill(100, 220, 100);
-                    p.rect(x * GameConfig.TILE, y * GameConfig.TILE, GameConfig.TILE, GameConfig.TILE);
+                    p.rect(x * TILE, y * TILE, TILE, TILE);
                     p.fill(255);
                     p.textAlign(p.CENTER, p.CENTER);
                     p.textSize(12);
-                    p.text("GOAL", x * GameConfig.TILE + GameConfig.TILE/2, y * GameConfig.TILE + GameConfig.TILE/2);
+                    p.text("GOAL", x * TILE + GameConfig.TILE/2, y * TILE + TILE/2);
                 }
             }
         }

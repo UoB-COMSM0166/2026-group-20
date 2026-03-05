@@ -1,5 +1,4 @@
 import { Player } from "./entities/Player.js";
-//import { MAP, TILE } from "./utils/tiles.js";
 import { RespawnManager } from "./systems/RespawnManager.js";
 import { GameStage } from "./config/GameStage.js";
 import { MapMenu } from "./systems/MapMenu.js";
@@ -7,18 +6,13 @@ import { SplashScreen } from "./systems/SplashScreen.js";
 
 import { TimeManager } from "./systems/TimeManager.js"; 
 import { PlayerGameState } from "./config/PlayerGameState.js"; 
-
-import { drawMap, MAP } from "./systems/MapGeneration.js";
-import { GameConfig } from './config/GameConfig.js';
-import { DrawPlayer } from "./utils/DrawPlayer.js";
+import { GameConfig, TILE } from './config/GameConfig.js';
+import { playMap1Loop } from "./systems/playMap1Loop.js";
 
 export const sketch = (p) => {
     let players = [];
     let respawnManager;
     let timeManager;
-    
-    let gameWidth;
-    let gameHeight;
 
     let stage;
     let splashScreen;
@@ -31,14 +25,10 @@ export const sketch = (p) => {
     p.setup = function () {
         p.createCanvas(p.windowWidth, p.windowHeight);
 
-        gameWidth = MAP[0].length * GameConfig.TILE;
-        gameHeight = MAP.length * GameConfig.TILE;
-
         respawnManager = new RespawnManager();
-        //mapGeneration= new MapGeneration();
         players = [
-            new Player(p, 11 * GameConfig.TILE,( 7 * GameConfig.TILE) - 40, 0),
-            new Player(p, 13 * GameConfig.TILE, (7 * GameConfig.TILE) - 40, 1),
+            new Player(p, 11 * TILE,( 7 * TILE) - 40, 0),
+            new Player(p, 13 * TILE, (7 * TILE) - 40, 1),
         ];
 
         timeManager = new TimeManager(players);
@@ -46,15 +36,15 @@ export const sketch = (p) => {
         timeManager.reset(); 
 
         stage = GameStage.MENU;
-        splashScreen = new SplashScreen(p, gameWidth, gameHeight);
+        splashScreen = new SplashScreen(p, GameConfig.GAME_WIDTH, GameConfig.GAME_HEIGHT);
     };
 
     p.draw = function () {
         p.background(0);
 
-        scaleFactor = p.min(p.width / gameWidth, p.height / gameHeight);
-        offsetX = (p.width - gameWidth * scaleFactor) / 2;
-        offsetY = (p.height - gameHeight * scaleFactor) / 2;
+        scaleFactor = p.min(p.width / GameConfig.GAME_WIDTH, p.height / GameConfig.GAME_HEIGHT);
+        offsetX = (p.width - GameConfig.GAME_WIDTH * scaleFactor) / 2;
+        offsetY = (p.height - GameConfig.GAME_HEIGHT * scaleFactor) / 2;
 
         p.cursor(p.ARROW);
 
@@ -71,11 +61,11 @@ export const sketch = (p) => {
         }
         else if (stage === GameStage.MAPMENU) {
             p.background(40);
-            if (!mapMenu) mapMenu = new MapMenu(p, gameWidth, gameHeight);
+            if (!mapMenu) mapMenu = new MapMenu(p, GameConfig.GAME_WIDTH, GameConfig.GAME_HEIGHT);
             mapMenu.render(p, realMouseX, realMouseY);
         }
         else if (stage === GameStage.MAP1) {
-            playMap1Loop(p);
+            playMap1Loop(p, respawnManager, timeManager, players, GameConfig.GAME_WIDTH, GameConfig.GAME_HEIGHT);
         }
         else if (stage === GameStage.MAP2) {
             p.background(50);
@@ -89,63 +79,6 @@ export const sketch = (p) => {
 
         p.pop();
     };
-
-    function playMap1Loop(p) {
-        p.background(25);
-        drawMap(p);
-
-        let deltaTime = p.deltaTime || 16.6;
-        respawnManager.update(deltaTime);
-
-        timeManager.update(deltaTime);
-
-        if (!timeManager.isGameOver) {
-            for (const player of players) {
-                if (player.gameState !== PlayerGameState.SUCCESS) {
-                    player.update(players, respawnManager);
-
-                    let tx = p.floor((player.x + player.w / 2) / GameConfig.TILE);
-                    let ty = p.floor((player.y + player.h / 2) / GameConfig.TILE);
-
-                    if (MAP[ty] && MAP[ty][tx] === "F") {
-                        timeManager.onPlayerReachFinish(player);
-                    }
-                }
-            }
-        }
-
-        for (const player of players) {
-            DrawPlayer(player);
-        }
-
-        p.fill(255);
-        p.textSize(24);
-        p.textAlign(p.CENTER, p.TOP);
-        p.text(`Time: ${Math.ceil(timeManager.timeLeft)}s`, gameWidth / 2, 20);
-
-        if (timeManager.isGameOver) {
-            p.fill(0, 0, 0, 150); 
-            p.rect(0, 0, gameWidth, gameHeight);
-            
-            p.fill(255);
-            p.textAlign(p.CENTER, p.CENTER);
-            p.textSize(48);
-            p.text("GAME OVER", gameWidth / 2, gameHeight / 2 - 50);
-
-            p.textSize(24);
-            if (timeManager.rankings.length > 0) {
-                let winner = timeManager.rankings[0];
-                p.text(`Winner: Player ${winner.playerNo + 1} !`, gameWidth / 2, gameHeight / 2 + 10);
-            } else {
-                p.text("Time's Up! Everyone Failed.", gameWidth / 2, gameHeight / 2 + 10);
-            }
-        }
-
-        p.fill(255);
-        p.textSize(14);
-        p.textAlign(p.LEFT, p.BOTTOM);
-        p.text("P1: A/D + W   P2: ←/→ + ↑   (Press ESC to Return)", 10, gameHeight - 10);
-    }
 
     p.mousePressed = function () {
         let realMouseX = (p.mouseX - offsetX) / scaleFactor;
@@ -173,11 +106,11 @@ export const sketch = (p) => {
     p.keyPressed = function () {
         if (stage === GameStage.MENU && p.key === " ") {
             stage = GameStage.MAPMENU;
-            mapMenu = new MapMenu(p, gameWidth, gameHeight); 
+            mapMenu = new MapMenu(p, GameConfig.GAME_WIDTH, GameConfig.GAME_HEIGHT); 
         }
-        else if ((stage === GameStage.MAP1 || stage === GameStage.MAP2) && p.keyCode === p.ESCAPE) {
-            stage = GameStage.MAPMENU;
-        }
+        // else if ((stage === GameStage.MAP1 || stage === GameStage.MAP2) && p.keyCode === p.ESCAPE) {
+        //     stage = GameStage.MAPMENU;
+        // }
     };
 
     p.windowResized = function () {
@@ -198,28 +131,4 @@ export const sketch = (p) => {
         }
     }
 
-
-   //  function drawMap() {
-   //      p.noStroke();
-   //      for (let y = 0; y < MAP.length; y++) {
-   //          for (let x = 0; x < MAP[0].length; x++) {
-   //              const c = MAP[y][x];
-   //              if (c === "#") {
-   //                  p.fill(80);
-   //                  p.rect(x * TILE, y * TILE, TILE, TILE);
-   //              } else if (c === "S") {
-   //                  p.fill(220, 80, 80);
-   //                  const px = x * TILE, py = y * TILE;
-   //                  p.triangle(px, py + TILE, px + TILE / 2, py + 6, px + TILE, py + TILE);
-   //              } else if (c === "F") {
-   //                  p.fill(100, 220, 100);
-   //                  p.rect(x * TILE, y * TILE, TILE, TILE);
-   //                  p.fill(255);
-   //                  p.textAlign(p.CENTER, p.CENTER);
-   //                  p.textSize(12);
-   //                  p.text("GOAL", x * TILE + TILE/2, y * TILE + TILE/2);
-   //              }
-   //          }
-   //      }
-   //  }
 };
