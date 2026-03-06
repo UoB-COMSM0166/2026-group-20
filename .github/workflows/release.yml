@@ -12,6 +12,8 @@ jobs:
     build:
         if: contains(github.ref_name, 'game') || contains(github.ref_name, 'paint')
         runs-on: ubuntu-latest
+        env:
+            NODE_ENV: production
         steps:
             - name: Checking out files to runner
               uses: actions/checkout@v6
