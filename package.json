@@ -15,9 +15,8 @@
         "build": "vite build",
         "run-all": "npm run prettier-fix && npm run lint-fix && npm run test",
         "preview": "vite preview",
-        "prepare": "[[ -z $CI ]] && husky || true"
+        "prepare": "[ -z $CI ] && husky || true"
     },
-
     "dependencies": {
         "p5": "^1.11.11"
     },
