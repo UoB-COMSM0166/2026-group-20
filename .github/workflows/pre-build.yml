@@ -1,0 +1,72 @@
+name: pre-build.yml
+on:
+    push:
+        branches:
+            - dev
+            - paint-app
+            - main
+        paths:
+            - '**/*.js'
+            - '**/*.html'
+        tags-ignore:
+            - '*'
+    pull_request:
+        branches:
+            - dev
+            - paint-app
+            - main
+        paths:
+            - '**/*.js'
+            - '**/*.html'
+    workflow_dispatch:
+
+run-name: ${{ github.actor }} triggered pre-build pipeline on ${{ github.base_ref || github.ref_name }} by ${{ github.event_name}}
+
+jobs:
+    # Stage 1: Auto-formatting
+    prettify:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checking out files to runner
+              uses: actions/checkout@v6
+            - name: Setup node environment
+              uses: actions/setup-node@v6
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
+            - name: Install dependencies
+              run: npm ci --omit=optional
+            - name: Checking formatting
+              run: npm run prettier-ci -- --check
+
+    # Stage 2: Linting
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checking out files to runner
+              uses: actions/checkout@v6
+            - name: Setup node environment
+              uses: actions/setup-node@v6
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
+            - name: Install dependencies
+              run: npm ci --omit=optional
+            - name: Checking code quality
+              run: npm run lint
+
+    # Stage 3: Testing
+    coverage:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checking out files to runner
+              uses: actions/checkout@v6
+            - name: Setup node environment
+              uses: actions/setup-node@v6
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
+            - name: Install dependencies
+              run: npm ci --omit=optional
+            - name: Testing
+              run: npm test
