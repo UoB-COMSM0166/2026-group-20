@@ -27,10 +27,10 @@ ${GREEN}Running pre-commits using Husky...${NC}
 |-------------------------------------------------------------------|
 EOF
 
-printf "\n${CYAN}Stage 1: Formating using prettier${NC}\n" > /dev/tty
+printf "\n${CYAN}Stage 1: Formating using prettier${NC}" > /dev/tty
 
 FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
-prettier $FILES --write --ignore-unknown
+npm run prettier-ci -- $FILES --write
 git update-index --again
 
 # Stage-2 (Linting)
@@ -40,18 +40,18 @@ git update-index --again
 
 set +e
 
-printf "${CYAN}Stage 2: Linting using ESlint${NC}\n" > /dev/tty
-OUTPUT=$(npx eslint $ESLINT_FLAGS --color src/**/*.js)
+printf "\n${CYAN}Stage 2: Linting using ESlint${NC}" > /dev/tty
+OUTPUT=$(npm run lint -- $ESLINT_FLAGS --color)
 printf "$OUTPUT\n" > /dev/tty
 if [[ -n $OUTPUT ]] && grep -sq -e "--fix" <<< "$OUTPUT"; then
     printf "Fix possible issues? (y?): " > /dev/tty
     read -r ANS < /dev/tty
     if [[ $ANS == "y" ]]; then
-        npx eslint --fix-dry-run src/**/*.js
+        npm run lint-dry-run
         printf "Apply fix? (y?): " > /dev/tty
         read -r ANS < /dev/tty
         if [[ $ANS == "y" ]]; then
-            npx eslint --fix src/**/*.js
+            npm run lint-fix
         fi
     fi
 fi
@@ -59,7 +59,7 @@ fi
 set -e
 
 # Stage-3 (Testing)
-printf "${CYAN}Stage 3: Testing using Vitest${NC}" > /dev/tty
+printf "\n${CYAN}Stage 3: Testing using Vitest${NC}" > /dev/tty
 npm test
 
 # Stage-4 (Building)

@@ -1,18 +1,21 @@
 {
-    "name": "my-paint-app",
+    "name": "my-game-app",
     "private": true,
     "version": "0.0.1",
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "prettier": "prettier --write ./*.js src/**/*.js tests/**/*.js",
+        "prettier": "prettier --ignore-unknown src/**/*.html src/**/*.js ./*.html ./*.js",
+        "prettier-fix": "npm run prettier -- --write --no-error-on-unmatched-pattern",
+        "prettier-ci": "prettier --ignore-unknown",
         "lint": "eslint src/**/*.js",
-        "lint-dry-run": "eslint --fix-dry-run src/**/*.js",
+        "lint-fix": "npm run lint -- --fix",
+        "lint-dry-run": "npm run lint -- --fix-dry-run",
         "test": "vitest run",
         "build": "vite build",
-        "run-all": "npm run prettier && npm run lint && npm run test && npm run build",
+        "run-all": "npm run prettier-fix && npm run lint-fix && npm run test",
         "preview": "vite preview",
-        "prepare": "husky"
+        "prepare": "[[ -n $CI ]] && husky || true"
     },
     "dependencies": {
         "p5": "^1.11.11"
@@ -23,9 +26,11 @@
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-jsdoc": "^62.7.1",
         "globals": "^17.4.0",
-        "husky": "^9.1.7",
         "prettier": "3.8.1",
         "vite": "^7.3.1",
         "vitest": "^4.0.18"
+    },
+    "optionalDependencies": {
+        "husky": "^9.1.7"
     }
 }
