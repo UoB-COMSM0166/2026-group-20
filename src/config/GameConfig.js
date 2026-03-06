@@ -55,4 +55,10 @@ export const GameConfig = {
 
     // tile
     TILE: 40,
+
+    // Reward algorithm: index 0 = 1st place, 1 = 2nd, etc. Fail = 0.
+    FINISH_REWARDS: [20, 10, 5, 2],
+
+    // Value of each coin collected during a round
+    COIN_VALUE: 1,
 };

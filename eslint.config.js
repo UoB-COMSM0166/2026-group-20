@@ -12,6 +12,7 @@ export default defineConfig([
         plugins: {
             js,
             jsdoc,
+            eslintConfigPrettier,
         },
         languageOptions: {
             globals: globals.browser,

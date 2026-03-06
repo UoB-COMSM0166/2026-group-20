@@ -5,17 +5,14 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "prettier": "prettier --ignore-unknown src/**/*.html src/**/*.js ./*.html ./*.js",
-        "prettier-fix": "npm run prettier -- --write --no-error-on-unmatched-pattern",
-        "prettier-ci": "prettier --ignore-unknown",
+        "prettier": "prettier --write ./*.js src/**/*.js tests/**/*.js",
         "lint": "eslint src/**/*.js",
-        "lint-fix": "npm run lint -- --fix",
-        "lint-dry-run": "npm run lint -- --fix-dry-run",
+        "lint-dry-run": "eslint --fix-dry-run src/**/*.js",
         "test": "vitest run",
         "build": "vite build",
-        "run-all": "npm run prettier-fix && npm run lint-fix && npm run test",
+        "run-all": "npm run prettier && npm run lint && npm run test && npm run build",
         "preview": "vite preview",
-        "prepare": "[[ -n $CI ]] && husky || true"
+        "prepare": "husky"
     },
     "dependencies": {
         "p5": "^1.11.11"
@@ -26,11 +23,9 @@
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-jsdoc": "^62.7.1",
         "globals": "^17.4.0",
+        "husky": "^9.1.7",
         "prettier": "3.8.1",
         "vite": "^7.3.1",
         "vitest": "^4.0.18"
-    },
-    "optionalDependencies": {
-        "husky": "^9.1.7"
     }
 }
