@@ -37,7 +37,7 @@ jobs:
             - name: Install dependencies
               run: npm ci --omit=optional
             - name: Checking formatting
-              run: npm run prettier-ci -- --check
+              run: npm run prettier -- --check --no-error-on-unmatched-pattern
 
     # Stage 2: Linting
     lint:
