@@ -1,0 +1,36 @@
+{
+    "name": "my-game-app",
+    "private": true,
+    "version": "0.0.1",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "prettier": "prettier --ignore-unknown src/**/*.html src/**/*.js ./*.html ./*.js",
+        "prettier-fix": "npm run prettier -- --write --no-error-on-unmatched-pattern",
+        "prettier-ci": "prettier --ignore-unknown",
+        "lint": "eslint src/**/*.js",
+        "lint-fix": "npm run lint -- --fix",
+        "lint-dry-run": "npm run lint -- --fix-dry-run",
+        "test": "vitest run",
+        "build": "vite build",
+        "run-all": "npm run prettier-fix && npm run lint-fix && npm run test",
+        "preview": "vite preview",
+        "prepare": "[[ -n $CI ]] && husky || true"
+    },
+    "dependencies": {
+        "p5": "^1.11.11"
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.0.2",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-jsdoc": "^62.7.1",
+        "globals": "^17.4.0",
+        "prettier": "3.8.1",
+        "vite": "^7.3.1",
+        "vitest": "^4.0.18"
+    },
+    "optionalDependencies": {
+        "husky": "^9.1.7"
+    }
+}

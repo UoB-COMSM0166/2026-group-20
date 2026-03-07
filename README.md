@@ -1,7 +1,9 @@
 # 2026-group-20
+
 2026 COMSM0166 group 20
 
 # COMSM0166 Project Template
+
 A project template for the Software Engineering Discipline and Practice module (COMSM0166).
 
 ## Info
@@ -10,16 +12,16 @@ This is the template for your group project repo/report. We'll be setting up you
 
 You will be developing your game using [P5.js](https://p5js.org) a javascript library that provides you will all the tools you need to make your game. However, we won't be teaching you javascript, this is a chance for you and your team to learn a (friendly) new language and framework quickly, something you will almost certainly have to do with your summer project and in future. There is a lot of documentation online, you can start with:
 
-- [P5.js tutorials](https://p5js.org/tutorials/) 
+- [P5.js tutorials](https://p5js.org/tutorials/)
 - [Coding Train P5.js](https://thecodingtrain.com/tracks/code-programming-with-p5-js) course - go here for enthusiastic video tutorials from Dan Shiffman (recommended!)
 
-## The Ultimate Chicken Horse (provisional name) 
+## The Ultimate Chicken Horse (provisional name)
 
 STRAPLINE. Add an exciting one sentence description of your game here.
 
 IMAGE. Add an image of your game here, keep this updated with a snapshot of your latest development.
 
-LINK. Add a link here to your deployed game, you can also make the image above link to your game if you wish. Your game lives in the [/docs](/docs) folder, and is published using Github pages. 
+LINK. Add a link here to your deployed game, you can also make the image above link to your game if you wish. Your game lives in the [/docs](/docs) folder, and is published using Github pages.
 
 VIDEO. Include a demo video of your game here (you don't have to wait until the end, you can insert a work in progress video)
 
@@ -38,92 +40,96 @@ GROUP PHOTO. Add a group photo here.
 
 ### Introduction
 
-- 5% ~250 words 
-- Describe your game, what is based on, what makes it novel? (what's the "twist"?) 
+- 5% ~250 words
+- Describe your game, what is based on, what makes it novel? (what's the "twist"?)
 
-### Requirements 
+### Requirements
 
 - 15% ~750 words
 - Early stages design. Ideation process. How did you decide as a team what to develop? Use case diagrams, user stories.
 
 #### Our Stakeholders:
 
-* Platformer game players
-* Casual game players
-* Software Engineering module lecturers
-* Classmates
-* Other academic staff/Bristol students
- 
-To begin our game design process, we identified all possible individuals that needed to be taken into account when making our game. Building on the Onion Model we learned about in the lecture, we then split our list into three big categories (gamers, lecturers and other students), to better identify what qualities each one would look for in a game. 
+- Platformer game players
+- Casual game players
+- Software Engineering module lecturers
+- Classmates
+- Other academic staff/Bristol students
+
+To begin our game design process, we identified all possible individuals that needed to be taken into account when making our game. Building on the Onion Model we learned about in the lecture, we then split our list into three big categories (gamers, lecturers and other students), to better identify what qualities each one would look for in a game.
 Coming up with the epics (high level requirements) and subsequently, the user stories, was a very similar process to the Running app exercise we did during the workshop. Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users, which we had direct access to. This allowed us to come up with feedback-based requirements.
 
 #### Epics:
 
 -<i>Gamer Group</i>
-* Retro/Nostalgic Visuals
-* Twists/added features
-* Visually stimulating
-* Audio background/effects
-* Game lore
-* Core features (wallet system, scoreboard, intro tutorial)
-* Good UX
-* Multi device compatibility 
 
+- Retro/Nostalgic Visuals
+- Twists/added features
+- Visually stimulating
+- Audio background/effects
+- Game lore
+- Core features (wallet system, scoreboard, intro tutorial)
+- Good UX
+- Multi device compatibility
 
 -<i>Lecturer Group</i>
-* Learning concepts integration and application
-* Clear challenge(s) demonstration
-* Achievable within the project timeline
-* Collaborative work 
-* Continuous progress updates
-* Unique
 
--<i>Student Group</i> 
-* Social features
-* Easy to pick up
-* Short game runs 
+- Learning concepts integration and application
+- Clear challenge(s) demonstration
+- Achievable within the project timeline
+- Collaborative work
+- Continuous progress updates
+- Unique
 
+-<i>Student Group</i>
 
-#### User Stories 
+- Social features
+- Easy to pick up
+- Short game runs
+
+#### User Stories
 
 -<i>Students</i>
-* As a student, I want the game to have a multiplayer mode, so that I can play with my friends.
-* As a student, I want the game to have intuitive controls/mechanics, so that I can start playing right away.
-* As a student, I want a game run/level to be short enough so that I can play between class breaks. 
+
+- As a student, I want the game to have a multiplayer mode, so that I can play with my friends.
+- As a student, I want the game to have intuitive controls/mechanics, so that I can start playing right away.
+- As a student, I want a game run/level to be short enough so that I can play between class breaks.
 
 -<i>Lecturers</i>
-* As a lecturer, I want the game to clearly demonstrate applied programming concepts (e.g., OOP, game logic, UI handling), so that learning outcomes are achieved.
-* As a lecturer, I want the game to include defined challenges with measurable outcomes, so that student understanding can be evaluated.
-* As a lecturer, I want clear evidence of teamwork (shared commits, divided responsibilities, group meeting notes etc.), so that collaboration skills are demonstrated.
+
+- As a lecturer, I want the game to clearly demonstrate applied programming concepts (e.g., OOP, game logic, UI handling), so that learning outcomes are achieved.
+- As a lecturer, I want the game to include defined challenges with measurable outcomes, so that student understanding can be evaluated.
+- As a lecturer, I want clear evidence of teamwork (shared commits, divided responsibilities, group meeting notes etc.), so that collaboration skills are demonstrated.
 
 -<i>Gamers</i>
-* As a gamer, I want a scoreboard, so that I can track my performance and try to beat my high score.
-* As a gamer, I want a short interactive tutorial, so that I can quickly understand how to play.
-* As a gamer, I want intuitive menus and clear navigation, so that I can easily access and play the game without confusion.
-* As a gamer, I want responsive sound effects and visual feedback for my actions, so that the game feels immersive and satisfying.
+
+- As a gamer, I want a scoreboard, so that I can track my performance and try to beat my high score.
+- As a gamer, I want a short interactive tutorial, so that I can quickly understand how to play.
+- As a gamer, I want intuitive menus and clear navigation, so that I can easily access and play the game without confusion.
+- As a gamer, I want responsive sound effects and visual feedback for my actions, so that the game feels immersive and satisfying.
 
 ### Design
 
-- 15% ~750 words 
-- System architecture. Class diagrams, behavioural diagrams. 
+- 15% ~750 words
+- System architecture. Class diagrams, behavioural diagrams.
 
 ### Implementation
 
 - 15% ~750 words
 
-- Describe implementation of your game, in particular highlighting the TWO areas of *technical challenge* in developing your game. 
+- Describe implementation of your game, in particular highlighting the TWO areas of _technical challenge_ in developing your game.
 
 ### Evaluation
 
 - 15% ~750 words
 
-- One qualitative evaluation (of your choice) 
+- One qualitative evaluation (of your choice)
 
-- One quantitative evaluation (of your choice) 
+- One quantitative evaluation (of your choice)
 
-- Description of how code was tested. 
+- Description of how code was tested.
 
-### Process 
+### Process
 
 - 15% ~750 words
 
@@ -137,14 +143,14 @@ Coming up with the epics (high level requirements) and subsequently, the user st
 
 ### Contribution Statement
 
-- Provide a table of everyone's contribution, which *may* be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
+- Provide a table of everyone's contribution, which _may_ be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
 
 ### Additional Marks
 
 You can delete this section in your own repo, it's just here for information. in addition to the marks above, we will be marking you on the following two points:
 
-- **Quality** of report writing, presentation, use of figures and visual material (5% of report grade) 
-  - Please write in a clear concise manner suitable for an interested layperson. Write as if this repo was publicly available.
+- **Quality** of report writing, presentation, use of figures and visual material (5% of report grade)
+    - Please write in a clear concise manner suitable for an interested layperson. Write as if this repo was publicly available.
 - **Documentation** of code (5% of report grade)
-  - Organise your code so that it could easily be picked up by another team in the future and developed further.
-  - Is your repo clearly organised? Is code well commented throughout?
+    - Organise your code so that it could easily be picked up by another team in the future and developed further.
+    - Is your repo clearly organised? Is code well commented throughout?
