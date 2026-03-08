@@ -9,11 +9,11 @@ An exciting multiplayer platformer where players design obstacles and race to re
 </p>
 
 <h3 align="center"> Click <a href="https://uob-comsm0166.github.io/2026-group-20/main-game/"> HERE</a> to play the game (v0.1.0)</h3>
----
+
 
 <h3>VIDEO DEMO</h3>
 Add a video demo for v0.1.0 here...
----
+
 
 <h3>PAPER DEMO</h3>
 <p align="center">
@@ -37,7 +37,6 @@ GROUP PHOTO. Add a group photo here.
 | Mingxiao   | dh25275@bristol.ac.uk              |
 | Eira       | xz25553@bristol.ac.uk              |
 
----
 
 <h3>Project Management</h3>
 <p> Our project management is organised in <a href="link"> Lucidspark</a>:</p>
@@ -45,7 +44,7 @@ GROUP PHOTO. Add a group photo here.
 - Brainstorming board - used for idea generation, planning and taking meeting notes
 - Kanban board - used for tracking tasks and development progress
 
----
+
 
 <h2 align="center">Project Report</h2>
 
@@ -54,7 +53,7 @@ GROUP PHOTO. Add a group photo here.
 - 5% ~250 words
 - Describe your game, what is based on, what makes it novel? (what's the "twist"?)
 
----
+
 
 ### 2. Requirements
 
@@ -164,7 +163,6 @@ K -->|No| H
 K -->|Yes| L[Game End / Results]
 ```
 
----
 
 ### 3. Design
 
@@ -172,7 +170,7 @@ K -->|Yes| L[Game End / Results]
 
 - System architecture. Class diagrams, behavioural diagrams.
 
----
+
 
 ### 4. Implementation
 
@@ -180,7 +178,7 @@ K -->|Yes| L[Game End / Results]
 
 - Describe implementation of your game, in particular highlighting the TWO areas of _technical challenge_ in developing your game.
 
----
+
 
 ### 5. Evaluation
 
@@ -196,7 +194,6 @@ Add think aloud and heuristic evaluation for v0.1.0
 
 will need to do the evaluation again when the game is almost ready
 
----
 
 ### 6. Process
 
@@ -204,7 +201,6 @@ will need to do the evaluation again when the game is almost ready
 
 - Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project.
 
----
 
 ### 7. Conclusion
 
@@ -212,7 +208,6 @@ will need to do the evaluation again when the game is almost ready
 
 - Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
 
-<hr>
 
 ### 8. Contribution Statement
 
