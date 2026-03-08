@@ -10,19 +10,15 @@ An exciting multiplayer platformer where players design obstacles and race to re
 
 <h3 align="center"> Click <a href="https://uob-comsm0166.github.io/2026-group-20/main-game/"> HERE</a> to play the game (v0.1.0)</h3>
 
+<hr style="border: none; height: 1px; background-color:#ddd;">
 
 <h3>VIDEO DEMO</h3>
 Add a video demo for v0.1.0 here...
 
 
 <h3>PAPER DEMO</h3>
-<p align="center">
-  <video controls preload="metadata" width="100%">
-    <source src="docs/assets/video/paper-demo-ultimate-chicken-horse.mp4" type="video/mp4">
-  </video>
-</p>
-
----
+<video src="docs/assets/video/paper-demo-ultimate-chicken-horse.mp4" width="600" controls>
+</video>
 
 <h3>Group Members</h3>
 
