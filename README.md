@@ -10,7 +10,7 @@ An exciting multiplayer platformer where players design obstacles and race to re
 
 <h3 align="center"> Click <a href="https://uob-comsm0166.github.io/2026-group-20/main-game/"> HERE</a> to play the game (v0.1.0)</h3>
 
-<hr style="border: none; height: 1px; background-color:#ddd;">
+<hr style="border: none; height: 0.5px; background-color:#ddd;">
 
 <h3>VIDEO DEMO</h3>
 Add a video demo for v0.1.0 here...
