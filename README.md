@@ -139,6 +139,13 @@ After defining the epics, we deconstructed them into a set of user stories to de
 (~100 words) -> visual overview
 add a paragraph here
 
+### 3. Design
+
+(15% ~750 words)
+
+- System architecture. Class diagrams, behavioural diagrams.
+
+#### 3.3 Behaviourial Diagram
 
 ```mermaid
 stateDiagram-v2
@@ -163,14 +170,6 @@ Gameplay --> GameEnd : time limit reached
 
 GameEnd --> [*]
 ```
-
-### 3. Design
-
-(15% ~750 words)
-
-- System architecture. Class diagrams, behavioural diagrams.
-
-
 
 ### 4. Implementation
 
