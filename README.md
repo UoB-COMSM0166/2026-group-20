@@ -17,8 +17,8 @@ Add a video demo for v0.1.0 here...
 
 
 <h3>PAPER DEMO</h3>
-https://github.com/user-attachments/assets/b22ea9e5-d063-4fe0-875b-4679148b2b04
 
+https://github.com/user-attachments/assets/4d740826-4f04-4a33-90aa-97b0868dfc5b
 
 <h3>Group Members</h3>
 
