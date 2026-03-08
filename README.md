@@ -140,25 +140,30 @@ After defining the epics, we deconstructed them into a set of user stories to de
 (~100 words) -> visual overview
 add a paragraph here
 
+
 ```mermaid
-flowchart TD
+stateDiagram-v2
 
-A[Start Menu] --> B[Lobby]
-B -->  C[Character Selection]
-C --> D[Map Selection]
-D --> E[Obstacle Selection]
-E --> F[Obstacle Placement]
+[*] --> StartMenu
+StartMenu --> Lobby
+Lobby --> PreGameSetup
 
-F --> G[Game Start]
-G --> H[Gameplay]
-H --> I[Collect Coins]
-I --> J[Reach Goal Platform]
+state "Pre-Game Setup" as PreGameSetup {
+    direction LR
+    Character --> Map
+    Map --> Obstacle
+    Obstacle --> Placement
+}
 
-J --> K{Time Limit Reached?}
-K -->|No| H
-K -->|Yes| L[Game End / Results]
+PreGameSetup --> GameStart
+GameStart --> Gameplay
+Gameplay --> ReachGoal
+
+ReachGoal --> GameEnd : goal reached
+Gameplay --> GameEnd : time limit reached
+
+GameEnd --> [*]
 ```
-
 
 ### 3. Design
 
