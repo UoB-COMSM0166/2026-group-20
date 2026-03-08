@@ -8,7 +8,7 @@
 An exciting multiplayer platformer where players design obstacles and race to reach the goal.
 </p>
 
-<h3 align="center"> Click <a href="LINK_HERE"> HERE</a> to play the game (v0.1.0)</h3>
+<h3 align="center"> Click <a href="https://uob-comsm0166.github.io/2026-group-20/main-game/"> HERE</a> to play the game (v0.1.0)</h3>
 <hr>
 
 <h3>VIDEO DEMO</h3>
@@ -47,19 +47,16 @@ GROUP PHOTO. Add a group photo here.
 
 <hr>
 
-## Project Report
+<h2 align="center">Project Report</h2>
 
 ### 1. Introduction
-
 - 5% ~250 words
 - Describe your game, what is based on, what makes it novel? (what's the "twist"?)
 
 <hr>
 
 ### 2. Requirements
--> outlines the requirements engineering process
-- 15% ~750 words
-- Early stages design. Ideation process. How did you decide as a team what to develop? Use case diagrams, user stories.
+-> outlines the requirements engineering process (15% ~750 words)
 
 Our team began by brainstorming various game ideas and collectively selected the concept to develop. After the game was selected, we identified the stakeholders to understand who would be affected by the system and whose needs should be considered during the design process. Based on this understanding, we outlined epics for the game's key features, followed by user stories describing the detailed functional requirements. The overall game flow was then designed to show how players interact with the system.
 
@@ -67,32 +64,56 @@ Our team began by brainstorming various game ideas and collectively selected the
 #### 2.1 Ideation and Game Selection
 -> how the idea started 
 
-Each member of the team brainstormed 5-9 games of their faviourite games and brought their ideas to the meeting. During the meeting, everyone presented the game mechanics of their proposed ideas. 
+Each member of the team brainstormed 5-9 games of their faviourite games and brought their ideas to the meeting. During the meeting, everyone presented the core game mechanics of their proposed games. 
 
 ![Ideathon](docs/assets/gif/ideation.gif)
 
-As there are too many 
-We brought our idea into the meeting. Everyone shared the game mechaines of the purposed ideas. We decide to choose our two challenges first and find a game that is the best fits for the challenges. 
-The challenges: concurrency and AI were selected. We converged our ideas to two: the ultimate chicken horse and among us. We discussed about the pros and cons of the two games and think ultimate chicken would be the best fit. 
+As numerous ideas were proposed, our team decided to first identify the two key challenges: **concurrency** and **AI**. Based on these challenges, each member selected a game that either aligned with or could be adapted to fit the challenges. This process narrowed the selection down to six games. 
+
+The team then evaluated which of these games would best support the implementation of chosen challenges. As a result, two games were reduced to two games: **The Ultimate Chicken Horse** and **Among US**.  
+
+Both games were analysed to identify the most suitable base for the project. To account for time constraints, our selection involved a trade-off: a feature-rich base game would require fewer technical challenges, whereas a simpler base game would demand more complex implementations to maintain the project's level of difficulty. 
+
+| | <div align="center">Ultimate Chicken Horse<div> | <div align="center">Among Us<div> |  
+|:---:|:---|:---|
+| **Features** | • Obstacle placement <br> • Characters with different traits <br> • Different obstacles <br> • Scoreboard <br> • Coin collection / wallet system <br> • Timer <br> • Custom graphics  | • Task-based mini-games <br> • Visually Distinct characters <br> • Timer <br> • Custom graphics |
+| **Concurrency** | • Concurrent player movement <br> • Obstacle placement | • Concurrent player movement <br> • Task execution |
+| **AI Concept** | AI solver that can be purchased with coins recommends obstacle placement | AI imposter that decides whom, where and how to attack |
+
+
+Based on this comparison, **The Ultimate Chicken Horse** was selected as the base game due to its feature-rich design. This ensures that even if time constraints limit the implementation of the planned technical challenges, the project will still remain functional and cohesive as a playable game. 
+
+
+-> Add Appendix A: selection process
 
 #### 2.2 Stakeholders
 -> who is involved 
-To begin our game design process, we identified all possible individuals that needed to be taken into account when making our game.
 
-- Platformer game players
-- Casual game players
-- Software Engineering module lecturers
-- Classmates
-- Other academic staff/Bristol students
+To begin our game design process, we identified all relevant stakeholders including individuals and entities that needed to be taken into account when developing our game. These stakeholders were visualised using an onion model diagram. 
 
-To begin our game design process, we identified all possible individuals that needed to be taken into account when making our game. Building on the Onion Model we learned about in the lecture, we then split our list into three big categories (gamers, lecturers and other students), to better identify what qualities each one would look for in a game.
+![onion model](docs/assets/images/onion-model.png)
 
-Coming up with the epics (high level requirements) and subsequently, the user stories, was a very similar process to the Running app exercise we did during the workshop. Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users, which we had direct access to. This allowed us to come up with feedback-based requirements.
 
+Building on the Onion Model, we categoried the most relevant stakeholders into three groups: game players, lecturers and other students, to better identify what qualities each group would expect in a game. 
+
+- **Game players**: As primary users, they interact directly with the system. They expect an engaging and enjoyable gameplay experience.
+
+- **Lecturers**: As primary assessors, they evaluate the design process, technical implementation and whether the project meets academic requirements.
+
+- **Other students**: As peer testers, they provide critical feedbacks on bugs and playability. 
 
 
 #### 2.3 Epics:
 -> major game features
+Coming up with the epics (high level requirements) and subsequently, the user stories, was a very similar process to the Running app exercise we did during the workshop. Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users, which we had direct access to. This allowed us to come up with feedback-based requirements.
+
+
+| | <div align="center">Stakeholder Group<div> | <div align="center">Major Game Features<div> |  
+|:---:|:---|:---|
+| |  | |
+
+
+
 -<i>Gamer Group</i>
 
 - Retro/Nostalgic Visuals
@@ -161,8 +182,7 @@ Coming up with the epics (high level requirements) and subsequently, the user st
 <hr>
 
 ### 5. Evaluation
-
-- 15% ~750 words
+(15% ~750 words)
 
 - One qualitative evaluation (of your choice)
 
@@ -194,7 +214,9 @@ Coming up with the epics (high level requirements) and subsequently, the user st
 
 <hr>
 
-### 9. Additional Marks
+### 9. Appendix 
+
+
 
 You can delete this section in your own repo, it's just here for information. in addition to the marks above, we will be marking you on the following two points:
 
