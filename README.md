@@ -17,8 +17,8 @@ Add a video demo for v0.1.0 here...
 
 
 <h3>PAPER DEMO</h3>
-<video src="docs/assets/video/paper-demo-ultimate-chicken-horse.mp4" width="600" controls>
-</video>
+https://github.com/user-attachments/assets/b22ea9e5-d063-4fe0-875b-4679148b2b04
+
 
 <h3>Group Members</h3>
 
