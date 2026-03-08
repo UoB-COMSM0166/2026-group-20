@@ -103,12 +103,11 @@ Given the academic context of our game, we did not need to account for legal or 
 
 Building on our stakeholder analysis, we defined a set of epics (high-level requirements). These requirements were designed to satisfy the expectations of each stakeholder group, as the goal of the project was to develop a game aligns with user expectations.
 
-The following table summarises the key epics derived from the analysis:
 
 | <div align="center">Stakeholder Group<div> | <div align="center">High Level Requirements<div>                                                                                                                                                                                                                                     |
 | :----------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 |                 **Gamers**                 | • Retro / Nostalgic visuals <br> • Twists or added gameplay features <br> • Visually stimulating design <br> • Background audio and sound effects <br> • Game lore <br> • Core features (wallet system, scoreboard, intro tutorial) <br> • Good UX <br> • Multi-device compatibility |
-|               **Lecturersp**               | • Learning concept integration and application <br> • Clear demonstration of technical challenges <br> • Achievable within the project timeline <br> • Collaborative work <br> • Continuous progress updates <br> • Originality                                                      |
+|               **Lecturers**               | • Learning concept integration and application <br> • Clear demonstration of technical challenges <br> • Achievable within the project timeline <br> • Collaborative work <br> • Continuous progress updates <br> • Originality                                                      |
 |                **Students**                | • Social features <br> • Easy to pick up <br> • Short game sessions                                                                                                                                                                                                                  |
 
 #### 2.4 User Stories
