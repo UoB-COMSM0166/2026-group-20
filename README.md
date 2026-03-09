@@ -27,10 +27,10 @@ GROUP PHOTO. Add a group photo here.
 | Name       | Email                              |
 | ---------- | ---------------------------------- |
 | Megi       | jd25841@bristol.ac.uk              |
-| Maren      | ilamaran.magesh.2025@bristol.ac.uk |
+| Maran      | ilamaran.magesh.2025@bristol.ac.uk |
 | Jacqueline | oz25232@bristol.ac.uk              |
 | Jinwang    | ut25234@bristol.ac.uk              |
-| Mingxiao   | dh25275@bristol.ac.uk              |
+| Mengxiao   | dh25275@bristol.ac.uk              |
 | Eira       | xz25553@bristol.ac.uk              |
 
 
