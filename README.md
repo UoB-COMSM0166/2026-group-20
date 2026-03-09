@@ -12,9 +12,9 @@ An exciting multiplayer platformer where players design obstacles and race to re
 
 <hr style="border: none; height: 0.5px; background-color:#ddd;">
 
-<h3>VIDEO DEMO</h3>
-Add a video demo for v0.1.0 here...
+<h3>VIDEO DEMO (v0.1.0)</h3>
 
+https://github.com/user-attachments/assets/00920bfc-84fc-4969-a731-ab39fba2d5a1
 
 <h3>PAPER DEMO</h3>
 
@@ -212,9 +212,9 @@ will need to do the evaluation again when the game is almost ready
 
 - Provide a table of everyone's contribution, which _may_ be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
 
+### Reference
 
-
-### 9. Appendix
+### Appendix
 
 You can delete this section in your own repo, it's just here for information. in addition to the marks above, we will be marking you on the following two points:
 
