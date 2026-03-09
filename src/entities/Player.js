@@ -5,10 +5,7 @@ import { PlayerState } from "../config/PlayerState.js";
 import { PlayerGameState } from '../config/PlayerGameState.js';
 import { DeathReason } from "../config/DeathReason.js";
 
-
-
 import { moveAndCollideX, moveAndCollideY, checkSpikeCollision } from "../systems/PhysicsSystem.js";
-
 
 export class Player {
     constructor(p, x, y, playerNo) {
@@ -48,11 +45,6 @@ export class Player {
         this.respawnCountdown = 0;
     }
 
-    /**
-     *
-     *
-     * @memberof Player
-     */
     horizontalMovement() {
         this.vx = 0;
         if (this.input.left) {
@@ -76,17 +68,7 @@ export class Player {
         this.secondJump=this.input.jump;
     }
 
-    /**
-     *
-     *
-     * @param {*} allPlayers
-     * @param {*} respawnManager
-     * @return {*} 
-     * @memberof Player
-     */
-
-    //move
-    update(allPlayers, respawnManager) {
+    update(allPlayers, respawnManager, MAP) {
         if (this.lifeState !== PlayerState.ALIVE) {
             return;
         }
@@ -94,9 +76,10 @@ export class Player {
         this.horizontalMovement();
         this.jumpUp();
         this.comeDown();
-        this.moveAndCollide(allPlayers);
-        
-        if (checkSpikeCollision(this, this.p)) {
+
+        this.moveAndCollide(allPlayers, MAP);
+
+        if (checkSpikeCollision(this, this.p, MAP)) {
             respawnManager.triggerDeath(this, DeathReason.TRAP);
         }
 
@@ -110,19 +93,11 @@ export class Player {
         }
      }
 
-     //change name this is horrible 
-     //move to sparate file; handle collisions and the world
-     //move
-     moveAndCollide(allPlayers){
-        moveAndCollideX(this, this.vx, allPlayers, this.p);
-        moveAndCollideY(this, this.vy, allPlayers, this.p);
+     moveAndCollide(allPlayers, MAP){
+        moveAndCollideX(this, this.vx, allPlayers, this.p, MAP);
+        moveAndCollideY(this, this.vy, allPlayers, this.p, MAP);
      }
 
-    /**
-     *
-     *
-     * @memberof Player
-     */
     updateMovementState() {
         if (this.vx > 0) {
          this.facingRight = true;
@@ -138,57 +113,6 @@ export class Player {
         }
     }
 
-    /**
-     *
-     *
-     * @return {*} //???
-     * @memberof Player
-     */
-
-   //  display() {
-   //      if (!this.isVisible) {
-   //          return;
-   //      }
-   //      const p = this.p;
-   //      p.noStroke();
-   //      let alpha;
-   //      if(PlayerState.RESPAWNING===this.lifeState){
-   //          alpha=120;
-   //      }
-   //      else{
-   //          alpha=255;
-   //      }
-
-   //      let playerColor;
-   //      if (this.playerNo === 0) {
-   //          playerColor = p.color(90, 170, 255, alpha);
-   //      } 
-   //      else {
-   //          playerColor = p.color(255, 200, 80, alpha);
-   //      }
-   //      p.fill(playerColor);
-   //      p.rect(this.x, this.y, this.w, this.h, 6);
-   //      p.fill(255);
-   //      p.textAlign(p.CENTER, p.BOTTOM);
-   //      p.textSize(16);
-   //      p.textFont('Arial');
-
-   //      if (this.lifeState === PlayerState.RESPAWNING) {
-   //          p.fill(255, 100, 100);
-   //          p.text(Math.ceil(this.respawnCountdown) + "s", this.x + this.w / 2, this.y - 5);
-   //      } 
-   //      else {
-   //          p.text(this.movementState, this.x + this.w / 2, this.y - 5);
-   //      }
-   //  }
-
-    /**
-     *
-     *
-     * @param {*} reason
-     * @return {*} 
-     * @memberof Player
-     */
     die(reason) {
         if (this.lifeState === PlayerState.DEAD) {
             return;
@@ -202,11 +126,6 @@ export class Player {
         console.log(`Player ${this.playerNo} died due to: ${reason}`);
     }
 
-    /**
-     *
-     *
-     * @memberof Player
-     */
     prepareRespawn() {
         this.lifeState = PlayerState.RESPAWNING;
         this.x = this.spawnX;
@@ -214,38 +133,16 @@ export class Player {
         console.log(`Player ${this.playerNo} is preparing to respawn`);
     }
 
-    /**
-     *
-     *
-     * @memberof Player
-     */
-    //Needs to be moved to a separate class 
      finishRespawn() {
         this.lifeState = PlayerState.ALIVE;
         this.movementState = PlayerMovementState.IDLE;
         console.log(`Player ${this.playerNo} has respawned completely`);
     }
-    
 
-    /**
-     *
-     *
-     * @readonly
-     * @memberof Player
-     */
     get isVisible() {
-        // Player is visible only when alive
         return this.lifeState === PlayerState.ALIVE || this.lifeState === PlayerState.RESPAWNING;
-        // Player is invisible when dead 
-        // but could be transparent when respawning
     }
 
-    /**
-     *
-     *
-     * @param {*} newState
-     * @memberof Player
-     */
     setGameState(newState) {
         this.gameState = newState;
     }

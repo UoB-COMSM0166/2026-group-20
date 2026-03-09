@@ -1,6 +1,16 @@
-import { isSolid, isSpike } from "../systems/MapGeneration.js";
+// import { isSolid, isSpike } from "../systems/MapGeneration.js";
 import { aabbIntersects } from "../utils/collision.js";
 import { GameConfig } from "../config/GameConfig.js";
+
+function checkIsSolid(tx, ty, MAP) {
+    if (!MAP || !MAP[ty] || MAP[ty][tx] === undefined) return false;
+    return MAP[ty][tx] === "#";
+}
+
+function checkIsSpike(tx, ty, MAP) {
+    if (!MAP || !MAP[ty] || MAP[ty][tx] === undefined) return false;
+    return MAP[ty][tx] === "S";
+}
 
 //huh??
 function getTileRange(entity, p) {
@@ -12,14 +22,14 @@ function getTileRange(entity, p) {
     };
 }
 
-export function moveAndCollideX(entity, dx, allPlayers, p) {
+export function moveAndCollideX(entity, dx, allPlayers, p, MAP) {
     if (dx === 0) return;
     entity.x += dx;
 
     const { left, right, top, bottom } = getTileRange(entity, p);
     const tx = dx > 0 ? right : left;
     for (let ty = top; ty <= bottom; ty++) {
-        if (!isSolid(tx, ty)) continue;
+        if (!checkIsSolid(tx, ty, MAP)) continue;
         const tileX = tx * GameConfig.TILE, tileY = ty * GameConfig.TILE;
         if (aabbIntersects(entity.x, entity.y, entity.w, entity.h, tileX, tileY, GameConfig.TILE, GameConfig.TILE)) {
             entity.x = dx > 0 ? (tileX - entity.w - entity.skin) : (tileX + GameConfig.TILE + entity.skin);
@@ -34,7 +44,7 @@ export function moveAndCollideX(entity, dx, allPlayers, p) {
     }
 }
 
-export function moveAndCollideY(entity, dy, allPlayers, p) {
+export function moveAndCollideY(entity, dy, allPlayers, p, MAP) {
     entity.onGround = false;
     if (dy === 0) return;
     entity.y += dy;
@@ -42,7 +52,7 @@ export function moveAndCollideY(entity, dy, allPlayers, p) {
     const { left, right, top, bottom } = getTileRange(entity, p);
     const ty = dy > 0 ? bottom : top;
     for (let tx = left; tx <= right; tx++) {
-        if (!isSolid(tx, ty)) continue;
+        if (!checkIsSolid(tx, ty, MAP)) continue;
         const tileX = tx * GameConfig.TILE, tileY = ty * GameConfig.TILE;
         if (aabbIntersects(entity.x, entity.y, entity.w, entity.h, tileX, tileY, GameConfig.TILE, GameConfig.TILE)) {
             if (dy > 0) {
@@ -70,11 +80,11 @@ export function moveAndCollideY(entity, dy, allPlayers, p) {
     }
 }
 
-export function checkSpikeCollision(entity, p) {
+export function checkSpikeCollision(entity, p, MAP) {
     const { left, right, top, bottom } = getTileRange(entity, p);
     for (let ty = top; ty <= bottom; ty++) {
         for (let tx = left; tx <= right; tx++) {
-            if (!isSpike(tx, ty)) continue;
+            if (!checkIsSpike(tx, ty, MAP)) continue;
             const tileX = tx * GameConfig.TILE, tileY = ty * GameConfig.TILE;
             if (aabbIntersects(entity.x, entity.y, entity.w, entity.h, tileX, tileY, GameConfig.TILE, GameConfig.TILE)) {
                 return true;

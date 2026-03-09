@@ -1,14 +1,10 @@
 import { Player } from "./entities/Player.js";
-//import { MAP, TILE } from "./utils/tiles.js";
 import { RespawnManager } from "./systems/RespawnManager.js";
 import { GameStage } from "./config/GameStage.js";
 import { MapMenu } from "./systems/MapMenu.js";
 import { SplashScreen } from "./systems/SplashScreen.js";
-
 import { TimeManager } from "./systems/TimeManager.js"; 
 import { PlayerGameState } from "./config/PlayerGameState.js"; 
-
-import { drawMap, MAP } from "./systems/MapGeneration.js";
 import { GameConfig } from './config/GameConfig.js';
 import { DrawPlayer } from "./utils/DrawPlayer.js";
 
@@ -28,19 +24,53 @@ export const sketch = (p) => {
     let offsetX = 0;
     let offsetY = 0;
 
+    let mapData;
+    let tilesetImage;
+    let MAP = [];
+
+    p.preload = function () {
+        mapData = p.loadJSON("src/assets/maps/map.JSON");
+        tilesetImage = p.loadImage("src/assets/images/tiles/Tileset.png");
+    }
+
     p.setup = function () {
         p.createCanvas(p.windowWidth, p.windowHeight);
 
-        gameWidth = MAP[0].length * GameConfig.TILE;
-        gameHeight = MAP.length * GameConfig.TILE;
+        GameConfig.TILE = mapData.tilewidth;
+        gameWidth = mapData.width * mapData.tilewidth;
+        gameHeight = mapData.height * mapData.tileheight;
+
+        generateCollisionMap();
+
+        // Parsing the object layer
+        for (let layer of mapData.layers) {
+            if (layer.name === 'Object_Layer_1') {
+                for (let obj of layer.objects) {
+                    if (obj.name === 'startPoint') {
+                        players = [
+                            new Player(p, obj.x, obj.y, 0),
+                            new Player(p, obj.x, obj.y, 1)
+                        ]
+                    } else if (obj.name === 'endPoint') {
+                        // calulate tile coordinates for the end point if needed
+                        let startCol = p.floor(obj.x / mapData.tilewidth);
+                        let startRow = p.floor(obj.y / mapData.tileheight);
+                        let endCol = p.floor((obj.x + obj.width) / mapData.tilewidth);
+                        let endRow = p.floor((obj.y + obj.height) / mapData.tileheight);
+
+                        for (let r = startRow; r <= endRow; r++) {
+                            for (let c = startCol; c <= endCol; c++) {
+                                if (MAP[r] && MAP[r][c] !== undefined) {
+                                    MAP[r][c] = "F"; 
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         respawnManager = new RespawnManager();
-        //mapGeneration= new MapGeneration();
-        players = [
-            new Player(p, 11 * GameConfig.TILE,( 7 * GameConfig.TILE) - 40, 0),
-            new Player(p, 13 * GameConfig.TILE, (7 * GameConfig.TILE) - 40, 1),
-        ];
-
         timeManager = new TimeManager(players);
 
         timeManager.reset(); 
@@ -92,7 +122,8 @@ export const sketch = (p) => {
 
     function playMap1Loop(p) {
         p.background(25);
-        drawMap(p);
+        
+        renderTiledMap(p);
 
         let deltaTime = p.deltaTime || 16.6;
         respawnManager.update(deltaTime);
@@ -102,7 +133,7 @@ export const sketch = (p) => {
         if (!timeManager.isGameOver) {
             for (const player of players) {
                 if (player.gameState !== PlayerGameState.SUCCESS) {
-                    player.update(players, respawnManager);
+                    player.update(players, respawnManager, MAP);
 
                     let tx = p.floor((player.x + player.w / 2) / GameConfig.TILE);
                     let ty = p.floor((player.y + player.h / 2) / GameConfig.TILE);
@@ -198,28 +229,70 @@ export const sketch = (p) => {
         }
     }
 
+    function renderTiledMap(p) {
+        if (!mapData || !tilesetImage) return;
 
-   //  function drawMap() {
-   //      p.noStroke();
-   //      for (let y = 0; y < MAP.length; y++) {
-   //          for (let x = 0; x < MAP[0].length; x++) {
-   //              const c = MAP[y][x];
-   //              if (c === "#") {
-   //                  p.fill(80);
-   //                  p.rect(x * TILE, y * TILE, TILE, TILE);
-   //              } else if (c === "S") {
-   //                  p.fill(220, 80, 80);
-   //                  const px = x * TILE, py = y * TILE;
-   //                  p.triangle(px, py + TILE, px + TILE / 2, py + 6, px + TILE, py + TILE);
-   //              } else if (c === "F") {
-   //                  p.fill(100, 220, 100);
-   //                  p.rect(x * TILE, y * TILE, TILE, TILE);
-   //                  p.fill(255);
-   //                  p.textAlign(p.CENTER, p.CENTER);
-   //                  p.textSize(12);
-   //                  p.text("GOAL", x * TILE + TILE/2, y * TILE + TILE/2);
-   //              }
-   //          }
-   //      }
-   //  }
+        let tileW = mapData.tilewidth;
+        let tileH = mapData.tileheight;
+
+        let tilesetCols = tilesetImage.width / tileW;
+
+        for (let layer of mapData.layers) {
+            // We only render tile layers that are not the collision layer
+            if (layer.type === 'tilelayer' && layer.name !== 'Collision_Layer') {
+                let data = layer.data;
+                let cols = layer.width; 
+
+                for (let i = 0; i < data.length; i++) {
+                    let gid = data[i];
+
+                    if (gid !== 0) { 
+
+                        let col = i % cols;
+                        let row = p.floor(i / cols);
+                        let destX = col * tileW;
+                        let destY = row * tileH;
+
+                        let localId = gid - 1; 
+                        let srcX = (localId % tilesetCols) * tileW;
+                        let srcY = p.floor(localId / tilesetCols) * tileH;
+
+                        p.image(
+                            tilesetImage, 
+                            destX, destY, tileW, tileH, 
+                            srcX, srcY, tileW, tileH
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    function generateCollisionMap() {
+        MAP = []; 
+        let cols = mapData.width;
+        let rows = mapData.height;
+
+        for (let y = 0; y < rows; y++) {
+            let rowArray = [];
+            for (let x = 0; x < cols; x++) {
+                rowArray.push("."); 
+            }
+            MAP.push(rowArray);
+        }
+
+        for (let layer of mapData.layers) {
+            if (layer.name === 'Collision_Layer') {
+                for (let i = 0; i < layer.data.length; i++) {
+                    let gid = layer.data[i];
+
+                    if (gid !== 0) {
+                        let x = i % cols;
+                        let y = p.floor(i / cols);
+                        MAP[y][x] = "#";
+                    }
+                }
+            }
+        }
+    }
 };
