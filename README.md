@@ -1,4 +1,4 @@
-<h1 align="center">The Ultimate Chicken Horse</h1>
+<h1 align="center">The Ultimate Chicken Horse (provisional name) </h1>
 
 <h3 align="center">
   COMSM0166 (2026) · Group 20 
