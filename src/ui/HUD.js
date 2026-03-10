@@ -36,11 +36,7 @@ export class HUD {
         p.fill(255);
         p.textSize(24);
         p.textAlign(p.CENTER, p.TOP);
-        p.text(
-            `Time: ${Math.ceil(this.timeManager.timeLeft)}s`,
-            this.gameWidth / 2,
-            20,
-        );
+        p.text(`Time: ${Math.ceil(this.timeManager.timeLeft)}s`, this.gameWidth / 2, 20);
     }
 
     _drawScores(players) {
@@ -52,10 +48,6 @@ export class HUD {
         p.fill(255);
         p.textSize(14);
         p.textAlign(p.LEFT, p.BOTTOM);
-        p.text(
-            'P1: A/D + W   P2: ←/→ + ↑   (Press ESC to Return)',
-            10,
-            this.gameHeight - 10,
-        );
+        p.text('P1: A/D + W   P2: ←/→ + ↑   (Press ESC to Return)', 10, this.gameHeight - 10);
     }
 }

@@ -17,23 +17,19 @@ export class Obstacle {
      * @param {number} y - World y position in pixels (top-left, snapped to tile grid)
      */
     constructor(p, x, y) {
-        this.p = p;
-        this.x = x;
-        this.y = y;
-        this.w = GameConfig.TILE;
-        this.h = GameConfig.TILE;
+        this.p      = p;
+        this.x      = x;
+        this.y      = y;
+        this.w      = GameConfig.TILE;
+        this.h      = GameConfig.TILE;
         this.active = true;
     }
 
     /** @returns {boolean} true if this obstacle should block player movement */
-    get isSolid() {
-        return false;
-    }
+    get isSolid()  { return false; }
 
     /** @returns {boolean} true if touching this obstacle kills the player */
-    get isHazard() {
-        return false;
-    }
+    get isHazard() { return false; }
 
     /**
      * Per-frame logic. Override for moving/animated obstacles.

@@ -15,14 +15,14 @@
  */
 export class State {
     constructor(ctx, goTo) {
-        this.ctx = ctx;
+        this.ctx  = ctx;
         this.goTo = goTo;
     }
 
-    enter() {}
-    update(_deltaTime) {}
-    render(_mx, _my) {}
-    mousePressed(_mx, _my) {}
-    keyPressed() {}
-    exit() {}
+    enter()                      {}
+    update(_deltaTime)           {}
+    render(_mx, _my)             {}
+    mousePressed(_mx, _my)       {}
+    keyPressed()                 {}
+    exit()                       {}
 }

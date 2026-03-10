@@ -25,10 +25,10 @@ export class PlayState extends State {
         const { p, gameWidth, gameHeight, players, scoreManager } = this.ctx;
 
         // Per-round objects — recreated / reset each time we enter this state
-        this.coins = getCoins(p);
+        this.coins         = getCoins(p);
         this.respawnManager = new RespawnManager(scoreManager);
-        this.timeManager = new TimeManager(players, scoreManager);
-        this.scoreboard = new Scoreboard(p, gameWidth, gameHeight);
+        this.timeManager   = new TimeManager(players, scoreManager);
+        this.scoreboard    = new Scoreboard(p, gameWidth, gameHeight);
 
         this._resetRound();
     }
@@ -81,27 +81,18 @@ export class PlayState extends State {
         p.fill(255);
         p.textSize(24);
         p.textAlign(p.CENTER, p.TOP);
-        p.text(
-            `Time: ${Math.ceil(this.timeManager.timeLeft)}s`,
-            gameWidth / 2,
-            20,
-        );
+        p.text(`Time: ${Math.ceil(this.timeManager.timeLeft)}s`, gameWidth / 2, 20);
 
         // HUD — per-player round coins + wallet (sides)
         p.textSize(16);
         for (const player of players) {
             const side = player.playerNo === 0 ? p.LEFT : p.RIGHT;
-            const hx = player.playerNo === 0 ? 10 : gameWidth - 10;
+            const hx   = player.playerNo === 0 ? 10 : gameWidth - 10;
             p.textAlign(side, p.TOP);
-            p.fill(
-                player.playerNo === 0
-                    ? p.color(90, 170, 255)
-                    : p.color(255, 200, 80),
-            );
+            p.fill(player.playerNo === 0 ? p.color(90, 170, 255) : p.color(255, 200, 80));
             p.text(
                 `P${player.playerNo + 1}  🪙 ${scoreManager.getRoundCoins(player)}  💰 ${scoreManager.getWallet(player)}`,
-                hx,
-                20,
+                hx, 20
             );
         }
 
@@ -109,11 +100,7 @@ export class PlayState extends State {
         p.fill(255);
         p.textSize(14);
         p.textAlign(p.LEFT, p.BOTTOM);
-        p.text(
-            'P1: A/D + W   P2: ←/→ + ↑   (ESC to return)',
-            10,
-            gameHeight - 10,
-        );
+        p.text('P1: A/D + W   P2: ←/→ + ↑   (ESC to return)', 10, gameHeight - 10);
 
         // Scoreboard overlay when game is over
         if (this.timeManager.isGameOver) {

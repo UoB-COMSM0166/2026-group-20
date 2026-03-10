@@ -15,13 +15,13 @@ export class PlayerScore {
      * @param {number} playerNo
      */
     constructor(playerNo) {
-        this.playerNo = playerNo;
-        this.finished = false;
+        this.playerNo   = playerNo;
+        this.finished   = false;
         this.finishTime = null; // seconds elapsed at finish
-        this.deaths = 0;
-        this.coins = 0; // snapshot of round coins at end-of-round
-        this.wallet = 0; // snapshot of wallet after rewards applied
-        this.rank = null;
+        this.deaths     = 0;
+        this.coins      = 0;   // snapshot of round coins at end-of-round
+        this.wallet     = 0;   // snapshot of wallet after rewards applied
+        this.rank       = null;
     }
 
     /**

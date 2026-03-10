@@ -4,6 +4,8 @@ import { GameConfig } from '../config/GameConfig.js';
 import { ObstacleType } from '../config/ObstacleType.js';
 import { Platform } from '../entities/obstacles/Platform.js';
 import { SpikeObstacle } from '../entities/obstacles/SpikeObstacle.js';
+import { Cannon, CannonDir } from '../entities/obstacles/Cannon.js';
+import { Saw } from '../entities/obstacles/Saw.js';
 import { drawMap, MAP } from '../maps/MapLoader.js';
 
 // Map tile characters that cannot be overwritten when placing obstacles
@@ -31,26 +33,39 @@ const BLOCKED_TILES = new Set(['#', 'S', 'F', 'C']);
  *   ESC   → MapMenuState
  */
 export class BuildState extends State {
+
     // ── Palette definition ────────────────────────────────────────────────
     static PALETTE = [
         {
-            type: ObstacleType.PLATFORM,
+            type:  ObstacleType.PLATFORM,
             label: 'Platform',
-            hint: 'Solid block',
+            hint:  'Solid block',
             color: [120, 90, 60],
         },
         {
-            type: ObstacleType.SPIKE,
+            type:  ObstacleType.SPIKE,
             label: 'Spike',
-            hint: 'Kills on touch',
+            hint:  'Kills on touch',
             color: [220, 60, 60],
+        },
+        {
+            type:  ObstacleType.CANNON,
+            label: 'Cannon',
+            hint:  'Fires projectiles',
+            color: [70, 70, 80],
+        },
+        {
+            type:  ObstacleType.SAW,
+            label: 'Saw',
+            hint:  'Spinning blade',
+            color: [200, 60, 60],
         },
     ];
 
     enter() {
-        // Clear placed obstacles from any previous round
         this.ctx.placedObstacles.length = 0;
         this._selectedType = null;
+        this._cannonDir    = CannonDir.RIGHT; // default direction for cannon placement
     }
 
     update(_dt) {}
@@ -68,20 +83,20 @@ export class BuildState extends State {
         }
 
         // ── Ghost preview (snapped to grid, only over map area) ──────────
-        const T = GameConfig.TILE;
-        const snapX = Math.floor(mx / T) * T;
-        const snapY = Math.floor(my / T) * T;
-        const onMap =
-            snapX >= 0 &&
-            snapX < gameWidth &&
-            snapY >= 0 &&
-            snapY < gameHeight - this._paletteH();
+        const T       = GameConfig.TILE;
+        const snapX   = Math.floor(mx / T) * T;
+        const snapY   = Math.floor(my / T) * T;
+        const onMap   = snapX >= 0 && snapX < gameWidth && snapY >= 0 && snapY < gameHeight - this._paletteH();
 
         if (this._selectedType && onMap && !this._isTileBlocked(snapX, snapY)) {
             if (this._selectedType === ObstacleType.PLATFORM) {
                 Platform.drawGhost(p, snapX, snapY);
             } else if (this._selectedType === ObstacleType.SPIKE) {
                 SpikeObstacle.drawGhost(p, snapX, snapY);
+            } else if (this._selectedType === ObstacleType.CANNON) {
+                Cannon.drawGhost(p, snapX, snapY, this._cannonDir);
+            } else if (this._selectedType === ObstacleType.SAW) {
+                Saw.drawGhost(p, snapX, snapY);
             }
         }
 
@@ -97,16 +112,18 @@ export class BuildState extends State {
 
         p.fill(180, 180, 200);
         p.textSize(12);
-        p.text(
-            'Place obstacles on the map — Press ENTER to start | ESC to exit',
-            gameWidth / 2,
-            30,
-        );
+        p.text('Place obstacles on the map — Press ENTER to start | ESC to exit', gameWidth / 2, 30);
+
+        // Show cannon direction hint when cannon is selected
+        if (this._selectedType === ObstacleType.CANNON) {
+            p.fill(255, 180, 80);
+            p.text(`Cannon direction: ${this._cannonDir}  (press R to rotate)`, gameWidth / 2, 48);
+        }
     }
 
     mousePressed(mx, my) {
         const { p, gameWidth, gameHeight } = this.ctx;
-        const T = GameConfig.TILE;
+        const T        = GameConfig.TILE;
         const paletteY = gameHeight - this._paletteH();
 
         if (my >= paletteY) {
@@ -139,14 +156,17 @@ export class BuildState extends State {
             this.goTo(GameStage.RUN);
         } else if (p.keyCode === p.ESCAPE) {
             this.goTo(GameStage.MAPMENU);
+        } else if (p.key === 'r' || p.key === 'R') {
+            // Rotate cannon direction clockwise
+            const dirs   = [CannonDir.RIGHT, CannonDir.DOWN, CannonDir.LEFT, CannonDir.UP];
+            const idx    = dirs.indexOf(this._cannonDir);
+            this._cannonDir = dirs[(idx + 1) % dirs.length];
         }
     }
 
     // ── Private ───────────────────────────────────────────────────────────
 
-    _paletteH() {
-        return 70;
-    }
+    _paletteH() { return 70; }
 
     _drawPalette(mx, my) {
         const { p, gameWidth, gameHeight } = this.ctx;
@@ -170,15 +190,14 @@ export class BuildState extends State {
         p.text('Obstacles:', 12, pY + pH / 2);
 
         // Obstacle buttons
-        const btnW = 90;
-        const btnH = 44;
+        const btnW   = 90;
+        const btnH   = 44;
         const startX = 100;
-        const btnY = pY + (pH - btnH) / 2;
+        const btnY   = pY + (pH - btnH) / 2;
 
         BuildState.PALETTE.forEach((item, i) => {
-            const bx = startX + i * (btnW + 10);
-            const hovered =
-                mx >= bx && mx <= bx + btnW && my >= btnY && my <= btnY + btnH;
+            const bx       = startX + i * (btnW + 10);
+            const hovered  = mx >= bx && mx <= bx + btnW && my >= btnY && my <= btnY + btnH;
             const selected = this._selectedType === item.type;
 
             // Button background
@@ -224,50 +243,44 @@ export class BuildState extends State {
 
     _handlePaletteClick(mx, my) {
         const { gameHeight } = this.ctx;
-        const btnW = 90;
-        const btnH = 44;
+        const btnW   = 90;
+        const btnH   = 44;
         const startX = 100;
-        const btnY =
-            gameHeight - this._paletteH() + (this._paletteH() - btnH) / 2;
+        const btnY   = gameHeight - this._paletteH() + (this._paletteH() - btnH) / 2;
 
         BuildState.PALETTE.forEach((item, i) => {
             const bx = startX + i * (btnW + 10);
-            if (
-                mx >= bx &&
-                mx <= bx + btnW &&
-                my >= btnY &&
-                my <= btnY + btnH
-            ) {
+            if (mx >= bx && mx <= bx + btnW && my >= btnY && my <= btnY + btnH) {
                 // Toggle off if already selected
-                this._selectedType =
-                    this._selectedType === item.type ? null : item.type;
+                this._selectedType = this._selectedType === item.type ? null : item.type;
             }
         });
     }
 
     _isTileBlocked(px, py) {
-        const T = GameConfig.TILE;
+        const T  = GameConfig.TILE;
         const tx = Math.floor(px / T);
         const ty = Math.floor(py / T);
-        if (ty < 0 || ty >= MAP.length || tx < 0 || tx >= MAP[0].length)
-            return true;
+        if (ty < 0 || ty >= MAP.length || tx < 0 || tx >= MAP[0].length) return true;
         return BLOCKED_TILES.has(MAP[ty][tx]);
     }
 
     _obstacleAt(px, py) {
-        return this.ctx.placedObstacles.some((o) => o.x === px && o.y === py);
+        return this.ctx.placedObstacles.some(o => o.x === px && o.y === py);
     }
 
     _removeAt(px, py) {
         const arr = this.ctx.placedObstacles;
-        const idx = arr.findIndex((o) => o.x === px && o.y === py);
+        const idx = arr.findIndex(o => o.x === px && o.y === py);
         if (idx !== -1) arr.splice(idx, 1);
     }
 
     _createObstacle(type, x, y) {
         const { p } = this.ctx;
         if (type === ObstacleType.PLATFORM) return new Platform(p, x, y);
-        if (type === ObstacleType.SPIKE) return new SpikeObstacle(p, x, y);
+        if (type === ObstacleType.SPIKE)    return new SpikeObstacle(p, x, y);
+        if (type === ObstacleType.CANNON)   return new Cannon(p, x, y, this._cannonDir);
+        if (type === ObstacleType.SAW)      return new Saw(p, x, y);
         return null;
     }
 }

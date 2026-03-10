@@ -4,5 +4,7 @@
  */
 export const ObstacleType = Object.freeze({
     PLATFORM: 'PLATFORM', // solid block — blocks movement
-    SPIKE: 'SPIKE', // hazard — kills on contact
+    SPIKE:    'SPIKE',    // hazard — kills on contact
+    CANNON:   'CANNON',  // fires projectiles in a set direction
+    SAW:      'SAW',     // spinning blade — hazard, not solid
 });

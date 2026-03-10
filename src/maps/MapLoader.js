@@ -48,40 +48,18 @@ export function drawMap(p) {
             const c = MAP[y][x];
             if (c === '#') {
                 p.fill(80);
-                p.rect(
-                    x * GameConfig.TILE,
-                    y * GameConfig.TILE,
-                    GameConfig.TILE,
-                    GameConfig.TILE,
-                );
+                p.rect(x * GameConfig.TILE, y * GameConfig.TILE, GameConfig.TILE, GameConfig.TILE);
             } else if (c === 'S') {
                 p.fill(220, 80, 80);
-                const px = x * GameConfig.TILE,
-                    py = y * GameConfig.TILE;
-                p.triangle(
-                    px,
-                    py + GameConfig.TILE,
-                    px + GameConfig.TILE / 2,
-                    py + 6,
-                    px + GameConfig.TILE,
-                    py + GameConfig.TILE,
-                );
+                const px = x * GameConfig.TILE, py = y * GameConfig.TILE;
+                p.triangle(px, py + GameConfig.TILE, px + GameConfig.TILE / 2, py + 6, px + GameConfig.TILE, py + GameConfig.TILE);
             } else if (c === 'F') {
                 p.fill(100, 220, 100);
-                p.rect(
-                    x * GameConfig.TILE,
-                    y * GameConfig.TILE,
-                    GameConfig.TILE,
-                    GameConfig.TILE,
-                );
+                p.rect(x * GameConfig.TILE, y * GameConfig.TILE, GameConfig.TILE, GameConfig.TILE);
                 p.fill(255);
                 p.textAlign(p.CENTER, p.CENTER);
                 p.textSize(12);
-                p.text(
-                    'GOAL',
-                    x * GameConfig.TILE + GameConfig.TILE / 2,
-                    y * GameConfig.TILE + GameConfig.TILE / 2,
-                );
+                p.text('GOAL', x * GameConfig.TILE + GameConfig.TILE / 2, y * GameConfig.TILE + GameConfig.TILE / 2);
             }
             // 'C' tiles are handled as Coin entities — skip here
         }

@@ -14,14 +14,14 @@ export class Scoreboard {
      * @param {number} gameHeight
      */
     constructor(p, gameWidth, gameHeight) {
-        this.p = p;
-        this.gameWidth = gameWidth;
+        this.p          = p;
+        this.gameWidth  = gameWidth;
         this.gameHeight = gameHeight;
 
         // Colours per player index
         this.playerColours = [
-            { r: 90, g: 170, b: 255 }, // P1 — blue
-            { r: 255, g: 200, b: 80 }, // P2 — orange
+            { r: 90,  g: 170, b: 255 }, // P1 — blue
+            { r: 255, g: 200, b: 80  }, // P2 — orange
             { r: 100, g: 220, b: 120 }, // P3 — green
             { r: 255, g: 100, b: 120 }, // P4 — red
         ];
@@ -34,7 +34,7 @@ export class Scoreboard {
      * @param {ScoreManager} scoreManager
      */
     render(scoreManager) {
-        const p = this.p;
+        const p  = this.p;
         const gw = this.gameWidth;
         const gh = this.gameHeight;
 
@@ -71,13 +71,13 @@ export class Scoreboard {
         p.textSize(13);
         p.textAlign(p.CENTER, p.TOP);
 
-        p.text('RANK', cols.rank, headerY);
-        p.text('PLAYER', cols.player, headerY);
-        p.text('STATUS', cols.status, headerY);
-        p.text('TIME', cols.time, headerY);
-        p.text('DEATHS', cols.deaths, headerY);
-        p.text('COINS', cols.coins, headerY);
-        p.text('WALLET', cols.wallet, headerY);
+        p.text('RANK',    cols.rank,   headerY);
+        p.text('PLAYER',  cols.player, headerY);
+        p.text('STATUS',  cols.status, headerY);
+        p.text('TIME',    cols.time,   headerY);
+        p.text('DEATHS',  cols.deaths, headerY);
+        p.text('COINS',   cols.coins,  headerY);
+        p.text('WALLET',  cols.wallet, headerY);
 
         // Divider
         p.stroke(60, 60, 90);
@@ -87,16 +87,12 @@ export class Scoreboard {
 
         // ── Rows ─────────────────────────────────────────────────────────────
         const ranked = scoreManager.getRankedScores();
-        const rowH = 38;
+        const rowH   = 38;
         const firstRowY = headerY + 30;
 
         ranked.forEach((score, i) => {
-            const rowY = firstRowY + i * rowH;
-            const col = this.playerColours[score.playerNo] ?? {
-                r: 200,
-                g: 200,
-                b: 200,
-            };
+            const rowY  = firstRowY + i * rowH;
+            const col   = this.playerColours[score.playerNo] ?? { r: 200, g: 200, b: 200 };
             const isTop = i === 0;
 
             // Highlight top row
@@ -133,11 +129,7 @@ export class Scoreboard {
             p.text(score.finishTimeFormatted, cols.time, rowY + 2);
 
             // Deaths
-            p.fill(
-                score.deaths > 0
-                    ? p.color(255, 130, 130)
-                    : p.color(180, 180, 200),
-            );
+            p.fill(score.deaths > 0 ? p.color(255, 130, 130) : p.color(180, 180, 200));
             p.text(score.deaths, cols.deaths, rowY + 2);
 
             // Coins
@@ -152,12 +144,7 @@ export class Scoreboard {
             if (i < ranked.length - 1) {
                 p.stroke(40, 40, 60);
                 p.strokeWeight(1);
-                p.line(
-                    panelX + 16,
-                    rowY + rowH - 6,
-                    panelX + panelW - 16,
-                    rowY + rowH - 6,
-                );
+                p.line(panelX + 16, rowY + rowH - 6, panelX + panelW - 16, rowY + rowH - 6);
                 p.noStroke();
             }
         });

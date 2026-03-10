@@ -17,11 +17,7 @@ export class Map2State extends State {
         p.textSize(24);
         p.text('Map 2 is coming soon...', gameWidth / 2, gameHeight / 2);
         p.textSize(14);
-        p.text(
-            'Press ESC to return to Map Menu',
-            gameWidth / 2,
-            gameHeight / 2 + 40,
-        );
+        p.text('Press ESC to return to Map Menu', gameWidth / 2, gameHeight / 2 + 40);
     }
 
     keyPressed() {
