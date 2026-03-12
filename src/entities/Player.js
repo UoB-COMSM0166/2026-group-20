@@ -86,7 +86,7 @@ export class Player {
      */
 
     //move
-    update(allPlayers, respawnManager) {
+    update(allPlayers, respawnManager, obstacles = []) {
         if (this.lifeState !== PlayerState.ALIVE) {
             return;
         }
@@ -94,9 +94,9 @@ export class Player {
         this.horizontalMovement();
         this.jumpUp();
         this.comeDown();
-        this.moveAndCollide(allPlayers);
+        this.moveAndCollide(allPlayers, obstacles);
         
-        if (checkSpikeCollision(this, this.p)) {
+        if (checkSpikeCollision(this, this.p, obstacles)) {
             respawnManager.triggerDeath(this, DeathReason.TRAP);
         }
 
@@ -113,9 +113,9 @@ export class Player {
      //change name this is horrible 
      //move to sparate file; handle collisions and the world
      //move
-     moveAndCollide(allPlayers){
-        moveAndCollideX(this, this.vx, allPlayers, this.p);
-        moveAndCollideY(this, this.vy, allPlayers, this.p);
+     moveAndCollide(allPlayers, obstacles = []) {
+        moveAndCollideX(this, this.vx, allPlayers, this.p, obstacles);
+        moveAndCollideY(this, this.vy, allPlayers, this.p, obstacles);
      }
 
     /**
