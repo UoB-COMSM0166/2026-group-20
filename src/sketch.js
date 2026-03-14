@@ -32,15 +32,31 @@ export const sketch = (p) => {
     let scaleFactor = 1;
     let offsetX     = 0;
     let offsetY     = 0;
+    //let frameIndex=0;
 
-    // ── Setup ──────────────────────────────────────────────────────────────
+    //let cowImg; 
+    //let bunnyImg;
+    //let smallChickenImg;
+    let chickenAllFrames2;
+    let bunnyAllFrames;
+
+    p.preload = function(){
+      //cowImg = p.loadImage("src/assets/sprites/cow_frames.png");
+      //bunnyImg = p.loadImage("src/assets/sprites/bunny_frames.png");
+      //smallChickenImg= p.loadImage("src/assets/sprites/small_chicken.png");
+      chickenAllFrames2= p.loadImage("src/assets/sprites/chicken_all_frames2.png");
+      bunnyAllFrames= p.loadImage("src/assets/sprites/bunny_all_frames.png");
+      console.log("loaded");
+    };
+
+    // ── Setup ──
 
     p.setup = function () {
         p.createCanvas(p.windowWidth, p.windowHeight);
 
         const players      = [
-            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 0),
-            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 1),
+            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 0, chickenAllFrames2),
+            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 1, bunnyAllFrames),
         ];
         const scoreManager = new ScoreManager(players);
 
@@ -77,7 +93,7 @@ export const sketch = (p) => {
         goTo(GameStage.BOOT);
     };
 
-    // ── Draw ───────────────────────────────────────────────────────────────
+    // ── Draw ──
 
     p.draw = function () {
         p.background(0);
@@ -100,7 +116,8 @@ export const sketch = (p) => {
         p.pop();
     };
 
-    // ── Input ──────────────────────────────────────────────────────────────
+
+    // ── Input ──
 
     p.mousePressed = function () {
         const mx = (p.mouseX - offsetX) / scaleFactor;

@@ -11,7 +11,7 @@ import { moveAndCollideX, moveAndCollideY, checkSpikeCollision } from "../system
 
 
 export class Player {
-    constructor(p, x, y, playerNo) {
+    constructor(p, x, y, playerNo, spriteSheet) {
         this.p = p;
         this.playerNo = playerNo;
         this.spawnX = x;
@@ -42,11 +42,35 @@ export class Player {
         this.lastDeathReason = null;
 
         this.input = new HandleInput(p, playerNo);
-        this.state = PlayerMovementState.IDLE;
+        //this.state = PlayerMovementState.IDLE;
         this.facingRight = true;
 
         this.respawnCountdown = 0;
-    }
+        this.spriteSheet = spriteSheet;
+        this.framesArr=[];
+        //split frames 
+        this.splitAnimation();
+        console.log(this.framesArr);
+        //this.frameIndexIdle= 0;
+        //this.frameIndexRun=0;
+
+      }
+   
+   
+
+    splitAnimation(){
+      console.log(this.spriteSheet.width); 
+      const frameWidth= 28;
+      const frameHeight= 34;
+
+      for(let j=0; j<this.spriteSheet.width;j+=frameWidth){
+         //for(let i=0; i<this.spriteSheet.width;i+=frameWidth){
+            let frame= this.spriteSheet.get(j,0,frameWidth,frameHeight);
+            this.framesArr.push(frame);
+         }
+      }
+    //}
+    
 
     /**
      *
@@ -249,4 +273,6 @@ export class Player {
     setGameState(newState) {
         this.gameState = newState;
     }
+
+    
 }
