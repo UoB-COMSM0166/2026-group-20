@@ -3,5 +3,5 @@ export const AnimationConfig2={
    RUN:[3,4,5],
    JUMP: [10,11],
    FALL: [11,12],
-   RESPAWNING: [7,8]
+   RESPAWNING: [8]
 };

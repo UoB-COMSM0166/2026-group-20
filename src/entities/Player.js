@@ -53,6 +53,12 @@ export class Player {
         console.log(this.framesArr);
         //this.frameIndexIdle= 0;
         //this.frameIndexRun=0;
+         this.frameIndexIdle=0;
+         this.frameIndexRun=0;
+         this.frameIndexJump=0;
+         this.frameIndexFall=0;
+         this.frameIndexRespawning=0;
+         this.animationconfig; 
 
       }
    
