@@ -71,11 +71,11 @@ The team then evaluated which of these games would best support the implementati
 
 Both games were analysed to identify the most suitable base for the project. To account for time constraints, our selection involved a trade-off: a feature-rich base game would require fewer technical challenges, whereas a simpler base game would demand more complex implementations to maintain the project's level of difficulty.
 
-|                 | <div align="center">Ultimate Chicken Horse<div>                                                                                                                                      | <div align="center">Among Us<div>                                                               |
-| :-------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------- |
+|  | <div align="center">Ultimate Chicken Horse<div> | <div align="center">Among Us<div> |
+| :---: | :--- | :--- |
 |  **Features**   | • Obstacle placement <br> • Characters with different traits <br> • Different obstacles <br> • Scoreboard <br> • Coin collection / wallet system <br> • Timer <br> • Custom graphics | • Task-based mini-games <br> • Visually Distinct characters <br> • Timer <br> • Custom graphics |
-| **Concurrency** | • Concurrent player movement <br> • Obstacle placement                                                                                                                               | • Concurrent player movement <br> • Task execution                                              |
-| **AI Concept**  | AI solver that can be purchased with coins recommends obstacle placement                                                                                                             | AI imposter that decides whom, where and how to attack                                          |
+| **Concurrency** | • Concurrent player movement <br> • Obstacle placement  | • Concurrent player movement <br> • Task execution |
+| **AI Concept**  | AI solver that can be purchased with coins recommends obstacle placement  | AI imposter that decides whom, where and how to attack |
 
 Based on this comparison, **The Ultimate Chicken Horse** was selected as the base game due to its feature-rich design. This ensures that even if time constraints limit the implementation of the planned technical challenges, the project will still remain functional and cohesive as a playable game.
 
@@ -104,11 +104,11 @@ Given the academic context of our game, we did not need to account for legal or 
 Building on our stakeholder analysis, we defined a set of epics (high-level requirements). These requirements were designed to satisfy the expectations of each stakeholder group, as the goal of the project was to develop a game aligns with user expectations.
 
 
-| <div align="center">Stakeholder Group<div> | <div align="center">High Level Requirements<div>                                                                                                                                                                                                                                     |
-| :----------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|                 **Gamers**                 | • Retro / Nostalgic visuals <br> • Twists or added gameplay features <br> • Visually stimulating design <br> • Background audio and sound effects <br> • Game lore <br> • Core features (wallet system, scoreboard, intro tutorial) <br> • Good UX <br> • Multi-device compatibility |
-|               **Lecturers**               | • Learning concept integration and application <br> • Clear demonstration of technical challenges <br> • Achievable within the project timeline <br> • Collaborative work <br> • Continuous progress updates <br> • Originality                                                      |
-|                **Students**                | • Social features <br> • Easy to pick up <br> • Short game sessions                                                                                                                                                                                                                  |
+| <div align="center">Stakeholder Group<div> | <div align="center">High Level Requirements<div>|
+| :---: | :--- |
+|  **Gamers** | • Retro / Nostalgic visuals <br> • Twists or added gameplay features <br> • Visually stimulating design <br> • Background audio and sound effects <br> • Game lore <br> • Core features (wallet system, scoreboard, intro tutorial) <br> • Good UX <br> • Multi-device compatibility |
+| **Lecturers** | • Learning concept integration and application <br> • Clear demonstration of technical challenges <br> • Achievable within the project timeline <br> • Collaborative work <br> • Continuous progress updates <br> • Originality  |
+| **Students** | • Social features <br> • Easy to pick up <br> • Short game sessions |
 
 #### 2.4 User Stories
 
@@ -177,21 +177,67 @@ GameEnd --> [*]
 
 - Describe implementation of your game, in particular highlighting the TWO areas of _technical challenge_ in developing your game.
 
+note: the process of translating game design documents, concepts and assests into a playable game.
+### 4.1 Development Approach 
+During the planning phase of our project, we conducted a trade-off analysis between vertical development and horizontal development to determine which methodology would best suit the iterative design of a platformer game. 
+
+The process of vertical development typically progresses through the full lifecycle of a feature before moving on to the next. In our case, the team would focus entirely on the player movement system first, including jumping mechanics, movement animations and the visual design of the character. After completing this feature, development would proceed sequentially to other systems such as the game map, obstacle mechanics and the wallet system. 
+
+In contrast, horizontal development prioritises the breadth of the system architecture. In this approach, our team implements basic versions of multiple systems early in the development process. For example, the player movement system, map layout, obstacles and wallet mechanics would be implemented simultaneously using placeholder assets. 
+
+When considering the characteristics of our platformer game, adopting a vertical development approach presented several risks. First, our gameplay relies on the interaction between multiple systems, meaning that mechanics such as player movement must integrate correctly with collision detection and environmental obstacles. Developing these systems independently could delay the discovery of integration issues. For example, the behaviour of the player movement system can only be properly evaluated when it interacts with platforms, obstacles and other game objects. If such issues are discovered at a later stage of development, our team may need to perform extensive refactoring, which could significantly increase development time and complexity.
+
+Second, we wanted users to be able to experience the core gameplay at an early stage so that we could collect feedback and identify areas for improvement. For this reason, it was important to develop a Minimum Viable Product (MVP) within a short timeframe. Therefore, we adopted a horizontal development approach, enabling the team to rapidly implement simplified versions of key systems using placeholder assets while iteratively refining gameplay mechanics in later development stages.
+
+
+(add a diagram here) 
+
+
+### 4.2 Core systems
+
+### 4.3 Technical Challenges
+
 
 
 ### 5. Evaluation
 
 (15% ~750 words)
-
 - One qualitative evaluation (of your choice)
 - One quantitative evaluation (of your choice)
 - Description of how code was tested.
 
-#### 5.1
+#### 5.1 Qualitative Evaluation
+##### A. Think Aloud 
+##### B. Heuristic Evaluation 
 
-Add think aloud and heuristic evaluation for v0.1.0
+#### 5.2 Quantitative Evaluation
+We conducted a quantitative evaluation to obtain objective and measurable evidence regarding the usability and perceived workload of the two versions of the game. This allowed us to determine whether the increased difficulty affected the usability of the game or the workload experienced by players.
 
-will need to do the evaluation again when the game is almost ready
+To perform this evaluation, we recruited ten participants to play both the basic version and the harder version of the game. After completing each version, participants were asked to complete two standardised questionnaires: the System Usability Scale (SUS) and the NASA Task Load Index (NASA-TLX). The SUS questionnaire was used to measure the overall usability of the game, while the NASA-TLX questionnaire was used to assess the perceived workload experienced by players during gameplay.
+
+The collected responses were then converted into numerical scores according to the standard scoring procedures for SUS and NASA-TLX. 
+
+##### A. NASA-TLX
+Our NASA-TLX results indicate that participants experienced a significantly higher workload when playing the harder version of the game, compared to the basic version (p = 0.032). This increase in perceived workload was primarily driven by higher ratings in mental demand (p = 0.002), effort (p = 0.003), and frustration (p = 0.046). These findings suggest that the harder version required greater cognitive effort from players and led to increased frustration during gameplay compared to the basic version. This outcome is consistent with the intended design goal of creating a more challenging gameplay experience.
+
+
+<div align="center">
+    <img src="docs/quantitative-evaluation/NASA_all.png" alt="NASA TLX Results (All)" width="600">
+    <img src="docs/quantitative-evaluation/NASA_ave.png" alt="NASA TLX Results" width="300">
+</div>
+
+
+##### B. System Usability Scale (SUS)
+Our SUS results showed no significant difference in usability between the two versions of the game. A SUS score of approximately 68 is generally considered average usability, while scores above 80 indicate excellent usability. The SUS scores obtained in this evaluation (Basic: 70.75, Hard: 64.25) suggest that the usability of the game is currently around the average level. This indicates that increase in difficulty did not negatively affect the usability of the game, as players were still able to understand and interact with the game mechanics in both versions.
+
+However, while the usability is acceptable at this stage, the results also suggest that there is room for improvement to achieve a higher SUS score (e.g. above 80). In particular, feedback from testers suggested that the game could benefit from more intuitive keyboard controls and improved game stage management. For example, a tester reported that they could not undo or adjust obstacles if they were placed incorrectly. Therefore, this feedback will be considered in future iterations of the game in order to improve the overall usability.
+
+<div align="center">
+    <img src="docs/quantitative-evaluation/SUS_all.png" alt="SUS Results (All)" width="600">
+    <img src="docs/quantitative-evaluation/SUS_ave.png" alt="SUS Results" width="300">
+</div>
+
+add Appendix B, captions, gif 
 
 
 ### 6. Process
@@ -200,6 +246,7 @@ will need to do the evaluation again when the game is almost ready
 
 - Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project.
 
+add the sprint table ASAP
 
 ### 7. Conclusion
 
