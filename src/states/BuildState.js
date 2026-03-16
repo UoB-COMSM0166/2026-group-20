@@ -74,11 +74,16 @@ export class BuildState extends State {
     ];
 
     enter() {
+        // Round 1: no shop has run yet, so no obstacles to place — go straight to RUN.
+        if (!this.ctx.shopHasRun) {
+            this.goTo(GameStage.RUN);
+            return;
+        }
+
         this.ctx.placedObstacles.length = 0;
         this._currentTurn   = 0;
         this._selectedType  = null;
         this._cannonDir     = CannonDir.RIGHT;
-        // Track obstacles placed this turn so right-click can only undo own placements
         this._turnObstacles = [];
     }
 
