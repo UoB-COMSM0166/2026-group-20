@@ -59,6 +59,7 @@ export const sketch = (p) => {
             players,
             scoreManager,
             placedObstacles: [],
+            shopHasRun: false, // true after first shop phase; gates strict build-phase token enforcement
         };
 
         const goTo = (stage) => {

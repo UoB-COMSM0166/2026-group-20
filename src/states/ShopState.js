@@ -36,9 +36,10 @@ const PLAYER_COLOURS = [
 export class ShopState extends State {
 
     enter() {
-        this._currentTurn = 0; // 0 = P1, 1 = P2
-        this._selected    = null; // ObstacleType string currently highlighted
-        this._message     = '';   // one-frame feedback message
+        this.ctx.shopHasRun    = true;
+        this._currentTurn = 0;
+        this._selected    = null;
+        this._message     = '';
         this._msgTimer    = 0;
     }
 
