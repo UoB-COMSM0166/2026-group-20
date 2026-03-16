@@ -178,6 +178,7 @@ GameEnd --> [*]
 - Describe implementation of your game, in particular highlighting the TWO areas of _technical challenge_ in developing your game.
 
 note: the process of translating game design documents, concepts and assests into a playable game.
+
 ### 4.1 Development Approach 
 During the planning phase of our project, we conducted a trade-off analysis between vertical development and horizontal development to determine which methodology would best suit the iterative design of a platformer game. 
 
@@ -206,18 +207,69 @@ Second, we wanted users to be able to experience the core gameplay at an early s
 - One quantitative evaluation (of your choice)
 - Description of how code was tested.
 
-#### 5.1 Qualitative Evaluation
-##### A. Think Aloud 
-##### B. Heuristic Evaluation 
+To ensure a robust evaluation of the game’s usability and user experience, we used a mixed-methods approach consisting of the think-aloud method, heuristic evaluation, the System Usability Scale and NASA-TLX. These methods allowed us to identify usability issues and measure user satisfaction so that we could improve later versions of the game. 
 
-#### 5.2 Quantitative Evaluation
+#### 5.1 Qualitative Evaluation
+(add paragraph)
+
+<div align="center">
+<img src="docs/assets/gif/v0.1.0.gif" alt="Basic version" width="300">
+</div>
+
+**A. Think Aloud**
+
+The think-aloud method was selected for its efficiency and minimal commitment from participants. During this method, users were asked to verbalise their thoughts while playing the game. This enables us to identify specific usability bottlenecks and understand the reasoning behind user errors as they occurred.
+
+- Most users agreed the player movement controls were smooth. 
+- Some users were not aware there was a time limit in the game. 
+- Some users did not know realise the game is designed for two players.
+- Some users did not know the red triangle is an spike.
+- Some users did not know how to start the game as the start button had low constrast with the background
+- The goal was difficult to be identified as it was displayed in light green. 
+- The goal detection only worked one edge. The second player had to jump over the other player to trigger finish. 
+- Most users were unaware that the character could perform a double jump.
+- Some players reported that the two players start at slightly different positions, which makes the distance to the goal uneven and the game is unfair. 
+- One user reported that the message “Game Over” was discouraging.
+- Some users felt that the user interface was too 
+- Most users reported there were no instructions that explain the key controls for the game.
+
+**B. Heuristic Evaluation**
+
+To complement user testing, we conducted a Nielsen’s heuristic evaluation, a well-established approach to identify usability issues. This method allowed us to evaluate the interface and identify potential design problems based on recognised usability guidelines.
+
+| Problem No. | Issues | Heuristics Violated | Severity (0-4) |
+| :---: |:---:|:---:|:---:|
+| 1 | Interface lacked visual guidance (button, spikes, time limit and goal were not clear enough for players to understand what actions to take) | H1 - Visibilty of System Status| |
+| 2 | Start button had low contrast with the background | H8 – Aesthetic and Minimalist Design | |
+| 3 | No instructions for game controls | H10 – Help and Documentation | |
+| 4 | Goal detection only worked on one edge | H5 – Error Prevention | |
+| 5 | Players started at different positions (an uneven distance to the goal) | H4 – Consistency and Standards | |
+| 6 | No undo or quick restart option for mistakes | H3 - User Control and Freedom | |
+
+
+The presentation of this table is adapted from the template (4).
+
+#### 5.2. Quantitative Evaluation
+(add why chose these two tests)
 We conducted a quantitative evaluation to obtain objective and measurable evidence regarding the usability and perceived workload of the two versions of the game. This allowed us to determine whether the increased difficulty affected the usability of the game or the workload experienced by players.
+s
+<table align="center">
+  <tr>
+    <th><p align="center">Basic Version</p></th>
+    <th><p align="center">Harder Version</p></th>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/gif/v0.1.0_basic.gif" alt="Basic version" width="300"></td>
+    <td><img src="docs/assets/gif/v0.1.0_harder.gif" alt="Harder version" width="300"></td>
+  </tr>
+</table>
 
 To perform this evaluation, we recruited ten participants to play both the basic version and the harder version of the game. After completing each version, participants were asked to complete two standardised questionnaires: the System Usability Scale (SUS) and the NASA Task Load Index (NASA-TLX). The SUS questionnaire was used to measure the overall usability of the game, while the NASA-TLX questionnaire was used to assess the perceived workload experienced by players during gameplay.
 
 The collected responses were then converted into numerical scores according to the standard scoring procedures for SUS and NASA-TLX. 
 
-##### A. NASA-TLX
+**A. NASA-TLX**
+
  (add analytical methods)
 
 Our NASA-TLX results indicate that participants experienced a significantly higher workload when playing the harder version of the game, compared to the basic version (p = 0.032). This increase in perceived workload was primarily driven by higher ratings in mental demand (p = 0.002), effort (p = 0.003), and frustration (p = 0.046). These findings suggest that the harder version required greater cognitive effort from players and led to increased frustration during gameplay compared to the basic version. This outcome is consistent with the intended design goal of creating a more challenging gameplay experience.
@@ -229,7 +281,8 @@ Our NASA-TLX results indicate that participants experienced a significantly high
 </div>
 
 
-##### B. System Usability Scale (SUS)
+**B. System Usability Scale (SUS)**
+
 Our SUS results showed no significant difference in usability between the two versions of the game. A SUS score of approximately 68 is generally considered average usability, while scores above 80 indicate excellent usability. The SUS scores obtained in this evaluation (Basic: 70.75, Hard: 64.25) suggest that the usability of the game is currently around the average level. This indicates that increase in difficulty did not negatively affect the usability of the game, as players were still able to understand and interact with the game mechanics in both versions.
 
 However, while the usability is acceptable at this stage, the results also suggest that there is room for improvement to achieve a higher SUS score (e.g. above 80). In particular, feedback from testers suggested that the game could benefit from more intuitive keyboard controls and improved game stage management. For example, a tester reported that they could not undo or adjust obstacles if they were placed incorrectly. Therefore, this feedback will be considered in future iterations of the game in order to improve the overall usability.
@@ -264,6 +317,15 @@ add the sprint table ASAP
 - Provide a table of everyone's contribution, which _may_ be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
 
 ### Reference
+[1]J. Joe, S. Chaudhuri, T. Le, H. Thompson, and G. Demiris, “The use of think-aloud and instant data analysis in evaluation research: Exemplar and lessons learned,” Journal of Biomedical Informatics, vol. 56, pp. 284–291, Aug. 2015, doi: 10.1016/j.jbi.2015.06.001. (add to why choose think aloud)
+[2]“A comparison of heuristics applied for studying the usability of websites,” Procedia Computer Science, vol. 176, pp. 3571–3580, doi: 10.1016/j.procs.2020.09.029. (add to why we choose heuristics)
+
+[3]J. Nielsen, “10 Usability Heuristics for User Interface Design,” Nielsen Norman Group, Apr. 24, 1994. Accessed: Mar. 16, 2026. [Online]. Available: https://www.nngroup.com/articles/ten-usability-heuristics/ (heuristics principles for Nielsen)
+  
+
+[4]K. Chaudhary, X. Dai, and J. Grundy, “Experiences in Developing a Micro-payment System for Peer-to-Peer Networks,” International Journal of Information Technology and Web Engineering, vol. 5, no. 1, pp. 23–42, Jan. 2010, doi: 10.4018/jitwe.2010010102. (heurstics format)
+
+
 
 ### Appendix
 
