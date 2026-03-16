@@ -95,18 +95,7 @@ Coming up with the epics (high level requirements) and subsequently, the user st
 - As a student, I want the game to have intuitive controls/mechanics, so that I can start playing right away.
 - As a student, I want a game run/level to be short enough so that I can play between class breaks.
 
--<i>Lecturers</i>
-
-- As a lecturer, I want the game to clearly demonstrate applied programming concepts (e.g., OOP, game logic, UI handling), so that learning outcomes are achieved.
-- As a lecturer, I want the game to include defined challenges with measurable outcomes, so that student understanding can be evaluated.
-- As a lecturer, I want clear evidence of teamwork (shared commits, divided responsibilities, group meeting notes etc.), so that collaboration skills are demonstrated.
-
--<i>Gamers</i>
-
-- As a gamer, I want a scoreboard, so that I can track my performance and try to beat my high score.
-- As a gamer, I want a short interactive tutorial, so that I can quickly understand how to play.
-- As a gamer, I want intuitive menus and clear navigation, so that I can easily access and play the game without confusion.
-- As a gamer, I want responsive sound effects and visual feedback for my actions, so that the game feels immersive and satisfying.
+TBC
 
 ### Design
 

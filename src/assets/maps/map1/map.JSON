@@ -56,7 +56,7 @@
         }, 
         {
          "id":2,
-         "image":"..\/..\/Downloads\/generated-image (4).png",
+         "image":"background.png",
          "imageheight":1080,
          "imagewidth":1920,
          "name":"Image_Layer_1",
