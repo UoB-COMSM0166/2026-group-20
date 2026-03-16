@@ -218,6 +218,8 @@ To perform this evaluation, we recruited ten participants to play both the basic
 The collected responses were then converted into numerical scores according to the standard scoring procedures for SUS and NASA-TLX. 
 
 ##### A. NASA-TLX
+ (add analytical methods)
+
 Our NASA-TLX results indicate that participants experienced a significantly higher workload when playing the harder version of the game, compared to the basic version (p = 0.032). This increase in perceived workload was primarily driven by higher ratings in mental demand (p = 0.002), effort (p = 0.003), and frustration (p = 0.046). These findings suggest that the harder version required greater cognitive effort from players and led to increased frustration during gameplay compared to the basic version. This outcome is consistent with the intended design goal of creating a more challenging gameplay experience.
 
 
@@ -231,6 +233,8 @@ Our NASA-TLX results indicate that participants experienced a significantly high
 Our SUS results showed no significant difference in usability between the two versions of the game. A SUS score of approximately 68 is generally considered average usability, while scores above 80 indicate excellent usability. The SUS scores obtained in this evaluation (Basic: 70.75, Hard: 64.25) suggest that the usability of the game is currently around the average level. This indicates that increase in difficulty did not negatively affect the usability of the game, as players were still able to understand and interact with the game mechanics in both versions.
 
 However, while the usability is acceptable at this stage, the results also suggest that there is room for improvement to achieve a higher SUS score (e.g. above 80). In particular, feedback from testers suggested that the game could benefit from more intuitive keyboard controls and improved game stage management. For example, a tester reported that they could not undo or adjust obstacles if they were placed incorrectly. Therefore, this feedback will be considered in future iterations of the game in order to improve the overall usability.
+
+ (add sentences saying no statistical significance found)
 
 <div align="center">
     <img src="docs/quantitative-evaluation/SUS_all.png" alt="SUS Results (All)" width="600">
