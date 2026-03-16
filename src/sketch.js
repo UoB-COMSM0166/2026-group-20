@@ -50,10 +50,7 @@ export const sketch = (p) => {
          * Shared session context.
          * placedObstacles — written by BuildState, read by RunState.
          *                   Lives here so it survives the BUILD → RUN transition.
-         * shopPurchases   — null on round 1 (free placement).
-         *                   Set to [] by ShopState.enter() each subsequent round.
-         *                   Array of ObstacleType strings — one token per purchase.
-         *                   BuildState consumes tokens on placement, refunds on removal.
+         * Obstacle tokens are now stored per-player in player.inventory (Map).
          */
         const ctx = {
             p,
@@ -62,7 +59,6 @@ export const sketch = (p) => {
             players,
             scoreManager,
             placedObstacles: [],
-            shopPurchases:   null, // null = free placement (round 1)
         };
 
         const goTo = (stage) => {

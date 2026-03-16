@@ -73,57 +73,59 @@ export class BuildState extends State {
     // ── Token helpers ─────────────────────────────────────────────────────
 
     /**
-     * Returns true when the shop has run at least once.
-     * Round 1 (shopPurchases === null) uses free placement.
+     * Returns true when at least one player has items in their inventory.
+     * Round 1 (all inventories empty) uses free placement.
      * @private
      */
     _isShopMode() {
-        return this.ctx.shopPurchases !== null;
+        return this.ctx.players.some(pl =>
+            [...pl.inventory.values()].some(count => count > 0)
+        );
     }
 
     /**
-     * Number of remaining tokens for a given type in the purchase pool.
-     * In free mode always returns Infinity.
+     * Total tokens for a given type summed across all players' inventories.
+     * In free mode (no inventory yet) returns Infinity.
      * @param {string} type - ObstacleType
      * @returns {number}
      * @private
      */
     _tokenCount(type) {
         if (!this._isShopMode()) return Infinity;
-        return this.ctx.shopPurchases.filter(t => t === type).length;
+        return this.ctx.players.reduce(
+            (sum, pl) => sum + (pl.inventory.get(type) ?? 0), 0
+        );
     }
 
     /**
-     * Consume one token of the given type from the pool.
-     * No-op in free mode.
+     * Consume one token of the given type from whichever player has one.
+     * Deducts from the lowest-numbered player first.
      * @param {string} type
      * @private
      */
     _consumeToken(type) {
         if (!this._isShopMode()) return;
-        const idx = this.ctx.shopPurchases.indexOf(type);
-        if (idx !== -1) this.ctx.shopPurchases.splice(idx, 1);
+        for (const pl of this.ctx.players) {
+            const count = pl.inventory.get(type) ?? 0;
+            if (count > 0) {
+                pl.inventory.set(type, count - 1);
+                return;
+            }
+        }
     }
 
     /**
-     * Refund one token of the given type back to the pool.
-     * No-op in free mode.
+     * Refund one token of the given type back to the first player who
+     * originally had it (lowest-numbered player who is now below their
+     * purchase count is not tracked, so we just give it back to P1).
      * @param {string} type
      * @private
      */
     _refundToken(type) {
         if (!this._isShopMode()) return;
-        this.ctx.shopPurchases.push(type);
-    }
-
-    /**
-     * Returns only palette items that have at least one token (or all in free mode).
-     * @returns {Array}
-     * @private
-     */
-    _availablePalette() {
-        if (!this._isShopMode()) return BuildState.PALETTE;
-        return BuildState.PALETTE.filter(item => this._tokenCount(item.type) > 0);
+        const pl    = this.ctx.players[0];
+        const count = pl.inventory.get(type) ?? 0;
+        pl.inventory.set(type, count + 1);
     }
 
     render(mx, my) {

@@ -41,6 +41,14 @@ export class Player {
         this.gameState = PlayerGameState.PLAYING;
         this.lastDeathReason = null;
 
+        /**
+         * Persistent obstacle inventory — survives across rounds.
+         * Map of ObstacleType string → count.
+         * Populated by ShopState, consumed by BuildState.
+         * @type {Map<string, number>}
+         */
+        this.inventory = new Map();
+
         this.input = new HandleInput(p, playerNo);
         this.state = PlayerMovementState.IDLE;
         this.facingRight = true;

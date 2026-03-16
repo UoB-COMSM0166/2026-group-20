@@ -20,14 +20,13 @@ const PLAYER_COLOURS = [
  * ShopState — turn-based shop phase between rounds.
  *
  * Flow:
- *   enter() with ctx.shopPurchases = []
  *   P1 picks one item (or skips) → confirm
  *   P2 picks one item (or skips) → confirm
  *   → BuildState
  *
- * Purchased items are pushed into ctx.shopPurchases as ObstacleType strings.
- * BuildState reads this array as a token pool — placing an obstacle consumes
- * one matching token. A null shopPurchases means free placement (round 1).
+ * Purchases are written directly into player.inventory (Map<ObstacleType, count>),
+ * which persists across rounds — unspent tokens carry over indefinitely.
+ * BuildState reads the combined inventory of all players as its token pool.
  *
  * Controls (active player only):
  *   Mouse click on item card  — select / deselect
@@ -37,9 +36,6 @@ const PLAYER_COLOURS = [
 export class ShopState extends State {
 
     enter() {
-        // Reset the purchase pool for the new round
-        this.ctx.shopPurchases = [];
-
         this._currentTurn = 0; // 0 = P1, 1 = P2
         this._selected    = null; // ObstacleType string currently highlighted
         this._message     = '';   // one-frame feedback message
@@ -77,6 +73,18 @@ export class ShopState extends State {
         p.textSize(18);
         p.textAlign(p.RIGHT, p.TOP);
         p.text(`💰 Wallet: ${wallet}`, gameWidth - 20, 18);
+
+        // ── Existing inventory ────────────────────────────────────────────
+        const invEntries = [...player.inventory.entries()].filter(([, count]) => count > 0);
+        if (invEntries.length > 0) {
+            p.fill(160, 160, 200);
+            p.textSize(12);
+            p.textAlign(p.RIGHT, p.TOP);
+            const invText = 'Inventory: ' + invEntries
+                .map(([type, count]) => `${type.charAt(0) + type.slice(1).toLowerCase()} ×${count}`)
+                .join('  ');
+            p.text(invText, gameWidth - 20, 44);
+        }
 
         // ── Item cards ───────────────────────────────────────────────────
         const cardW   = 140;
@@ -274,7 +282,9 @@ export class ShopState extends State {
                 this._showMessage('Not enough coins!');
                 return;
             }
-            this.ctx.shopPurchases.push(this._selected);
+            // Add to this player's persistent inventory
+            const current = player.inventory.get(this._selected) ?? 0;
+            player.inventory.set(this._selected, current + 1);
             this._showMessage(`P${this._currentTurn + 1} bought ${this._selected.charAt(0) + this._selected.slice(1).toLowerCase()}!`);
         }
 
