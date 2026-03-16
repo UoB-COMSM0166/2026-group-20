@@ -1,20 +1,14 @@
 import { PlayerState } from "../config/PlayerState.js";
 import { PlayerMovementState } from "../config/PlayerMovementState.js";
-import { AnimationConfig } from "../config/AnimationConfig.js";
-import { AnimationConfig2 } from "../config/AnimationConfig2.js";
-// let frameIndexIdle=0;
-// let frameIndexRun=0;
-// let frameIndexJump=0;
-// let frameIndexFall=0;
-// let frameIndexRespawning=0;
-//let animationconfig; 
+
+
 export function DrawPlayer(player) {
-      if (player.playerNo === 0){
-         player.animationconfig = AnimationConfig; 
-      }
-      else{
-         player.animationconfig = AnimationConfig2; 
-      }
+      // if (player.playerNo === 0){
+      //    player.animationconfig = AnimationConfig; 
+      // }
+      // else{
+      //    player.animationconfig = AnimationConfig2; 
+      // }
 
         if (!player.isVisible) {
             return;
@@ -41,9 +35,7 @@ export function DrawPlayer(player) {
             const img = player.framesArr[frames[player.frameIndexRun]];
             player.p.push();
             if(player.facingRight){
-               //const frames = AnimationConfig.RUN;
                player.p.image( player.framesArr[frames[player.frameIndexRun]], player.x, player.y);
-               //frameIndexRun = (frameIndexRun + 1) % frames.length;
             }
             else{
                player.p.translate(player.x + player.w, player.y);
@@ -59,9 +51,7 @@ export function DrawPlayer(player) {
             const img = player.framesArr[frames[player.frameIndexJump]];
             player.p.push();
             if(player.facingRight){
-               //const frames = AnimationConfig.RUN;
                player.p.image( player.framesArr[frames[player.frameIndexJump]], player.x, player.y);
-               //frameIndexRun = (frameIndexRun + 1) % frames.length;
             }
             else{
                player.p.translate(player.x + player.w, player.y);
@@ -77,9 +67,7 @@ export function DrawPlayer(player) {
             const img = player.framesArr[frames[player.frameIndexFall]];
             player.p.push();
             if(player.facingRight){
-               //const frames = AnimationConfig.RUN;
                player.p.image( player.framesArr[frames[player.frameIndexFall]], player.x, player.y);
-               //frameIndexRun = (frameIndexRun + 1) % frames.length;
             }
             else{
                player.p.translate(player.x + player.w, player.y);
@@ -92,30 +80,10 @@ export function DrawPlayer(player) {
 
          if(player.lifeState===PlayerState.RESPAWNING){
             const frames = player.animationconfig.RESPAWNING;
-            const img = player.framesArr[frames[player.frameIndexRespawning]];
-            //player.p.push();
-            //if(player.facingRight){
-               //const frames = AnimationConfig.RUN;
-               player.p.image( player.framesArr[frames[player.frameIndexRespawning]], player.x, player.y);
-               //frameIndexRun = (frameIndexRun + 1) % frames.length;
-            //}
-            // else{
-            //    player.p.translate(player.x + player.w, player.y);
-            //    player.p.scale(-1, 1);
-            //    player.p.image(img, 0, 0);
-            // }
-            //player.p.pop();
+            player.p.image(player.framesArr[frames[player.frameIndexRespawning]], player.x, player.y);
             player.frameIndexRespawning = (player.frameIndexRespawning + 1) % frames.length;
          }
 
-         
-
-
-
-            
-         //player.p.image(player.framesArr[0], player.x, player.y);
-        //}
-        //player.p.image(player.framesArr[0], player.x, player.y);
         p.fill(255);
         p.textAlign(p.CENTER, p.BOTTOM);
         p.textSize(16);
