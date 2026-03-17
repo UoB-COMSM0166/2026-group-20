@@ -47,9 +47,17 @@ export class WindZone extends Obstacle {
         this._age += deltaTime;
     }
 
-    applyEffect(player) {
+    /**
+     * preEffect runs BEFORE player.update() so wind velocity is included in
+     * the moveAndCollide call. We also set slideMode so horizontalMovement()
+     * does not zero vx before wind can take effect.
+     */
+    preEffect(player) {
         if (!aabbIntersects(player.x, player.y, player.w, player.h,
                              this.x, this.y, this.w, this.h)) return;
+
+        // Prevent horizontalMovement from zeroing vx this frame
+        player.slideMode = true;
 
         const vec   = DIR_VECTORS[this.direction];
         const force = GameConfig.WIND_FORCE;

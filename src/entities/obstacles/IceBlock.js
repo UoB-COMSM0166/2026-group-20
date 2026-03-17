@@ -15,9 +15,11 @@ export class IceBlock extends Obstacle {
     get isSolid()  { return false; }
     get isHazard() { return false; }
 
-    applyEffect(player) {
-        const T = GameConfig.TILE;
-        // Apply ice within the tile bounds (player centre inside the block)
+    /**
+     * preEffect runs BEFORE player.update(), so slideMode is available when
+     * horizontalMovement() reads prevSlide to decide whether to preserve momentum.
+     */
+    preEffect(player) {
         const cx = player.x + player.w / 2;
         const cy = player.y + player.h / 2;
         const inside = cx > this.x && cx < this.x + this.w &&

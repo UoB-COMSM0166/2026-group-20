@@ -40,9 +40,17 @@ export class Obstacle {
     update(_deltaTime, _gameWidth, _gameHeight) {}
 
     /**
+     * Pre-physics effect — called BEFORE player.update() each frame.
+     * Override for effects that must influence the velocity that player.update()
+     * acts on this frame (e.g. wind push, ice slide mode).
+     * @param {object} _player
+     */
+    preEffect(_player) {}
+
+    /**
      * Apply special physics/effects to a player each frame.
      * Called after all player movement is resolved.
-     * Override in: IcePlatform, BouncePad, SpikePlatform, IceBlock, WindZone, Teleporter, Flame.
+     * Override in: IcePlatform, BouncePad, SpikePlatform, Teleporter, Flame.
      *
      * @param {object}     _player
      * @param {object[]}   _allPlayers

@@ -64,11 +64,13 @@ export class FallingPlatform extends Obstacle {
 
     applyEffect(player) {
         if (this._falling) return;
-        // Check player is standing on top surface
+        // Feet-based check — aabbIntersects fails due to skin offset (player lands
+        // at obs.y - skin, so no overlap). Match the fix used in IcePlatform/BouncePad.
+        const feetY = player.y + player.h;
         const onTop = player.onGround &&
-                      Math.abs((player.y + player.h) - this.y) <= 4 &&
-                      aabbIntersects(player.x, player.y, player.w, player.h,
-                                     this.x, this.y, this.w, this.h);
+                      feetY >= this.y - 2 && feetY <= this.y + 4 &&
+                      player.x + player.w > this.x + 2 &&
+                      player.x < this.x + this.w - 2;
         if (onTop) this._playerOnTop = true;
     }
 

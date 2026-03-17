@@ -53,6 +53,15 @@ export class RunState extends State {
             obs.carryPlayers(players);
         }
 
+        // Pre-physics effects (IceBlock, WindZone) — must run before player.update()
+        // so that slideMode and velocity changes are visible to horizontalMovement()
+        for (const obs of placedObstacles) {
+            for (const player of players) {
+                if (player.gameState !== PlayerGameState.PLAYING) continue;
+                obs.preEffect(player);
+            }
+        }
+
         for (const player of players) {
             if (player.gameState === PlayerGameState.SUCCESS) continue;
 
@@ -68,7 +77,7 @@ export class RunState extends State {
             }
         }
 
-        // Apply special obstacle effects (ice, bounce, wind, teleport, spike platform)
+        // Post-physics effects (FallingPlatform, BouncePad, SpikePlatform, Teleporter, Flame)
         for (const obs of placedObstacles) {
             for (const player of players) {
                 if (player.gameState !== PlayerGameState.PLAYING) continue;
