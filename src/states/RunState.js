@@ -43,6 +43,16 @@ export class RunState extends State {
             return;
         }
 
+        // Update obstacles first so moving platforms have their new position
+        for (const obs of this.ctx.placedObstacles) {
+            obs.update(deltaTime, gameWidth, gameHeight);
+        }
+
+        // Carry players on moving platforms BEFORE physics resolves this frame
+        for (const obs of this.ctx.placedObstacles) {
+            obs.carryPlayers(players);
+        }
+
         for (const player of players) {
             if (player.gameState === PlayerGameState.SUCCESS) continue;
 
@@ -54,11 +64,15 @@ export class RunState extends State {
             const ty = p.floor((player.y + player.h / 2) / GameConfig.TILE);
             if (MAP[ty] && MAP[ty][tx] === 'F') {
                 this.timeManager.onPlayerReachFinish(player);
-                // Hide the finished player so they don't block the finish tile
-                // for the remaining player. Setting lifeState DEAD stops
-                // update(), rendering (DrawPlayer skips non-visible), and
-                // player-vs-player collision (PhysicsSystem skips non-ALIVE).
                 player.lifeState = PlayerState.DEAD;
+            }
+        }
+
+        // Apply special obstacle effects (ice, bounce, wind, teleport, spike platform)
+        for (const obs of placedObstacles) {
+            for (const player of players) {
+                if (player.gameState !== PlayerGameState.PLAYING) continue;
+                obs.applyEffect(player, players, this.respawnManager, placedObstacles);
             }
         }
 
@@ -66,13 +80,7 @@ export class RunState extends State {
             coin.update(players, scoreManager);
         }
 
-        // Update obstacles — pass dimensions so cannons can cull out-of-bounds projectiles
-        for (const obs of this.ctx.placedObstacles) {
-            obs.update(deltaTime, gameWidth, gameHeight);
-        }
-
-        // Projectile collision — cannons manage their own projectiles internally,
-        // so we check them separately after movement is resolved
+        // Projectile collision — cannons manage their own projectiles internally
         for (const obs of this.ctx.placedObstacles) {
             if (!obs.checkProjectileHit) continue;
             for (const player of players) {

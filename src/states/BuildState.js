@@ -3,9 +3,18 @@ import { GameStage } from '../config/GameStage.js';
 import { GameConfig } from '../config/GameConfig.js';
 import { ObstacleType } from '../config/ObstacleType.js';
 import { Platform } from '../entities/obstacles/Platform.js';
+import { MovingPlatform } from '../entities/obstacles/MovingPlatform.js';
+import { FallingPlatform } from '../entities/obstacles/FallingPlatform.js';
+import { IcePlatform } from '../entities/obstacles/IcePlatform.js';
+import { BouncePad } from '../entities/obstacles/BouncePad.js';
 import { SpikeObstacle } from '../entities/obstacles/SpikeObstacle.js';
 import { Cannon, CannonDir } from '../entities/obstacles/Cannon.js';
 import { Saw } from '../entities/obstacles/Saw.js';
+import { Flame } from '../entities/obstacles/Flame.js';
+import { SpikePlatform } from '../entities/obstacles/SpikePlatform.js';
+import { IceBlock } from '../entities/obstacles/IceBlock.js';
+import { WindZone, WindDir } from '../entities/obstacles/WindZone.js';
+import { Teleporter } from '../entities/obstacles/Teleporter.js';
 import { drawMap, MAP } from '../maps/MapLoader.js';
 
 // Map tile characters that cannot be overwritten when placing obstacles
@@ -25,103 +34,79 @@ const PLAYER_COLOURS = [
  *   P1 turn → (ENTER) → P2 turn → (ENTER) → RunState
  *
  * Token rules:
- *   - Round 1 (shopHasRun = false): unlimited free placement for both players.
+ *   - Round 1 (shopHasRun = false): skip straight to RUN (no obstacles).
  *   - Round 2+ (shopHasRun = true): each player can only place what is in their
  *     own inventory (player.inventory Map<ObstacleType, count>).
- *     Right-clicking removes an obstacle placed during this turn and refunds
- *     its token to the active player.
+ *     Right-clicking removes an obstacle placed this turn and refunds its token.
  *
- * Controls (active player only):
+ * Teleporter pairing:
+ *   The first Teleporter placed is held as _pendingTeleporter. When a second
+ *   Teleporter is placed, both are linked as partners and the pending slot clears.
+ *   A third placement starts a new pair.
+ *
+ * Controls:
  *   Left click palette   — select / deselect obstacle type
  *   Left click map       — place selected obstacle
  *   Right click map      — undo a placement from this turn (refunds token)
- *   R                    — rotate cannon direction
- *   ENTER                — confirm turn → next player, or → RunState
+ *   R                    — rotate Cannon / WindZone direction
+ *   ENTER                — confirm turn → next player or → RunState
  *   ESC                  — return to map menu
- *
- * Transitions:
- *   ENTER (after last player) → RunState
- *   ESC                       → MapMenuState
  */
 export class BuildState extends State {
 
-    // ── Palette definition ────────────────────────────────────────────────
     static PALETTE = [
-        {
-            type:  ObstacleType.PLATFORM,
-            label: 'Platform',
-            hint:  'Solid block',
-            color: [120, 90, 60],
-        },
-        {
-            type:  ObstacleType.SPIKE,
-            label: 'Spike',
-            hint:  'Kills on touch',
-            color: [220, 60, 60],
-        },
-        {
-            type:  ObstacleType.CANNON,
-            label: 'Cannon',
-            hint:  'Fires projectiles',
-            color: [70, 70, 80],
-        },
-        {
-            type:  ObstacleType.SAW,
-            label: 'Saw',
-            hint:  'Spinning blade',
-            color: [200, 60, 60],
-        },
+        // Solid
+        { type: ObstacleType.PLATFORM,         label: 'Platform',    hint: 'Solid block',      color: [120, 90,  60]  },
+        { type: ObstacleType.MOVING_PLATFORM,  label: 'MovePlatform',hint: 'Slides back+forth', color: [80,  110, 160] },
+        { type: ObstacleType.FALLING_PLATFORM, label: 'FallPlatform',hint: 'Drops when stood on',color:[90,  65,  40]  },
+        { type: ObstacleType.ICE_PLATFORM,     label: 'IcePlatform', hint: 'Slippery solid',   color: [160, 220, 245] },
+        { type: ObstacleType.BOUNCE_PAD,       label: 'BouncePad',   hint: 'Launches upward',  color: [80,  200, 100] },
+        // Hazard
+        { type: ObstacleType.SPIKE,            label: 'Spike',       hint: 'Kills on touch',   color: [220, 60,  60]  },
+        { type: ObstacleType.CANNON,           label: 'Cannon',      hint: 'Fires projectiles',color: [70,  70,  80]  },
+        { type: ObstacleType.SAW,              label: 'Saw',         hint: 'Spinning blade',   color: [200, 60,  60]  },
+        { type: ObstacleType.FLAME,            label: 'Flame',       hint: 'Pulses on/off',    color: [240, 100, 20]  },
+        // Solid + hazard
+        { type: ObstacleType.SPIKE_PLATFORM,   label: 'SpikePlatform',hint:'Safe top, deadly sides',color:[170, 80, 40] },
+        // Special effect
+        { type: ObstacleType.ICE_BLOCK,        label: 'IceBlock',    hint: 'Slide through',    color: [120, 190, 230] },
+        { type: ObstacleType.WIND_ZONE,        label: 'WindZone',    hint: 'Push direction',   color: [60,  185, 185] },
+        { type: ObstacleType.TELEPORTER,       label: 'Teleporter',  hint: 'Warp to partner',  color: [160, 80,  240] },
     ];
 
     enter() {
-        // Round 1: no shop has run yet, so no obstacles to place — go straight to RUN.
+        // Round 1: shop has not run yet — skip straight to RUN
         if (!this.ctx.shopHasRun) {
             this.goTo(GameStage.RUN);
             return;
         }
 
         this.ctx.placedObstacles.length = 0;
-        this._currentTurn   = 0;
-        this._selectedType  = null;
-        this._cannonDir     = CannonDir.RIGHT;
-        this._turnObstacles = [];
+        this._currentTurn       = 0;
+        this._selectedType      = null;
+        this._cannonDir         = CannonDir.RIGHT;
+        this._windDir           = WindDir.RIGHT;
+        this._pendingTeleporter = null; // first placed teleporter waits for its partner
+        this._turnObstacles     = [];   // obstacles placed this turn (for undo)
     }
 
     update(_dt) {}
 
     // ── Turn / token helpers ──────────────────────────────────────────────
 
-    /** The player whose turn it currently is. @private */
     _activePlayer() {
         return this.ctx.players[this._currentTurn];
     }
 
-    /**
-     * True after the shop has run at least once (ctx.shopHasRun).
-     * Round 1 is always free placement regardless of inventory contents.
-     * @private
-     */
     _isShopMode() {
         return this.ctx.shopHasRun;
     }
 
-    /**
-     * Tokens the active player has for a given type.
-     * Returns Infinity in free mode.
-     * @param {string} type
-     * @returns {number}
-     * @private
-     */
     _tokenCount(type) {
         if (!this._isShopMode()) return Infinity;
         return this._activePlayer().inventory.get(type) ?? 0;
     }
 
-    /**
-     * Consume one token from the active player's inventory.
-     * @param {string} type
-     * @private
-     */
     _consumeToken(type) {
         if (!this._isShopMode()) return;
         const pl    = this._activePlayer();
@@ -129,11 +114,6 @@ export class BuildState extends State {
         if (count > 0) pl.inventory.set(type, count - 1);
     }
 
-    /**
-     * Refund one token to the active player's inventory.
-     * @param {string} type
-     * @private
-     */
     _refundToken(type) {
         if (!this._isShopMode()) return;
         const pl    = this._activePlayer();
@@ -141,14 +121,12 @@ export class BuildState extends State {
         pl.inventory.set(type, count + 1);
     }
 
-    /**
-     * Advance to the next player's turn, or go to RUN when all players are done.
-     * @private
-     */
     _advanceTurn() {
-        this._selectedType  = null;
-        this._cannonDir     = CannonDir.RIGHT;
-        this._turnObstacles = [];
+        this._selectedType      = null;
+        this._cannonDir         = CannonDir.RIGHT;
+        this._windDir           = WindDir.RIGHT;
+        this._pendingTeleporter = null;
+        this._turnObstacles     = [];
         this._currentTurn++;
 
         if (this._currentTurn >= this.ctx.players.length) {
@@ -162,38 +140,27 @@ export class BuildState extends State {
         const { p, gameWidth, gameHeight } = this.ctx;
         const col = PLAYER_COLOURS[this._currentTurn] ?? [200, 200, 200];
 
-        // ── Background + map ─────────────────────────────────────────────
         p.background(20);
         drawMap(p);
 
-        // ── Already-placed obstacles ─────────────────────────────────────
         for (const obs of this.ctx.placedObstacles) {
             obs.draw();
         }
 
-        // ── Ghost preview ─────────────────────────────────────────────────
-        const T       = GameConfig.TILE;
-        const snapX   = Math.floor(mx / T) * T;
-        const snapY   = Math.floor(my / T) * T;
-        const onMap   = snapX >= 0 && snapX < gameWidth &&
-                        snapY >= 0 && snapY < gameHeight - this._paletteH();
+        // Ghost preview
+        const T     = GameConfig.TILE;
+        const snapX = Math.floor(mx / T) * T;
+        const snapY = Math.floor(my / T) * T;
+        const onMap = snapX >= 0 && snapX < gameWidth &&
+                      snapY >= 0 && snapY < gameHeight - this._paletteH();
 
         if (this._selectedType && onMap && !this._isTileBlocked(snapX, snapY)) {
-            if (this._selectedType === ObstacleType.PLATFORM) {
-                Platform.drawGhost(p, snapX, snapY);
-            } else if (this._selectedType === ObstacleType.SPIKE) {
-                SpikeObstacle.drawGhost(p, snapX, snapY);
-            } else if (this._selectedType === ObstacleType.CANNON) {
-                Cannon.drawGhost(p, snapX, snapY, this._cannonDir);
-            } else if (this._selectedType === ObstacleType.SAW) {
-                Saw.drawGhost(p, snapX, snapY);
-            }
+            this._drawGhost(p, this._selectedType, snapX, snapY);
         }
 
-        // ── Palette panel ────────────────────────────────────────────────
         this._drawPalette(mx, my, col);
 
-        // ── Header ───────────────────────────────────────────────────────
+        // Header
         p.noStroke();
         p.fill(...col);
         p.textAlign(p.CENTER, p.TOP);
@@ -202,10 +169,7 @@ export class BuildState extends State {
 
         p.fill(180, 180, 200);
         p.textSize(12);
-        const modeHint = this._isShopMode()
-            ? 'Place your purchased obstacles — ENTER to confirm turn'
-            : 'Place obstacles freely — ENTER to confirm turn';
-        p.text(modeHint, gameWidth / 2, 30);
+        p.text('Place your purchased obstacles — ENTER to confirm turn', gameWidth / 2, 30);
 
         // Inventory summary
         if (this._isShopMode()) {
@@ -224,12 +188,25 @@ export class BuildState extends State {
             }
         }
 
-        // Cannon direction hint
+        // Direction hint for Cannon / WindZone
         if (this._selectedType === ObstacleType.CANNON) {
             p.noStroke();
             p.fill(255, 180, 80);
             p.textSize(12);
             p.text(`Cannon direction: ${this._cannonDir}  (R to rotate)`, gameWidth / 2, 58);
+        } else if (this._selectedType === ObstacleType.WIND_ZONE) {
+            p.noStroke();
+            p.fill(120, 230, 230);
+            p.textSize(12);
+            p.text(`Wind direction: ${this._windDir}  (R to rotate)`, gameWidth / 2, 58);
+        } else if (this._selectedType === ObstacleType.TELEPORTER) {
+            p.noStroke();
+            p.fill(160, 80, 240);
+            p.textSize(12);
+            const hint = this._pendingTeleporter
+                ? 'Place the second portal to complete the pair'
+                : 'Place the first portal';
+            p.text(hint, gameWidth / 2, 58);
         }
     }
 
@@ -247,12 +224,22 @@ export class BuildState extends State {
         const snapY = Math.floor(my / T) * T;
 
         if (p.mouseButton === p.RIGHT) {
-            // Only undo obstacles placed during this player's own turn
+            // Only undo obstacles placed this player's own turn
             const obs = this._turnObstacles.find(o => o.x === snapX && o.y === snapY);
             if (obs) {
                 this._removeAt(snapX, snapY);
                 this._turnObstacles = this._turnObstacles.filter(o => o !== obs);
                 this._refundToken(obs.type);
+                // If it was a teleporter, clear pending link if needed
+                if (obs === this._pendingTeleporter) {
+                    this._pendingTeleporter = null;
+                } else if (obs.partner) {
+                    obs.partner.partner = null;
+                    // If the partner was also placed this turn, restore it to pending
+                    if (this._turnObstacles.includes(obs.partner)) {
+                        this._pendingTeleporter = obs.partner;
+                    }
+                }
             }
             return;
         }
@@ -268,7 +255,18 @@ export class BuildState extends State {
             this.ctx.placedObstacles.push(obs);
             this._turnObstacles.push(obs);
             this._consumeToken(this._selectedType);
-            // Deselect if no tokens remain
+
+            // Teleporter pairing
+            if (this._selectedType === ObstacleType.TELEPORTER) {
+                if (this._pendingTeleporter) {
+                    obs.partner = this._pendingTeleporter;
+                    this._pendingTeleporter.partner = obs;
+                    this._pendingTeleporter = null;
+                } else {
+                    this._pendingTeleporter = obs;
+                }
+            }
+
             if (this._tokenCount(this._selectedType) <= 0) {
                 this._selectedType = null;
             }
@@ -282,27 +280,53 @@ export class BuildState extends State {
         } else if (p.keyCode === p.ESCAPE) {
             this.goTo(GameStage.MAPMENU);
         } else if (p.key === 'r' || p.key === 'R') {
-            const dirs = [CannonDir.RIGHT, CannonDir.DOWN, CannonDir.LEFT, CannonDir.UP];
-            const idx  = dirs.indexOf(this._cannonDir);
-            this._cannonDir = dirs[(idx + 1) % dirs.length];
+            this._rotateDirection();
         }
     }
 
     // ── Private ───────────────────────────────────────────────────────────
 
+    _rotateDirection() {
+        if (this._selectedType === ObstacleType.CANNON) {
+            const dirs = [CannonDir.RIGHT, CannonDir.DOWN, CannonDir.LEFT, CannonDir.UP];
+            const idx  = dirs.indexOf(this._cannonDir);
+            this._cannonDir = dirs[(idx + 1) % dirs.length];
+        } else if (this._selectedType === ObstacleType.WIND_ZONE) {
+            const dirs = [WindDir.RIGHT, WindDir.DOWN, WindDir.LEFT, WindDir.UP];
+            const idx  = dirs.indexOf(this._windDir);
+            this._windDir = dirs[(idx + 1) % dirs.length];
+        }
+    }
+
     _paletteH() { return 70; }
+
+    _drawGhost(p, type, x, y) {
+        switch (type) {
+            case ObstacleType.PLATFORM:         Platform.drawGhost(p, x, y);                        break;
+            case ObstacleType.MOVING_PLATFORM:  MovingPlatform.drawGhost(p, x, y);                  break;
+            case ObstacleType.FALLING_PLATFORM: FallingPlatform.drawGhost(p, x, y);                 break;
+            case ObstacleType.ICE_PLATFORM:     IcePlatform.drawGhost(p, x, y);                     break;
+            case ObstacleType.BOUNCE_PAD:       BouncePad.drawGhost(p, x, y);                       break;
+            case ObstacleType.SPIKE:            SpikeObstacle.drawGhost(p, x, y);                   break;
+            case ObstacleType.CANNON:           Cannon.drawGhost(p, x, y, this._cannonDir);          break;
+            case ObstacleType.SAW:              Saw.drawGhost(p, x, y);                             break;
+            case ObstacleType.FLAME:            Flame.drawGhost(p, x, y);                           break;
+            case ObstacleType.SPIKE_PLATFORM:   SpikePlatform.drawGhost(p, x, y);                   break;
+            case ObstacleType.ICE_BLOCK:        IceBlock.drawGhost(p, x, y);                        break;
+            case ObstacleType.WIND_ZONE:        WindZone.drawGhost(p, x, y, this._windDir);          break;
+            case ObstacleType.TELEPORTER:       Teleporter.drawGhost(p, x, y);                      break;
+        }
+    }
 
     _drawPalette(mx, my, playerCol) {
         const { p, gameWidth, gameHeight } = this.ctx;
         const pH = this._paletteH();
         const pY = gameHeight - pH;
 
-        // Panel background
         p.noStroke();
         p.fill(20, 22, 35, 235);
         p.rect(0, pY, gameWidth, pH);
 
-        // Player colour accent bar at top of palette
         p.fill(...playerCol, 180);
         p.rect(0, pY, gameWidth, 3);
         p.noStroke();
@@ -312,26 +336,23 @@ export class BuildState extends State {
         p.line(0, pY + 3, gameWidth, pY + 3);
         p.noStroke();
 
-        // Label
         p.fill(...playerCol);
         p.textAlign(p.LEFT, p.CENTER);
         p.textSize(12);
         p.text(`P${this._currentTurn + 1}:`, 12, pY + pH / 2);
 
-        // Obstacle buttons
-        const btnW   = 90;
+        const btnW   = 78;
         const btnH   = 44;
         const startX = 46;
         const btnY   = pY + (pH - btnH) / 2;
 
         BuildState.PALETTE.forEach((item, i) => {
-            const bx        = startX + i * (btnW + 10);
+            const bx        = startX + i * (btnW + 6);
             const hovered   = mx >= bx && mx <= bx + btnW && my >= btnY && my <= btnY + btnH;
             const selected  = this._selectedType === item.type;
             const tokens    = this._tokenCount(item.type);
             const available = tokens > 0;
 
-            // Background
             if (!available) {
                 p.fill(18, 18, 28);
             } else if (selected) {
@@ -342,60 +363,58 @@ export class BuildState extends State {
                 p.fill(28, 30, 50);
             }
             p.noStroke();
-            p.rect(bx, btnY, btnW, btnH, 6);
+            p.rect(bx, btnY, btnW, btnH, 5);
 
-            // Selection border in player colour
             if (selected) {
                 p.stroke(...playerCol);
                 p.strokeWeight(2);
                 p.noFill();
-                p.rect(bx, btnY, btnW, btnH, 6);
+                p.rect(bx, btnY, btnW, btnH, 5);
                 p.noStroke();
             }
 
             // Colour swatch
             p.fill(...item.color.map(c => available ? c : Math.floor(c * 0.3)));
-            p.rect(bx + 8, btnY + 12, 14, 14, 2);
+            p.rect(bx + 5, btnY + 13, 10, 10, 2);
 
             // Labels
-            p.fill(available ? [220, 220, 240] : [70, 70, 80]);
+            p.fill(available ? [210, 210, 235] : [65, 65, 75]);
             p.textAlign(p.LEFT, p.TOP);
-            p.textSize(12);
-            p.text(item.label, bx + 28, btnY + 8);
-
-            p.fill(available ? [120, 120, 150] : [55, 55, 65]);
             p.textSize(10);
-            p.text(item.hint, bx + 28, btnY + 26);
+            p.text(item.label, bx + 19, btnY + 7);
 
-            // Token count badge (shop mode)
+            p.fill(available ? [110, 110, 140] : [50, 50, 60]);
+            p.textSize(9);
+            p.text(item.hint, bx + 19, btnY + 22);
+
+            // Token count badge
             if (this._isShopMode()) {
                 const badge = tokens === Infinity ? '' : `×${tokens}`;
                 p.fill(tokens > 0 ? [100, 200, 120] : [130, 60, 60]);
                 p.textAlign(p.RIGHT, p.TOP);
-                p.textSize(10);
-                p.text(badge, bx + btnW - 4, btnY + 4);
+                p.textSize(9);
+                p.text(badge, bx + btnW - 3, btnY + 3);
             }
         });
 
-        // Right side: next step hint
         const nextLabel = this._currentTurn < this.ctx.players.length - 1
             ? `ENTER → P${this._currentTurn + 2} Turn`
             : 'ENTER → Start Run';
         p.fill(100, 200, 120);
         p.textAlign(p.RIGHT, p.CENTER);
-        p.textSize(13);
-        p.text(nextLabel, gameWidth - 14, pY + pH / 2);
+        p.textSize(12);
+        p.text(nextLabel, gameWidth - 10, pY + pH / 2);
     }
 
     _handlePaletteClick(mx, my) {
         const { gameHeight } = this.ctx;
-        const btnW   = 90;
+        const btnW   = 78;
         const btnH   = 44;
         const startX = 46;
         const btnY   = gameHeight - this._paletteH() + (this._paletteH() - btnH) / 2;
 
         BuildState.PALETTE.forEach((item, i) => {
-            const bx = startX + i * (btnW + 10);
+            const bx = startX + i * (btnW + 6);
             if (mx >= bx && mx <= bx + btnW && my >= btnY && my <= btnY + btnH) {
                 if (this._tokenCount(item.type) <= 0) return;
                 this._selectedType = this._selectedType === item.type ? null : item.type;
@@ -424,10 +443,21 @@ export class BuildState extends State {
 
     _createObstacle(type, x, y) {
         const { p } = this.ctx;
-        if (type === ObstacleType.PLATFORM) return new Platform(p, x, y);
-        if (type === ObstacleType.SPIKE)    return new SpikeObstacle(p, x, y);
-        if (type === ObstacleType.CANNON)   return new Cannon(p, x, y, this._cannonDir);
-        if (type === ObstacleType.SAW)      return new Saw(p, x, y);
-        return null;
+        switch (type) {
+            case ObstacleType.PLATFORM:         return new Platform(p, x, y);
+            case ObstacleType.MOVING_PLATFORM:  return new MovingPlatform(p, x, y);
+            case ObstacleType.FALLING_PLATFORM: return new FallingPlatform(p, x, y);
+            case ObstacleType.ICE_PLATFORM:     return new IcePlatform(p, x, y);
+            case ObstacleType.BOUNCE_PAD:       return new BouncePad(p, x, y);
+            case ObstacleType.SPIKE:            return new SpikeObstacle(p, x, y);
+            case ObstacleType.CANNON:           return new Cannon(p, x, y, this._cannonDir);
+            case ObstacleType.SAW:              return new Saw(p, x, y);
+            case ObstacleType.FLAME:            return new Flame(p, x, y);
+            case ObstacleType.SPIKE_PLATFORM:   return new SpikePlatform(p, x, y);
+            case ObstacleType.ICE_BLOCK:        return new IceBlock(p, x, y);
+            case ObstacleType.WIND_ZONE:        return new WindZone(p, x, y, this._windDir);
+            case ObstacleType.TELEPORTER:       return new Teleporter(p, x, y);
+            default:                            return null;
+        }
     }
 }

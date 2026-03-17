@@ -34,8 +34,29 @@ export class Obstacle {
     /**
      * Per-frame logic. Override for moving/animated obstacles.
      * @param {number} _deltaTime - ms since last frame
+     * @param {number} _gameWidth
+     * @param {number} _gameHeight
      */
-    update(_deltaTime) {}
+    update(_deltaTime, _gameWidth, _gameHeight) {}
+
+    /**
+     * Apply special physics/effects to a player each frame.
+     * Called after all player movement is resolved.
+     * Override in: IcePlatform, BouncePad, SpikePlatform, IceBlock, WindZone, Teleporter, Flame.
+     *
+     * @param {object}     _player
+     * @param {object[]}   _allPlayers
+     * @param {object}     _respawnManager
+     * @param {object[]}   _obstacles
+     */
+    applyEffect(_player, _allPlayers, _respawnManager, _obstacles) {}
+
+    /**
+     * Move players that are riding this obstacle before player physics resolves.
+     * Override in MovingPlatform.
+     * @param {object[]} _players
+     */
+    carryPlayers(_players) {}
 
     /** Render the obstacle. Must be overridden. */
     draw() {}

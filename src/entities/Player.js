@@ -42,6 +42,13 @@ export class Player {
         this.lastDeathReason = null;
 
         /**
+         * Set to true by IcePlatform / IceBlock each frame the player is in contact.
+         * When true, horizontal momentum is preserved (multiplied) instead of zeroed.
+         * Reset to false at the start of every horizontalMovement() call.
+         */
+        this.slideMode = false;
+
+        /**
          * Persistent obstacle inventory — survives across rounds.
          * Map of ObstacleType string → count.
          * Populated by ShopState, consumed by BuildState.
@@ -62,12 +69,17 @@ export class Player {
      * @memberof Player
      */
     horizontalMovement() {
-        this.vx = 0;
-        if (this.input.left) {
-            this.vx -= this.speed;
-        }
-        if (this.input.right) {
-            this.vx += this.speed;
+        const prevSlide = this.slideMode;
+        this.slideMode  = false; // reset each frame; ice obstacles re-set it before this call
+
+        const noInput = !this.input.left && !this.input.right;
+        if (noInput && prevSlide) {
+            // Ice: preserve momentum with light friction instead of zeroing
+            this.vx *= 0.97;
+        } else {
+            this.vx = 0;
+            if (this.input.left)  this.vx -= this.speed;
+            if (this.input.right) this.vx += this.speed;
         }
     }
 
