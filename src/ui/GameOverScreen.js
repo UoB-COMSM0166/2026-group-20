@@ -34,17 +34,9 @@ export class GameOverScreen {
         p.textSize(24);
         if (timeManager.rankings.length > 0) {
             const winner = timeManager.rankings[0];
-            p.text(
-                `Winner: Player ${winner.playerNo + 1} !`,
-                this.gameWidth / 2,
-                this.gameHeight / 2 + 10,
-            );
+            p.text(`Winner: Player ${winner.playerNo + 1} !`, this.gameWidth / 2, this.gameHeight / 2 + 10);
         } else {
-            p.text(
-                "Time's Up! Everyone Failed.",
-                this.gameWidth / 2,
-                this.gameHeight / 2 + 10,
-            );
+            p.text("Time's Up! Everyone Failed.", this.gameWidth / 2, this.gameHeight / 2 + 10);
         }
     }
 }

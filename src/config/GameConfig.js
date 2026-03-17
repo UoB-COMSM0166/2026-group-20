@@ -55,4 +55,19 @@ export const GameConfig = {
 
     // tile
     TILE: 40,
+
+    // Reward algorithm: index 0 = 1st place, 1 = 2nd, etc. Fail = 0.
+    FINISH_REWARDS: [20, 10, 5, 2],
+
+    // Value of each coin collected during a round
+    COIN_VALUE: 1,
+
+    // Cannon
+    CANNON_FIRE_INTERVAL: 2200, // ms between shots
+    CANNON_PROJECTILE_SPEED: 5, // pixels per frame
+    CANNON_PROJECTILE_RADIUS: 7,
+
+    // Saw
+    SAW_ROTATION_SPEED: 0.005, // radians per millisecond (~0.8 rotations/second)
+    SAW_TOOTH_COUNT: 10,       // number of teeth around the blade circumference
 };

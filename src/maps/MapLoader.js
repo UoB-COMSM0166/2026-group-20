@@ -1,4 +1,5 @@
 import { GameConfig } from '../config/GameConfig.js';
+import { Coin } from '../entities/Coin.js';
 
 // Active map — swap this import to change which map is loaded.
 export { MAP1 as MAP } from './Map1.js';
@@ -47,41 +48,41 @@ export function drawMap(p) {
             const c = MAP[y][x];
             if (c === '#') {
                 p.fill(80);
-                p.rect(
-                    x * GameConfig.TILE,
-                    y * GameConfig.TILE,
-                    GameConfig.TILE,
-                    GameConfig.TILE,
-                );
+                p.rect(x * GameConfig.TILE, y * GameConfig.TILE, GameConfig.TILE, GameConfig.TILE);
             } else if (c === 'S') {
                 p.fill(220, 80, 80);
-                const px = x * GameConfig.TILE,
-                    py = y * GameConfig.TILE;
-                p.triangle(
-                    px,
-                    py + GameConfig.TILE,
-                    px + GameConfig.TILE / 2,
-                    py + 6,
-                    px + GameConfig.TILE,
-                    py + GameConfig.TILE,
-                );
+                const px = x * GameConfig.TILE, py = y * GameConfig.TILE;
+                p.triangle(px, py + GameConfig.TILE, px + GameConfig.TILE / 2, py + 6, px + GameConfig.TILE, py + GameConfig.TILE);
             } else if (c === 'F') {
                 p.fill(100, 220, 100);
-                p.rect(
-                    x * GameConfig.TILE,
-                    y * GameConfig.TILE,
-                    GameConfig.TILE,
-                    GameConfig.TILE,
-                );
+                p.rect(x * GameConfig.TILE, y * GameConfig.TILE, GameConfig.TILE, GameConfig.TILE);
                 p.fill(255);
                 p.textAlign(p.CENTER, p.CENTER);
                 p.textSize(12);
-                p.text(
-                    'GOAL',
-                    x * GameConfig.TILE + GameConfig.TILE / 2,
-                    y * GameConfig.TILE + GameConfig.TILE / 2,
-                );
+                p.text('GOAL', x * GameConfig.TILE + GameConfig.TILE / 2, y * GameConfig.TILE + GameConfig.TILE / 2);
+            }
+            // 'C' tiles are handled as Coin entities — skip here
+        }
+    }
+}
+
+/**
+ * Parses the active map and returns a Coin instance for every 'C' tile.
+ * Call once during setup; the returned array is the live coin list.
+ *
+ * @param {p5} p - The p5 instance
+ * @returns {Coin[]}
+ */
+export function getCoins(p) {
+    const coins = [];
+    for (let y = 0; y < MAP.length; y++) {
+        for (let x = 0; x < MAP[0].length; x++) {
+            if (MAP[y][x] === 'C') {
+                const px = x * GameConfig.TILE + GameConfig.TILE * 0.25;
+                const py = y * GameConfig.TILE + GameConfig.TILE * 0.25;
+                coins.push(new Coin(p, px, py, GameConfig.COIN_VALUE));
             }
         }
     }
+    return coins;
 }

@@ -1,38 +1,42 @@
+import { GameConfig } from '../config/GameConfig.js';
+
 /**
- * Base class for all placeable obstacles (e.g. moving platforms, cannons, traps).
- * Extend this class to implement specific obstacle types.
+ * Base class for all placeable obstacles.
  *
- * TODO: flesh out as obstacle types are designed
+ * Subclasses must override:
+ *   get isSolid()  — true if the obstacle blocks player movement
+ *   get isHazard() — true if the obstacle kills on contact
+ *   draw()         — how to render the obstacle
+ *
+ * PhysicsSystem reads isSolid and isHazard each frame.
  */
 export class Obstacle {
     /**
-     * @param {p5} p
-     * @param {number} x
-     * @param {number} y
-     * @param {number} w
-     * @param {number} h
+     * @param {p5}    p
+     * @param {number} x - World x position in pixels (top-left, snapped to tile grid)
+     * @param {number} y - World y position in pixels (top-left, snapped to tile grid)
      */
-    constructor(p, x, y, w, h) {
-        this.p = p;
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
+    constructor(p, x, y) {
+        this.p      = p;
+        this.x      = x;
+        this.y      = y;
+        this.w      = GameConfig.TILE;
+        this.h      = GameConfig.TILE;
         this.active = true;
     }
 
-    /**
-     * Update obstacle logic each frame.
-     * @param {number} deltaTime - ms since last frame
-     */
-    update(deltaTime) {
-        // TODO: override in subclasses
-    }
+    /** @returns {boolean} true if this obstacle should block player movement */
+    get isSolid()  { return false; }
+
+    /** @returns {boolean} true if touching this obstacle kills the player */
+    get isHazard() { return false; }
 
     /**
-     * Draw the obstacle.
+     * Per-frame logic. Override for moving/animated obstacles.
+     * @param {number} _deltaTime - ms since last frame
      */
-    draw() {
-        // TODO: override in subclasses
-    }
+    update(_deltaTime) {}
+
+    /** Render the obstacle. Must be overridden. */
+    draw() {}
 }
