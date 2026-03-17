@@ -140,8 +140,6 @@ export class ScoreManager {
         return this.wallet.get(player.playerNo) ?? 0;
     }
 
-<<<<<<< HEAD
-=======
     /**
      * Deduct amount from a player's wallet.
      * Returns true on success, false if insufficient funds.
@@ -156,7 +154,6 @@ export class ScoreManager {
         return true;
     }
 
->>>>>>> origin/feature/shop
     /** @param {Player} player @returns {number} */
     getRoundCoins(player) {
         return this.roundCoins.get(player.playerNo) ?? 0;

@@ -3,12 +3,6 @@
  * Add new entries here as new obstacle classes are implemented.
  */
 export const ObstacleType = Object.freeze({
-<<<<<<< HEAD
-    PLATFORM: 'PLATFORM', // solid block — blocks movement
-    SPIKE:    'SPIKE',    // hazard — kills on contact
-    CANNON:   'CANNON',  // fires projectiles in a set direction
-    SAW:      'SAW',     // spinning blade — hazard, not solid
-=======
     // Solid only
     PLATFORM:         'PLATFORM',         // static solid block
     MOVING_PLATFORM:  'MOVING_PLATFORM',  // slides on a fixed path
@@ -29,5 +23,4 @@ export const ObstacleType = Object.freeze({
     ICE_BLOCK:  'ICE_BLOCK',  // applies sliding physics to nearby players
     WIND_ZONE:  'WIND_ZONE',  // pushes players in a set direction
     TELEPORTER: 'TELEPORTER', // warps player to linked partner
->>>>>>> origin/feature/shop
 });
