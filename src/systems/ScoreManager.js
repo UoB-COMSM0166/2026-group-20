@@ -140,6 +140,23 @@ export class ScoreManager {
         return this.wallet.get(player.playerNo) ?? 0;
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * Deduct amount from a player's wallet.
+     * Returns true on success, false if insufficient funds.
+     * @param {Player} player
+     * @param {number} amount
+     * @returns {boolean}
+     */
+    spendWallet(player, amount) {
+        const current = this.wallet.get(player.playerNo) ?? 0;
+        if (current < amount) return false;
+        this.wallet.set(player.playerNo, current - amount);
+        return true;
+    }
+
+>>>>>>> origin/feature/shop
     /** @param {Player} player @returns {number} */
     getRoundCoins(player) {
         return this.roundCoins.get(player.playerNo) ?? 0;

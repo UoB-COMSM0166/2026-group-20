@@ -76,12 +76,21 @@ class Projectile {
         const p = this.p;
         p.noStroke();
 
+<<<<<<< HEAD
         // Outer ball — dark iron
         p.fill(50, 50, 55);
         p.circle(this.x, this.y, this.r * 2);
 
         // Glint highlight
         p.fill(120, 120, 130, 200);
+=======
+        // Outer ball — bright orange-red so it's clearly visible in play
+        p.fill(255, 90, 30);
+        p.circle(this.x, this.y, this.r * 2);
+
+        // White glint highlight
+        p.fill(255, 255, 255, 200);
+>>>>>>> origin/feature/shop
         p.circle(this.x - this.r * 0.25, this.y - this.r * 0.25, this.r * 0.6);
     }
 }
