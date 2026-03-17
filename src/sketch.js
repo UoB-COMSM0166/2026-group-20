@@ -10,7 +10,10 @@ import { MapMenuState } from './states/MapMenuState.js';
 import { BuildState }   from './states/BuildState.js';
 import { RunState }     from './states/RunState.js';
 import { ResultsState } from './states/ResultsState.js';
+<<<<<<< HEAD
+=======
 import { ShopState }    from './states/ShopState.js';
+>>>>>>> origin/feature/shop
 import { Map2State }    from './states/Map2State.js';
 
 /**
@@ -20,9 +23,14 @@ import { Map2State }    from './states/Map2State.js';
  * and the active state machine. All game logic lives in src/states/.
  *
  * State flow:
+<<<<<<< HEAD
+ *   BOOT → MENU → MAPMENU → BUILD → RUN → RESULTS
+ *                                  ↑____________| (ENTER plays again)
+=======
  *   BOOT → MENU → MAPMENU → BUILD → RUN → RESULTS → SHOP → BUILD → …
  *                                                    ↑  ESC  ↓
  *                                                  MAPMENU
+>>>>>>> origin/feature/shop
  */
 export const sketch = (p) => {
     const gameWidth  = MAP[0].length * GameConfig.TILE;
@@ -50,7 +58,10 @@ export const sketch = (p) => {
          * Shared session context.
          * placedObstacles — written by BuildState, read by RunState.
          *                   Lives here so it survives the BUILD → RUN transition.
+<<<<<<< HEAD
+=======
          * Obstacle tokens are now stored per-player in player.inventory (Map).
+>>>>>>> origin/feature/shop
          */
         const ctx = {
             p,
@@ -59,7 +70,10 @@ export const sketch = (p) => {
             players,
             scoreManager,
             placedObstacles: [],
+<<<<<<< HEAD
+=======
             shopHasRun: false, // true after first shop phase; gates strict build-phase token enforcement
+>>>>>>> origin/feature/shop
         };
 
         const goTo = (stage) => {
@@ -75,7 +89,10 @@ export const sketch = (p) => {
             [GameStage.BUILD]:   new BuildState(ctx, goTo),
             [GameStage.RUN]:     new RunState(ctx, goTo),
             [GameStage.RESULTS]: new ResultsState(ctx, goTo),
+<<<<<<< HEAD
+=======
             [GameStage.SHOP]:    new ShopState(ctx, goTo),
+>>>>>>> origin/feature/shop
             [GameStage.MAP2]:    new Map2State(ctx, goTo),
         };
 

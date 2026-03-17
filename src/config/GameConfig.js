@@ -70,6 +70,8 @@ export const GameConfig = {
     // Saw
     SAW_ROTATION_SPEED: 0.005, // radians per millisecond (~0.8 rotations/second)
     SAW_TOOTH_COUNT: 10,       // number of teeth around the blade circumference
+<<<<<<< HEAD
+=======
 
     // Shop — wallet cost to purchase one placement token per item type
     SHOP_PRICES: {
@@ -108,4 +110,5 @@ export const GameConfig = {
 
     // Teleporter
     TELEPORTER_COOLDOWN_MS: 1200, // ms before same player can teleport again
+>>>>>>> origin/feature/shop
 };

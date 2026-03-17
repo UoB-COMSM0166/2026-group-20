@@ -34,6 +34,10 @@ export class Obstacle {
     /**
      * Per-frame logic. Override for moving/animated obstacles.
      * @param {number} _deltaTime - ms since last frame
+<<<<<<< HEAD
+     */
+    update(_deltaTime) {}
+=======
      * @param {number} _gameWidth
      * @param {number} _gameHeight
      */
@@ -65,6 +69,7 @@ export class Obstacle {
      * @param {object[]} _players
      */
     carryPlayers(_players) {}
+>>>>>>> origin/feature/shop
 
     /** Render the obstacle. Must be overridden. */
     draw() {}

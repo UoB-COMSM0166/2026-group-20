@@ -9,11 +9,19 @@ import { Scoreboard } from '../ui/Scoreboard.js';
  * Shows the full Scoreboard (rank, time, deaths, coins, wallet).
  *
  * Controls:
+<<<<<<< HEAD
+ *   ENTER — play again (back to BuildState, same map, fresh obstacles)
+ *   ESC   — return to map menu
+ *
+ * Transitions:
+ *   ENTER → BuildState
+=======
  *   ENTER — proceed to shop for the next round
  *   ESC   — return to map menu
  *
  * Transitions:
  *   ENTER → ShopState
+>>>>>>> origin/feature/shop
  *   ESC   → MapMenuState
  */
 export class ResultsState extends State {
@@ -29,7 +37,11 @@ export class ResultsState extends State {
     keyPressed() {
         const { p } = this.ctx;
         if (p.keyCode === p.ENTER || p.keyCode === 13) {
+<<<<<<< HEAD
+            this.goTo(GameStage.BUILD);
+=======
             this.goTo(GameStage.SHOP);
+>>>>>>> origin/feature/shop
         } else if (p.keyCode === p.ESCAPE) {
             this.goTo(GameStage.MAPMENU);
         }

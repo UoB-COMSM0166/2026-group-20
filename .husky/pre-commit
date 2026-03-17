@@ -1,0 +1,66 @@
+# Author: Maran (https://github.com/IlamaranMagesh)
+# Runs below scripts on git-hooks -> https://git-scm.com/docs/githooks
+# To disable, set HUSKY=0 in your environment variables
+# before running any git-hook supported commands
+
+# Set Colors
+GREEN=$'\033[32;1m'
+CYAN=$'\033[36;1m'
+NC=$'\033[0m'
+
+# Stage-1 (Auto-formating)
+
+cat <<-EOF
+
+${GREEN}Running pre-commits using Husky...${NC}
+
+|-------------------------------------------------------------------|
+|-> Update the pre-commit script here, /.husky/pre-commit           |
+|                                                                   |
+|-> To disable pre-commit hooks, add HUSKY=0 to your git command.   |
+|   eg: HUSKY=0 git commit ...                                      |
+|                                                                   |
+|-> To disable for the current shell, run                           |
+|   export HUSKY=0                                                  |
+|                                                                   |
+|-> For quiet-mode in Linting set ESLINT_FLAGS to --quiet           |
+|-------------------------------------------------------------------|
+EOF
+
+printf "\n${CYAN}Stage 1: Formating using prettier${NC}\n" > /dev/tty
+
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
+prettier $FILES --write --ignore-unknown
+git update-index --again
+
+# Stage-2 (Linting)
+# For quiet-mode set ESLINT_FLAGS to --quiet
+# For multiple flags, "--quiet --max-warnings"
+# To remove ESLINT_FLAGS, run 'unset ESLINT_FLAGS'
+
+set +e
+
+printf "${CYAN}Stage 2: Linting using ESlint${NC}\n" > /dev/tty
+OUTPUT=$(npx eslint $ESLINT_FLAGS --color src/**/*.js)
+printf "$OUTPUT\n" > /dev/tty
+if [[ -n $OUTPUT ]] && grep -sq -e "--fix" <<< "$OUTPUT"; then
+    printf "Fix possible issues? (y?): " > /dev/tty
+    read -r ANS < /dev/tty
+    if [[ $ANS == "y" ]]; then
+        npx eslint --fix-dry-run src/**/*.js
+        printf "Apply fix? (y?): " > /dev/tty
+        read -r ANS < /dev/tty
+        if [[ $ANS == "y" ]]; then
+            npx eslint --fix src/**/*.js
+        fi
+    fi
+fi
+
+set -e
+
+# Stage-3 (Testing)
+printf "${CYAN}Stage 3: Testing using Vitest${NC}" > /dev/tty
+npm test
+
+# Stage-4 (Building)
+# Local dev environment doesn't need building, yet

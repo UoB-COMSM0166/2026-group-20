@@ -153,7 +153,11 @@ export class Scoreboard {
         p.fill(120, 120, 150);
         p.textSize(13);
         p.textAlign(p.CENTER, p.BOTTOM);
+<<<<<<< HEAD
+        p.text('Press ESC to return to Map Menu', gw / 2, panelY + panelH - 12);
+=======
         p.text('ENTER → Shop  •  ESC → Map Menu', gw / 2, panelY + panelH - 12);
+>>>>>>> origin/feature/shop
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

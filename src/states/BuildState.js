@@ -3,6 +3,11 @@ import { GameStage } from '../config/GameStage.js';
 import { GameConfig } from '../config/GameConfig.js';
 import { ObstacleType } from '../config/ObstacleType.js';
 import { Platform } from '../entities/obstacles/Platform.js';
+<<<<<<< HEAD
+import { SpikeObstacle } from '../entities/obstacles/SpikeObstacle.js';
+import { Cannon, CannonDir } from '../entities/obstacles/Cannon.js';
+import { Saw } from '../entities/obstacles/Saw.js';
+=======
 import { MovingPlatform } from '../entities/obstacles/MovingPlatform.js';
 import { FallingPlatform } from '../entities/obstacles/FallingPlatform.js';
 import { IcePlatform } from '../entities/obstacles/IcePlatform.js';
@@ -15,11 +20,69 @@ import { SpikePlatform } from '../entities/obstacles/SpikePlatform.js';
 import { IceBlock } from '../entities/obstacles/IceBlock.js';
 import { WindZone, WindDir } from '../entities/obstacles/WindZone.js';
 import { Teleporter } from '../entities/obstacles/Teleporter.js';
+>>>>>>> origin/feature/shop
 import { drawMap, MAP } from '../maps/MapLoader.js';
 
 // Map tile characters that cannot be overwritten when placing obstacles
 const BLOCKED_TILES = new Set(['#', 'S', 'F', 'C']);
 
+<<<<<<< HEAD
+/**
+ * BuildState — the obstacle placement phase.
+ *
+ * Players select an obstacle type from the bottom palette and click
+ * anywhere on the open map to place it, snapped to the tile grid.
+ * Right-click removes a placed obstacle.
+ *
+ * The placed obstacles are stored in ctx.placedObstacles, which RunState
+ * reads directly — so they persist into (and only into) the next run.
+ *
+ * Controls:
+ *   Left click on palette  — select obstacle type
+ *   Left click on map      — place selected obstacle
+ *   Right click on map     — remove obstacle at that tile
+ *   ENTER                  — start run (→ RunState)
+ *   ESC                    — return to map menu
+ *
+ * Transitions:
+ *   ENTER → RunState
+ *   ESC   → MapMenuState
+ */
+export class BuildState extends State {
+
+    // ── Palette definition ────────────────────────────────────────────────
+    static PALETTE = [
+        {
+            type:  ObstacleType.PLATFORM,
+            label: 'Platform',
+            hint:  'Solid block',
+            color: [120, 90, 60],
+        },
+        {
+            type:  ObstacleType.SPIKE,
+            label: 'Spike',
+            hint:  'Kills on touch',
+            color: [220, 60, 60],
+        },
+        {
+            type:  ObstacleType.CANNON,
+            label: 'Cannon',
+            hint:  'Fires projectiles',
+            color: [70, 70, 80],
+        },
+        {
+            type:  ObstacleType.SAW,
+            label: 'Saw',
+            hint:  'Spinning blade',
+            color: [200, 60, 60],
+        },
+    ];
+
+    enter() {
+        this.ctx.placedObstacles.length = 0;
+        this._selectedType = null;
+        this._cannonDir    = CannonDir.RIGHT; // default direction for cannon placement
+=======
 // Player colours — must match DrawPlayer / Scoreboard / ShopState
 const PLAYER_COLOURS = [
     [90,  170, 255], // P1 blue
@@ -88,10 +151,21 @@ export class BuildState extends State {
         this._windDir           = WindDir.RIGHT;
         this._pendingTeleporter = null; // first placed teleporter waits for its partner
         this._turnObstacles     = [];   // obstacles placed this turn (for undo)
+>>>>>>> origin/feature/shop
     }
 
     update(_dt) {}
 
+<<<<<<< HEAD
+    render(mx, my) {
+        const { p, gameWidth, gameHeight } = this.ctx;
+
+        // ── Background + map ─────────────────────────────────────────────
+        p.background(20);
+        drawMap(p);
+
+        // ── Already-placed obstacles ─────────────────────────────────────
+=======
     // ── Turn / token helpers ──────────────────────────────────────────────
 
     _activePlayer() {
@@ -143,10 +217,49 @@ export class BuildState extends State {
         p.background(20);
         drawMap(p);
 
+>>>>>>> origin/feature/shop
         for (const obs of this.ctx.placedObstacles) {
             obs.draw();
         }
 
+<<<<<<< HEAD
+        // ── Ghost preview (snapped to grid, only over map area) ──────────
+        const T       = GameConfig.TILE;
+        const snapX   = Math.floor(mx / T) * T;
+        const snapY   = Math.floor(my / T) * T;
+        const onMap   = snapX >= 0 && snapX < gameWidth && snapY >= 0 && snapY < gameHeight - this._paletteH();
+
+        if (this._selectedType && onMap && !this._isTileBlocked(snapX, snapY)) {
+            if (this._selectedType === ObstacleType.PLATFORM) {
+                Platform.drawGhost(p, snapX, snapY);
+            } else if (this._selectedType === ObstacleType.SPIKE) {
+                SpikeObstacle.drawGhost(p, snapX, snapY);
+            } else if (this._selectedType === ObstacleType.CANNON) {
+                Cannon.drawGhost(p, snapX, snapY, this._cannonDir);
+            } else if (this._selectedType === ObstacleType.SAW) {
+                Saw.drawGhost(p, snapX, snapY);
+            }
+        }
+
+        // ── Palette panel ────────────────────────────────────────────────
+        this._drawPalette(mx, my);
+
+        // ── Header hint ──────────────────────────────────────────────────
+        p.noStroke();
+        p.fill(255, 220, 80);
+        p.textAlign(p.CENTER, p.TOP);
+        p.textSize(15);
+        p.text('BUILD PHASE', gameWidth / 2, 10);
+
+        p.fill(180, 180, 200);
+        p.textSize(12);
+        p.text('Place obstacles on the map — Press ENTER to start | ESC to exit', gameWidth / 2, 30);
+
+        // Show cannon direction hint when cannon is selected
+        if (this._selectedType === ObstacleType.CANNON) {
+            p.fill(255, 180, 80);
+            p.text(`Cannon direction: ${this._cannonDir}  (press R to rotate)`, gameWidth / 2, 48);
+=======
         // Ghost preview
         const T     = GameConfig.TILE;
         const snapX = Math.floor(mx / T) * T;
@@ -207,15 +320,24 @@ export class BuildState extends State {
                 ? 'Place the second portal to complete the pair'
                 : 'Place the first portal';
             p.text(hint, gameWidth / 2, 58);
+>>>>>>> origin/feature/shop
         }
     }
 
     mousePressed(mx, my) {
+<<<<<<< HEAD
+        const { p, gameWidth, gameHeight } = this.ctx;
+=======
         const { p, gameHeight } = this.ctx;
+>>>>>>> origin/feature/shop
         const T        = GameConfig.TILE;
         const paletteY = gameHeight - this._paletteH();
 
         if (my >= paletteY) {
+<<<<<<< HEAD
+            // Click is inside the palette panel
+=======
+>>>>>>> origin/feature/shop
             this._handlePaletteClick(mx, my);
             return;
         }
@@ -224,6 +346,20 @@ export class BuildState extends State {
         const snapY = Math.floor(my / T) * T;
 
         if (p.mouseButton === p.RIGHT) {
+<<<<<<< HEAD
+            // Right click — remove obstacle at this tile
+            this._removeAt(snapX, snapY);
+            return;
+        }
+
+        // Left click — place selected obstacle
+        if (!this._selectedType) return;
+        if (this._isTileBlocked(snapX, snapY)) return;
+        if (this._obstacleAt(snapX, snapY)) return; // already occupied
+
+        const obs = this._createObstacle(this._selectedType, snapX, snapY);
+        if (obs) this.ctx.placedObstacles.push(obs);
+=======
             // Only undo obstacles placed this player's own turn
             const obs = this._turnObstacles.find(o => o.x === snapX && o.y === snapY);
             if (obs) {
@@ -295,21 +431,108 @@ export class BuildState extends State {
                 }
             }
         }
+>>>>>>> origin/feature/shop
     }
 
     keyPressed() {
         const { p } = this.ctx;
         if (p.keyCode === p.ENTER || p.keyCode === 13) {
+<<<<<<< HEAD
+            this.goTo(GameStage.RUN);
+        } else if (p.keyCode === p.ESCAPE) {
+            this.goTo(GameStage.MAPMENU);
+        } else if (p.key === 'r' || p.key === 'R') {
+            // Rotate cannon direction clockwise
+            const dirs   = [CannonDir.RIGHT, CannonDir.DOWN, CannonDir.LEFT, CannonDir.UP];
+            const idx    = dirs.indexOf(this._cannonDir);
+            this._cannonDir = dirs[(idx + 1) % dirs.length];
+=======
             this._advanceTurn();
         } else if (p.keyCode === p.ESCAPE) {
             this.goTo(GameStage.MAPMENU);
         } else if (p.key === 'r' || p.key === 'R') {
             this._rotateDirection();
+>>>>>>> origin/feature/shop
         }
     }
 
     // ── Private ───────────────────────────────────────────────────────────
 
+<<<<<<< HEAD
+    _paletteH() { return 70; }
+
+    _drawPalette(mx, my) {
+        const { p, gameWidth, gameHeight } = this.ctx;
+        const pH = this._paletteH();
+        const pY = gameHeight - pH;
+
+        // Panel background
+        p.noStroke();
+        p.fill(25, 25, 40, 230);
+        p.rect(0, pY, gameWidth, pH);
+
+        p.stroke(60, 60, 90);
+        p.strokeWeight(1);
+        p.line(0, pY, gameWidth, pY);
+        p.noStroke();
+
+        // Label
+        p.fill(140, 140, 180);
+        p.textAlign(p.LEFT, p.CENTER);
+        p.textSize(12);
+        p.text('Obstacles:', 12, pY + pH / 2);
+
+        // Obstacle buttons
+        const btnW   = 90;
+        const btnH   = 44;
+        const startX = 100;
+        const btnY   = pY + (pH - btnH) / 2;
+
+        BuildState.PALETTE.forEach((item, i) => {
+            const bx       = startX + i * (btnW + 10);
+            const hovered  = mx >= bx && mx <= bx + btnW && my >= btnY && my <= btnY + btnH;
+            const selected = this._selectedType === item.type;
+
+            // Button background
+            if (selected) {
+                p.fill(60, 60, 100);
+            } else if (hovered) {
+                p.fill(40, 40, 65);
+            } else {
+                p.fill(30, 30, 50);
+            }
+            p.rect(bx, btnY, btnW, btnH, 6);
+
+            // Selection highlight border
+            if (selected) {
+                p.stroke(180, 180, 255);
+                p.strokeWeight(2);
+                p.noFill();
+                p.rect(bx, btnY, btnW, btnH, 6);
+                p.noStroke();
+            }
+
+            // Colour swatch
+            p.fill(...item.color);
+            p.rect(bx + 8, btnY + 12, 14, 14, 2);
+
+            // Labels
+            p.fill(220, 220, 240);
+            p.textAlign(p.LEFT, p.TOP);
+            p.textSize(12);
+            p.text(item.label, bx + 28, btnY + 8);
+
+            p.fill(120, 120, 150);
+            p.textSize(10);
+            p.text(item.hint, bx + 28, btnY + 26);
+        });
+
+        // Right side: ENTER to start hint
+        p.fill(100, 200, 120);
+        p.textAlign(p.RIGHT, p.CENTER);
+        p.textSize(13);
+        p.text('ENTER → Start Run', gameWidth - 14, pY + pH / 2);
+=======
     _rotateDirection() {
         if (this._selectedType === ObstacleType.CANNON) {
             const dirs = [CannonDir.RIGHT, CannonDir.DOWN, CannonDir.LEFT, CannonDir.UP];
@@ -426,10 +649,22 @@ export class BuildState extends State {
         p.textAlign(p.RIGHT, p.CENTER);
         p.textSize(12);
         p.text(nextLabel, gameWidth - 10, pY + pH / 2);
+>>>>>>> origin/feature/shop
     }
 
     _handlePaletteClick(mx, my) {
         const { gameHeight } = this.ctx;
+<<<<<<< HEAD
+        const btnW   = 90;
+        const btnH   = 44;
+        const startX = 100;
+        const btnY   = gameHeight - this._paletteH() + (this._paletteH() - btnH) / 2;
+
+        BuildState.PALETTE.forEach((item, i) => {
+            const bx = startX + i * (btnW + 10);
+            if (mx >= bx && mx <= bx + btnW && my >= btnY && my <= btnY + btnH) {
+                // Toggle off if already selected
+=======
         const ROW_SZ = 7;
         const btnW   = 116;
         const btnH   = 46;
@@ -447,6 +682,7 @@ export class BuildState extends State {
 
             if (mx >= bx && mx <= bx + btnW && my >= by && my <= by + btnH) {
                 if (this._tokenCount(item.type) <= 0) return;
+>>>>>>> origin/feature/shop
                 this._selectedType = this._selectedType === item.type ? null : item.type;
             }
         });
@@ -467,12 +703,23 @@ export class BuildState extends State {
     _removeAt(px, py) {
         const arr = this.ctx.placedObstacles;
         const idx = arr.findIndex(o => o.x === px && o.y === py);
+<<<<<<< HEAD
+        if (idx !== -1) arr.splice(idx, 1);
+=======
         if (idx !== -1) return arr.splice(idx, 1)[0];
         return null;
+>>>>>>> origin/feature/shop
     }
 
     _createObstacle(type, x, y) {
         const { p } = this.ctx;
+<<<<<<< HEAD
+        if (type === ObstacleType.PLATFORM) return new Platform(p, x, y);
+        if (type === ObstacleType.SPIKE)    return new SpikeObstacle(p, x, y);
+        if (type === ObstacleType.CANNON)   return new Cannon(p, x, y, this._cannonDir);
+        if (type === ObstacleType.SAW)      return new Saw(p, x, y);
+        return null;
+=======
         switch (type) {
             case ObstacleType.PLATFORM:         return new Platform(p, x, y);
             case ObstacleType.MOVING_PLATFORM:  return new MovingPlatform(p, x, y);
@@ -489,5 +736,6 @@ export class BuildState extends State {
             case ObstacleType.TELEPORTER:       return new Teleporter(p, x, y);
             default:                            return null;
         }
+>>>>>>> origin/feature/shop
     }
 }
