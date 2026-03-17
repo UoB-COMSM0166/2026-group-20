@@ -28,18 +28,19 @@ export class BouncePad extends Obstacle {
     }
 
     applyEffect(player) {
-        // Trigger only when player lands on the top surface
+        // Same feet-based check as IcePlatform — aabbIntersects returns false
+        // because physics resolves player feet to obs.y - skin (0.01px above top).
+        const feetY = player.y + player.h;
         const onTop = player.onGround &&
-                      Math.abs((player.y + player.h) - this.y) <= 4 &&
-                      aabbIntersects(player.x, player.y, player.w, player.h,
-                                     this.x, this.y, this.w, this.h);
+                      feetY >= this.y - 2 && feetY <= this.y + 4 &&
+                      player.x + player.w > this.x + 2 &&
+                      player.x < this.x + this.w - 2;
         if (!onTop) return;
 
         player.vy       = GameConfig.BOUNCE_PAD_FORCE;
         player.onGround = false;
-        // Reset double-jump counter so players can jump again at peak
         player.jumpsLeft = player.maxJumps;
-        this._compressTimer = 200; // 200 ms compression animation
+        this._compressTimer = 200;
     }
 
     draw() {

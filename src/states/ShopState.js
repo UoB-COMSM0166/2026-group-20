@@ -3,44 +3,47 @@ import { GameStage } from '../config/GameStage.js';
 import { GameConfig } from '../config/GameConfig.js';
 import { ObstacleType } from '../config/ObstacleType.js';
 
-// Ordered list of items shown in the shop, derived from GameConfig.SHOP_PRICES
+// All purchasable items derived from GameConfig.SHOP_PRICES
 const SHOP_ITEMS = Object.entries(GameConfig.SHOP_PRICES).map(([type, price]) => ({
     type,
     price,
-    label: type.charAt(0) + type.slice(1).toLowerCase(), // 'PLATFORM' → 'Platform'
+    label: type.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' '),
 }));
 
-// Player colours — must match DrawPlayer / Scoreboard
+// Player colours
 const PLAYER_COLOURS = [
     [90,  170, 255], // P1 blue
     [255, 200, 80],  // P2 orange
 ];
 
+// Table layout constants
+const COLS        = 2;
+const ROW_H       = 36;
+const TABLE_PAD_X = 20;
+const TABLE_PAD_Y = 10;
+
 /**
- * ShopState — turn-based shop phase between rounds.
+ * ShopState — turn-based shop.
  *
- * Flow:
- *   P1 picks one item (or skips) → confirm
- *   P2 picks one item (or skips) → confirm
- *   → BuildState
+ * A player can buy as many items as they can afford in their turn.
+ * Each purchase immediately deducts from wallet and adds to inventory.
+ * "Done" (or ENTER with nothing selected) ends the turn.
  *
- * Purchases are written directly into player.inventory (Map<ObstacleType, count>),
- * which persists across rounds — unspent tokens carry over indefinitely.
- * BuildState reads the combined inventory of all players as its token pool.
+ * Layout: 2-column scrollable table. Each row shows name, price, and a Buy
+ * button. All 13 items fit within the 960-wide canvas without overflow.
  *
- * Controls (active player only):
- *   Mouse click on item card  — select / deselect
- *   ENTER or click Confirm    — buy selected item (if affordable) and end turn
- *   S or click Skip           — end turn without buying
+ * Controls:
+ *   Click Buy button   — purchase that item (if affordable)
+ *   Click Done / ENTER — end turn
+ *   S                  — end turn (skip)
  */
 export class ShopState extends State {
 
     enter() {
-        this.ctx.shopHasRun    = true;
-        this._currentTurn = 0;
-        this._selected    = null;
-        this._message     = '';
-        this._msgTimer    = 0;
+        this.ctx.shopHasRun = true;
+        this._currentTurn   = 0;
+        this._message       = '';
+        this._msgTimer      = 0;
     }
 
     update(deltaTime) {
@@ -62,157 +65,159 @@ export class ShopState extends State {
         p.noStroke();
         p.fill(...col);
         p.textAlign(p.CENTER, p.TOP);
-        p.textSize(28);
-        p.text(`P${this._currentTurn + 1} — SHOP`, gameWidth / 2, 18);
+        p.textSize(22);
+        p.text(`P${this._currentTurn + 1} — SHOP`, gameWidth / 2, 10);
 
-        p.fill(180, 180, 200);
-        p.textSize(14);
-        p.text('Pick one obstacle to place this round, then confirm.', gameWidth / 2, 56);
-
-        // ── Wallet ───────────────────────────────────────────────────────
+        // Wallet (top-right)
         p.fill(100, 220, 180);
-        p.textSize(18);
+        p.textSize(16);
         p.textAlign(p.RIGHT, p.TOP);
-        p.text(`💰 Wallet: ${wallet}`, gameWidth - 20, 18);
+        p.text(`💰 ${wallet}`, gameWidth - 14, 10);
 
-        // ── Existing inventory ────────────────────────────────────────────
-        const invEntries = [...player.inventory.entries()].filter(([, count]) => count > 0);
+        // Inventory summary (top-left)
+        const invEntries = [...player.inventory.entries()].filter(([, c]) => c > 0);
+        p.fill(160, 160, 200);
+        p.textSize(11);
+        p.textAlign(p.LEFT, p.TOP);
         if (invEntries.length > 0) {
-            p.fill(160, 160, 200);
-            p.textSize(12);
-            p.textAlign(p.RIGHT, p.TOP);
-            const invText = 'Inventory: ' + invEntries
-                .map(([type, count]) => `${type.charAt(0) + type.slice(1).toLowerCase()} ×${count}`)
-                .join('  ');
-            p.text(invText, gameWidth - 20, 44);
+            const inv = invEntries.map(([t, c]) => `${t.split('_').map(w => w[0] + w.slice(1).toLowerCase()).join(' ')} ×${c}`).join('  ');
+            p.text(`Bag: ${inv}`, 14, 12);
+        } else {
+            p.fill(90, 90, 110);
+            p.text('Bag: empty', 14, 12);
         }
 
-        // ── Item cards ───────────────────────────────────────────────────
-        const cardW   = 140;
-        const cardH   = 110;
-        const gap     = 24;
-        const totalW  = SHOP_ITEMS.length * cardW + (SHOP_ITEMS.length - 1) * gap;
-        const startX  = (gameWidth - totalW) / 2;
-        const cardY   = gameHeight / 2 - cardH / 2 - 20;
+        // Subtitle
+        p.fill(160, 160, 190);
+        p.textSize(12);
+        p.textAlign(p.CENTER, p.TOP);
+        p.text('Buy as many items as you can afford. Press ENTER or Done when finished.', gameWidth / 2, 34);
 
-        SHOP_ITEMS.forEach((item, i) => {
-            const cx        = startX + i * (cardW + gap);
-            const isSelected = this._selected === item.type;
-            const canAfford  = wallet >= item.price;
-            const isHovered  = mx >= cx && mx <= cx + cardW && my >= cardY && my <= cardY + cardH;
+        // ── Table ────────────────────────────────────────────────────────
+        const tableTop  = 58;
+        const tableH    = gameHeight - tableTop - 52; // leave room for buttons at bottom
+        const colW      = (gameWidth - TABLE_PAD_X * 2) / COLS;
+        const itemsPerCol = Math.ceil(SHOP_ITEMS.length / COLS);
 
-            // Card background
-            if (isSelected) {
-                p.fill(50, 70, 110);
-            } else if (isHovered && canAfford) {
-                p.fill(35, 40, 60);
-            } else {
-                p.fill(22, 25, 40);
-            }
+        // Table background
+        p.fill(20, 22, 36);
+        p.noStroke();
+        p.rect(TABLE_PAD_X, tableTop, gameWidth - TABLE_PAD_X * 2, tableH, 6);
+
+        // Column headers
+        const headerH = 24;
+        p.fill(35, 38, 58);
+        p.rect(TABLE_PAD_X, tableTop, gameWidth - TABLE_PAD_X * 2, headerH, 6);
+
+        p.fill(140, 140, 180);
+        p.textSize(11);
+        p.textAlign(p.LEFT, p.CENTER);
+        for (let c = 0; c < COLS; c++) {
+            const hx = TABLE_PAD_X + c * colW + TABLE_PAD_Y;
+            p.text('ITEM', hx, tableTop + headerH / 2);
+            p.text('COST', hx + colW * 0.52, tableTop + headerH / 2);
+        }
+
+        // Rows
+        for (let i = 0; i < SHOP_ITEMS.length; i++) {
+            const col_i   = Math.floor(i / itemsPerCol);
+            const row_i   = i % itemsPerCol;
+            const rx      = TABLE_PAD_X + col_i * colW;
+            const ry      = tableTop + headerH + row_i * ROW_H;
+            const item    = SHOP_ITEMS[i];
+            const canAfford = wallet >= item.price;
+            const btnRect = this._buyBtnRect(i, tableTop, colW, headerH, itemsPerCol);
+            const hovered = mx >= btnRect.x && mx <= btnRect.x + btnRect.w &&
+                            my >= btnRect.y && my <= btnRect.y + btnRect.h;
+
+            // Row background (alternating)
             p.noStroke();
-            p.rect(cx, cardY, cardW, cardH, 8);
+            p.fill(row_i % 2 === 0 ? [24, 26, 42] : [28, 30, 48]);
+            p.rect(rx, ry, colW, ROW_H);
 
-            // Selection / hover border
-            if (isSelected) {
-                p.stroke(...col);
-                p.strokeWeight(2.5);
-                p.noFill();
-                p.rect(cx, cardY, cardW, cardH, 8);
-                p.noStroke();
-            } else if (isHovered && canAfford) {
-                p.stroke(100, 110, 160);
-                p.strokeWeight(1.5);
-                p.noFill();
-                p.rect(cx, cardY, cardW, cardH, 8);
-                p.noStroke();
-            }
-
-            // Obstacle preview icon
-            p.noStroke();
-            this._drawIcon(p, item.type, cx + cardW / 2, cardY + 38);
+            // Item colour swatch
+            const swatchCol = this._itemColor(item.type);
+            p.fill(...swatchCol);
+            p.rect(rx + 8, ry + ROW_H / 2 - 7, 14, 14, 2);
 
             // Item name
-            p.fill(canAfford ? 230 : 110);
-            p.textAlign(p.CENTER, p.TOP);
-            p.textSize(14);
-            p.text(item.label, cx + cardW / 2, cardY + 68);
+            p.fill(canAfford ? [210, 210, 235] : [90, 90, 100]);
+            p.textSize(12);
+            p.textAlign(p.LEFT, p.CENTER);
+            p.text(item.label, rx + 28, ry + ROW_H / 2);
 
             // Price
+            p.fill(canAfford ? [255, 215, 0] : [140, 80, 80]);
+            p.textSize(12);
+            p.textAlign(p.LEFT, p.CENTER);
+            p.text(`💰 ${item.price}`, rx + colW * 0.52, ry + ROW_H / 2);
+
+            // Buy button
             if (canAfford) {
-                p.fill(255, 215, 0);
+                p.fill(hovered ? [60, 140, 75] : [38, 100, 52]);
             } else {
-                p.fill(160, 80, 80);
+                p.fill(35, 35, 45);
             }
-            p.textSize(13);
-            p.text(`💰 ${item.price}`, cx + cardW / 2, cardY + 87);
-
-            // Can't afford overlay
-            if (!canAfford) {
-                p.fill(0, 0, 0, 100);
-                p.rect(cx, cardY, cardW, cardH, 8);
-                p.fill(180, 80, 80);
-                p.textSize(11);
-                p.text('CAN\'T AFFORD', cx + cardW / 2, cardY + cardH / 2 - 6);
-            }
-        });
-
-        // ── Confirm / Skip buttons ────────────────────────────────────────
-        const btnY   = cardY + cardH + 36;
-        const btnH   = 38;
-        const btnW   = 140;
-        const confirmX = gameWidth / 2 - btnW - 12;
-        const skipX    = gameWidth / 2 + 12;
-
-        // Confirm
-        const confirmActive = this._selected !== null;
-        const confirmHover  = mx >= confirmX && mx <= confirmX + btnW && my >= btnY && my <= btnY + btnH;
-        p.fill(confirmActive
-            ? (confirmHover ? [60, 140, 80] : [40, 110, 60])
-            : [30, 50, 35]);
-        p.noStroke();
-        p.rect(confirmX, btnY, btnW, btnH, 6);
-        p.fill(confirmActive ? 230 : 90);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(14);
-        p.text('✓  Confirm', confirmX + btnW / 2, btnY + btnH / 2);
-
-        // Skip
-        const skipHover = mx >= skipX && mx <= skipX + btnW && my >= btnY && my <= btnY + btnH;
-        p.fill(skipHover ? [80, 50, 50] : [55, 35, 35]);
-        p.noStroke();
-        p.rect(skipX, btnY, btnW, btnH, 6);
-        p.fill(200, 150, 150);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(14);
-        p.text('✗  Skip', skipX + btnW / 2, btnY + btnH / 2);
-
-        // ── Turn indicator dots ───────────────────────────────────────────
-        const dotY = btnY + btnH + 28;
-        [0, 1].forEach(i => {
-            const dotX = gameWidth / 2 + (i === 0 ? -18 : 18);
-            const active = i === this._currentTurn;
-            p.fill(active ? PLAYER_COLOURS[i] : [50, 50, 65]);
             p.noStroke();
-            p.circle(dotX, dotY, active ? 14 : 10);
-        });
-        p.fill(150, 150, 170);
-        p.textAlign(p.CENTER, p.TOP);
-        p.textSize(11);
-        p.text('P1                    P2', gameWidth / 2, dotY + 10);
+            p.rect(btnRect.x, btnRect.y, btnRect.w, btnRect.h, 4);
+            p.fill(canAfford ? (hovered ? 255 : 200) : 70);
+            p.textSize(11);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.text('Buy', btnRect.x + btnRect.w / 2, btnRect.y + btnRect.h / 2);
+        }
 
-        // ── Feedback message ──────────────────────────────────────────────
+        // Divider lines between rows
+        p.stroke(35, 38, 55);
+        p.strokeWeight(1);
+        for (let i = 0; i < SHOP_ITEMS.length; i++) {
+            const col_i = Math.floor(i / itemsPerCol);
+            const row_i = i % itemsPerCol;
+            const rx    = TABLE_PAD_X + col_i * colW;
+            const ry    = tableTop + headerH + row_i * ROW_H;
+            p.line(rx, ry, rx + colW, ry);
+        }
+        // Column divider
+        p.line(TABLE_PAD_X + colW, tableTop, TABLE_PAD_X + colW, tableTop + tableH);
+        p.noStroke();
+
+        // ── Done button ───────────────────────────────────────────────────
+        const doneY  = gameHeight - 44;
+        const doneW  = 160;
+        const doneH  = 34;
+        const doneX  = gameWidth / 2 - doneW / 2;
+        const doneHov = mx >= doneX && mx <= doneX + doneW && my >= doneY && my <= doneY + doneH;
+
+        p.fill(doneHov ? [60, 120, 180] : [40, 85, 135]);
+        p.noStroke();
+        p.rect(doneX, doneY, doneW, doneH, 6);
+        p.fill(220, 235, 255);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(14);
+        p.text('✓  Done shopping', doneX + doneW / 2, doneY + doneH / 2);
+
+        // Turn dots
+        const dotY = doneY + doneH + 8;
+        [0, 1].forEach(i => {
+            const dotX = gameWidth / 2 + (i === 0 ? -14 : 14);
+            const active = i === this._currentTurn;
+            p.fill(active ? PLAYER_COLOURS[i] : [45, 45, 60]);
+            p.noStroke();
+            p.circle(dotX, dotY, active ? 12 : 8);
+        });
+
+        // Feedback message
         if (this._message) {
             p.fill(255, 220, 80);
             p.textAlign(p.CENTER, p.BOTTOM);
-            p.textSize(13);
-            p.text(this._message, gameWidth / 2, btnY - 8);
+            p.textSize(12);
+            p.text(this._message, gameWidth / 2, doneY - 4);
         }
 
-        // ── Controls hint ─────────────────────────────────────────────────
-        p.fill(90, 90, 110);
-        p.textAlign(p.CENTER, p.BOTTOM);
-        p.textSize(11);
-        p.text('Click to select  •  ENTER to confirm  •  S to skip', gameWidth / 2, gameHeight - 8);
+        // Controls hint
+        p.fill(75, 75, 95);
+        p.textAlign(p.LEFT, p.BOTTOM);
+        p.textSize(10);
+        p.text('ENTER / Done → finish turn   S → skip turn', 14, gameHeight - 2);
     }
 
     mousePressed(mx, my) {
@@ -220,163 +225,116 @@ export class ShopState extends State {
         const player = players[this._currentTurn];
         const wallet = scoreManager.getWallet(player);
 
-        const cardW  = 140;
-        const cardH  = 110;
-        const gap    = 24;
-        const totalW = SHOP_ITEMS.length * cardW + (SHOP_ITEMS.length - 1) * gap;
-        const startX = (gameWidth - totalW) / 2;
-        const cardY  = gameHeight / 2 - cardH / 2 - 20;
+        const tableTop    = 58;
+        const tableH      = gameHeight - tableTop - 52;
+        const colW        = (gameWidth - TABLE_PAD_X * 2) / COLS;
+        const headerH     = 24;
+        const itemsPerCol = Math.ceil(SHOP_ITEMS.length / COLS);
 
-        // Item card click
-        SHOP_ITEMS.forEach(item => {
-            const i  = SHOP_ITEMS.indexOf(item);
-            const cx = startX + i * (cardW + gap);
-            if (mx >= cx && mx <= cx + cardW && my >= cardY && my <= cardY + cardH) {
-                if (wallet >= item.price) {
-                    this._selected = this._selected === item.type ? null : item.type;
-                } else {
-                    this._showMessage(`Not enough coins! Need 💰${item.price}`);
-                }
+        // Buy button clicks
+        for (let i = 0; i < SHOP_ITEMS.length; i++) {
+            const item    = SHOP_ITEMS[i];
+            const btnRect = this._buyBtnRect(i, tableTop, colW, headerH, itemsPerCol);
+            if (mx >= btnRect.x && mx <= btnRect.x + btnRect.w &&
+                my >= btnRect.y && my <= btnRect.y + btnRect.h) {
+                this._buyItem(item, player, scoreManager);
+                return;
             }
-        });
-
-        // Confirm button
-        const btnY     = cardY + cardH + 36;
-        const btnH     = 38;
-        const btnW     = 140;
-        const confirmX = gameWidth / 2 - btnW - 12;
-        if (mx >= confirmX && mx <= confirmX + btnW && my >= btnY && my <= btnY + btnH) {
-            this._confirmTurn();
-            return;
         }
 
-        // Skip button
-        const skipX = gameWidth / 2 + 12;
-        if (mx >= skipX && mx <= skipX + btnW && my >= btnY && my <= btnY + btnH) {
-            this._skipTurn();
+        // Done button
+        const doneY = gameHeight - 44;
+        const doneW = 160;
+        const doneH = 34;
+        const doneX = gameWidth / 2 - doneW / 2;
+        if (mx >= doneX && mx <= doneX + doneW && my >= doneY && my <= doneY + doneH) {
+            this._doneTurn();
         }
     }
 
     keyPressed() {
         const { p } = this.ctx;
         if (p.keyCode === p.ENTER || p.keyCode === 13) {
-            this._confirmTurn();
+            this._doneTurn();
         } else if (p.key === 's' || p.key === 'S') {
-            this._skipTurn();
+            this._doneTurn();
         }
     }
 
     // ── Private ───────────────────────────────────────────────────────────
 
     /**
-     * Buy the selected item (if any) and advance to the next turn / BUILD.
+     * Attempt to buy one unit of an item. Does NOT end the turn.
      * @private
      */
-    _confirmTurn() {
-        const { players, scoreManager } = this.ctx;
-        const player = players[this._currentTurn];
-
-        if (this._selected !== null) {
-            const price = GameConfig.SHOP_PRICES[this._selected];
-            const ok    = scoreManager.spendWallet(player, price);
-            if (!ok) {
-                this._showMessage('Not enough coins!');
-                return;
-            }
-            // Add to this player's persistent inventory
-            const current = player.inventory.get(this._selected) ?? 0;
-            player.inventory.set(this._selected, current + 1);
-            this._showMessage(`P${this._currentTurn + 1} bought ${this._selected.charAt(0) + this._selected.slice(1).toLowerCase()}!`);
+    _buyItem(item, player, scoreManager) {
+        const ok = scoreManager.spendWallet(player, item.price);
+        if (!ok) {
+            this._showMessage(`Not enough coins! Need 💰${item.price}`);
+            return;
         }
-
-        this._advanceTurn();
+        const current = player.inventory.get(item.type) ?? 0;
+        player.inventory.set(item.type, current + 1);
+        const label = item.label;
+        this._showMessage(`Bought ${label}! (💰 ${scoreManager.getWallet(player)} remaining)`);
     }
 
     /**
-     * Skip without buying and advance to next turn / BUILD.
+     * End this player's shopping turn.
      * @private
      */
-    _skipTurn() {
-        this._advanceTurn();
-    }
-
-    /**
-     * Move to the next player's turn, or to BUILD if all players are done.
-     * @private
-     */
-    _advanceTurn() {
-        this._selected = null;
+    _doneTurn() {
+        this._message     = '';
         this._currentTurn++;
-
         if (this._currentTurn >= this.ctx.players.length) {
             this.goTo(GameStage.BUILD);
         }
-        // else render() will now show the next player's turn
     }
 
-    /**
-     * Show a short feedback message for 1.8 seconds.
-     * @private
-     */
     _showMessage(text) {
         this._message  = text;
-        this._msgTimer = 1800;
+        this._msgTimer = 2200;
     }
 
     /**
-     * Draw a small icon for each obstacle type, centred at (cx, cy).
+     * Compute the Buy button rect for item index i.
      * @private
      */
-    _drawIcon(p, type, cx, cy) {
-        const s = 22; // icon half-size
-        p.noStroke();
+    _buyBtnRect(i, tableTop, colW, headerH, itemsPerCol) {
+        const col_i = Math.floor(i / itemsPerCol);
+        const row_i = i % itemsPerCol;
+        const rx    = TABLE_PAD_X + col_i * colW;
+        const ry    = tableTop + headerH + row_i * ROW_H;
+        const btnW  = 42;
+        const btnH  = ROW_H - 8;
+        return {
+            x: rx + colW - btnW - 8,
+            y: ry + 4,
+            w: btnW,
+            h: btnH,
+        };
+    }
 
-        switch (type) {
-            case ObstacleType.PLATFORM:
-                p.fill(120, 90, 60);
-                p.rect(cx - s, cy - s * 0.4, s * 2, s * 0.8, 3);
-                p.fill(160, 125, 85);
-                p.rect(cx - s, cy - s * 0.4, s * 2, s * 0.15, 3);
-                break;
-
-            case ObstacleType.SPIKE:
-                p.fill(220, 60, 60);
-                p.triangle(cx - s, cy + s * 0.6, cx, cy - s * 0.6, cx + s, cy + s * 0.6);
-                p.fill(255, 120, 120, 160);
-                p.triangle(cx - s * 0.4, cy + s * 0.6, cx, cy - s * 0.1, cx + s * 0.1, cy + s * 0.6);
-                break;
-
-            case ObstacleType.CANNON: {
-                // Base
-                p.fill(70, 70, 80);
-                p.rect(cx - s * 0.7, cy - s * 0.7, s * 1.4, s * 1.4, 3);
-                // Barrel
-                p.fill(55, 55, 65);
-                p.rect(cx, cy - s * 0.24, s * 0.9, s * 0.48, 3);
-                // Red dot
-                p.fill(220, 80, 80);
-                p.circle(cx + s * 0.7, cy, s * 0.2);
-                break;
-            }
-
-            case ObstacleType.SAW: {
-                // Outer disc
-                p.fill(200, 200, 210);
-                p.circle(cx, cy, s * 1.7);
-                // Teeth
-                p.fill(220, 60, 60);
-                for (let i = 0; i < 6; i++) {
-                    const a  = (i / 6) * Math.PI * 2;
-                    p.circle(cx + Math.cos(a) * s * 0.72, cy + Math.sin(a) * s * 0.72, s * 0.4);
-                }
-                // Inner disc
-                p.fill(180, 180, 190);
-                p.circle(cx, cy, s * 0.9);
-                // Hub
-                p.fill(100, 100, 110);
-                p.circle(cx, cy, s * 0.36);
-                break;
-            }
-        }
+    /**
+     * Return a display colour for an obstacle type.
+     * @private
+     */
+    _itemColor(type) {
+        const map = {
+            PLATFORM:         [120, 90,  60],
+            MOVING_PLATFORM:  [80,  110, 160],
+            FALLING_PLATFORM: [90,  65,  40],
+            ICE_PLATFORM:     [160, 220, 245],
+            BOUNCE_PAD:       [80,  200, 100],
+            SPIKE:            [220, 60,  60],
+            CANNON:           [100, 100, 115],
+            SAW:              [200, 60,  60],
+            FLAME:            [240, 100, 20],
+            SPIKE_PLATFORM:   [170, 80,  40],
+            ICE_BLOCK:        [120, 190, 230],
+            WIND_ZONE:        [60,  185, 185],
+            TELEPORTER:       [160, 80,  240],
+        };
+        return map[type] ?? [150, 150, 150];
     }
 }

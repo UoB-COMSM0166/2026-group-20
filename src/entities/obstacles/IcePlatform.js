@@ -17,11 +17,15 @@ export class IcePlatform extends Obstacle {
     get isHazard() { return false; }
 
     applyEffect(player) {
-        // Set slideMode if player is standing on the top surface
+        // Check player is standing on the top surface.
+        // We cannot use aabbIntersects here because physics resolves the player's
+        // feet to obs.y - skin (0.01px above), so there is no actual AABB overlap.
+        // Instead check feet-Y within a small tolerance and horizontal overlap.
+        const feetY = player.y + player.h;
         const onTop = player.onGround &&
-                      Math.abs((player.y + player.h) - this.y) <= 4 &&
-                      aabbIntersects(player.x, player.y, player.w, player.h,
-                                     this.x, this.y, this.w, this.h);
+                      feetY >= this.y - 2 && feetY <= this.y + 4 &&
+                      player.x + player.w > this.x + 2 &&
+                      player.x < this.x + this.w - 2;
         if (onTop) player.slideMode = true;
     }
 

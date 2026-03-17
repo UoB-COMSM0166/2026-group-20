@@ -71,7 +71,7 @@ export class BuildState extends State {
         // Special effect
         { type: ObstacleType.ICE_BLOCK,        label: 'IceBlock',    hint: 'Slide through',    color: [120, 190, 230] },
         { type: ObstacleType.WIND_ZONE,        label: 'WindZone',    hint: 'Push direction',   color: [60,  185, 185] },
-        { type: ObstacleType.TELEPORTER,       label: 'Teleporter',  hint: 'Warp to partner',  color: [160, 80,  240] },
+        { type: ObstacleType.TELEPORTER,       label: 'Teleporter',  hint: '1 token = 1 pair',  color: [160, 80,  240] },
     ];
 
     enter() {
@@ -229,16 +229,29 @@ export class BuildState extends State {
             if (obs) {
                 this._removeAt(snapX, snapY);
                 this._turnObstacles = this._turnObstacles.filter(o => o !== obs);
-                this._refundToken(obs.type);
-                // If it was a teleporter, clear pending link if needed
-                if (obs === this._pendingTeleporter) {
-                    this._pendingTeleporter = null;
-                } else if (obs.partner) {
-                    obs.partner.partner = null;
-                    // If the partner was also placed this turn, restore it to pending
-                    if (this._turnObstacles.includes(obs.partner)) {
-                        this._pendingTeleporter = obs.partner;
+
+                // Teleporter undo logic:
+                // One token covers both portals of a pair.
+                // Only refund when removing the FIRST portal of the pair (the one that cost the token).
+                // Removing the second portal of a complete pair: no refund, restore first to pending.
+                if (obs.type === ObstacleType.TELEPORTER) {
+                    if (obs === this._pendingTeleporter) {
+                        // Removing the unpaired first portal — refund the token
+                        this._pendingTeleporter = null;
+                        this._refundToken(ObstacleType.TELEPORTER);
+                    } else if (obs.partner) {
+                        // Removing the second portal of a complete pair —
+                        // no refund (token was spent on the pair), restore first to pending
+                        obs.partner.partner = null;
+                        if (this._turnObstacles.includes(obs.partner)) {
+                            this._pendingTeleporter = obs.partner;
+                        }
+                    } else {
+                        // Orphaned teleporter with no partner — refund
+                        this._refundToken(ObstacleType.TELEPORTER);
                     }
+                } else {
+                    this._refundToken(obs.type);
                 }
             }
             return;
@@ -246,29 +259,40 @@ export class BuildState extends State {
 
         // Left click — place
         if (!this._selectedType) return;
-        if (this._tokenCount(this._selectedType) <= 0) return;
         if (this._isTileBlocked(snapX, snapY)) return;
         if (this._obstacleAt(snapX, snapY)) return;
+
+        // Teleporter second portal is free — one token covers both ends of a pair
+        const isTeleporterSecond = this._selectedType === ObstacleType.TELEPORTER &&
+                                   this._pendingTeleporter !== null;
+        if (!isTeleporterSecond && this._tokenCount(this._selectedType) <= 0) return;
 
         const obs = this._createObstacle(this._selectedType, snapX, snapY);
         if (obs) {
             this.ctx.placedObstacles.push(obs);
             this._turnObstacles.push(obs);
-            this._consumeToken(this._selectedType);
 
-            // Teleporter pairing
             if (this._selectedType === ObstacleType.TELEPORTER) {
                 if (this._pendingTeleporter) {
+                    // Complete the pair — no token consumed for second portal
                     obs.partner = this._pendingTeleporter;
                     this._pendingTeleporter.partner = obs;
                     this._pendingTeleporter = null;
+                    // Deselect once pair is complete (or keep selected if more tokens remain)
+                    if (this._tokenCount(this._selectedType) <= 0) {
+                        this._selectedType = null;
+                    }
                 } else {
+                    // First portal — consume one token, wait for second
+                    this._consumeToken(this._selectedType);
                     this._pendingTeleporter = obs;
+                    // Keep selected so player can immediately place the second portal
                 }
-            }
-
-            if (this._tokenCount(this._selectedType) <= 0) {
-                this._selectedType = null;
+            } else {
+                this._consumeToken(this._selectedType);
+                if (this._tokenCount(this._selectedType) <= 0) {
+                    this._selectedType = null;
+                }
             }
         }
     }
@@ -298,7 +322,7 @@ export class BuildState extends State {
         }
     }
 
-    _paletteH() { return 70; }
+    _paletteH() { return 116; }
 
     _drawGhost(p, type, x, y) {
         switch (type) {
@@ -320,8 +344,15 @@ export class BuildState extends State {
 
     _drawPalette(mx, my, playerCol) {
         const { p, gameWidth, gameHeight } = this.ctx;
-        const pH = this._paletteH();
-        const pY = gameHeight - pH;
+        const pH     = this._paletteH();
+        const pY     = gameHeight - pH;
+        const ROW_SZ = 7;   // items per row
+        const btnW   = 116;
+        const btnH   = 46;
+        const startX = 40;
+        const btnGap = 6;
+        const row0Y  = pY + 8;
+        const row1Y  = row0Y + btnH + 6;
 
         p.noStroke();
         p.fill(20, 22, 35, 235);
@@ -338,62 +369,53 @@ export class BuildState extends State {
 
         p.fill(...playerCol);
         p.textAlign(p.LEFT, p.CENTER);
-        p.textSize(12);
-        p.text(`P${this._currentTurn + 1}:`, 12, pY + pH / 2);
-
-        const btnW   = 78;
-        const btnH   = 44;
-        const startX = 46;
-        const btnY   = pY + (pH - btnH) / 2;
+        p.textSize(11);
+        p.text(`P${this._currentTurn + 1}:`, 8, pY + pH / 2);
 
         BuildState.PALETTE.forEach((item, i) => {
-            const bx        = startX + i * (btnW + 6);
-            const hovered   = mx >= bx && mx <= bx + btnW && my >= btnY && my <= btnY + btnH;
+            const row    = Math.floor(i / ROW_SZ);
+            const col_i  = i % ROW_SZ;
+            const bx     = startX + col_i * (btnW + btnGap);
+            const by     = row === 0 ? row0Y : row1Y;
+
+            const hovered   = mx >= bx && mx <= bx + btnW && my >= by && my <= by + btnH;
             const selected  = this._selectedType === item.type;
             const tokens    = this._tokenCount(item.type);
             const available = tokens > 0;
 
-            if (!available) {
-                p.fill(18, 18, 28);
-            } else if (selected) {
-                p.fill(50, 55, 100);
-            } else if (hovered) {
-                p.fill(38, 40, 65);
-            } else {
-                p.fill(28, 30, 50);
-            }
+            if (!available)      p.fill(18, 18, 28);
+            else if (selected)   p.fill(50, 55, 100);
+            else if (hovered)    p.fill(38, 40, 65);
+            else                 p.fill(28, 30, 50);
             p.noStroke();
-            p.rect(bx, btnY, btnW, btnH, 5);
+            p.rect(bx, by, btnW, btnH, 5);
 
             if (selected) {
                 p.stroke(...playerCol);
                 p.strokeWeight(2);
                 p.noFill();
-                p.rect(bx, btnY, btnW, btnH, 5);
+                p.rect(bx, by, btnW, btnH, 5);
                 p.noStroke();
             }
 
-            // Colour swatch
             p.fill(...item.color.map(c => available ? c : Math.floor(c * 0.3)));
-            p.rect(bx + 5, btnY + 13, 10, 10, 2);
+            p.rect(bx + 5, by + btnH / 2 - 6, 12, 12, 2);
 
-            // Labels
             p.fill(available ? [210, 210, 235] : [65, 65, 75]);
             p.textAlign(p.LEFT, p.TOP);
             p.textSize(10);
-            p.text(item.label, bx + 19, btnY + 7);
+            p.text(item.label, bx + 21, by + 6);
 
             p.fill(available ? [110, 110, 140] : [50, 50, 60]);
             p.textSize(9);
-            p.text(item.hint, bx + 19, btnY + 22);
+            p.text(item.hint, bx + 21, by + 20);
 
-            // Token count badge
             if (this._isShopMode()) {
                 const badge = tokens === Infinity ? '' : `×${tokens}`;
                 p.fill(tokens > 0 ? [100, 200, 120] : [130, 60, 60]);
                 p.textAlign(p.RIGHT, p.TOP);
                 p.textSize(9);
-                p.text(badge, bx + btnW - 3, btnY + 3);
+                p.text(badge, bx + btnW - 3, by + 3);
             }
         });
 
@@ -408,14 +430,22 @@ export class BuildState extends State {
 
     _handlePaletteClick(mx, my) {
         const { gameHeight } = this.ctx;
-        const btnW   = 78;
-        const btnH   = 44;
-        const startX = 46;
-        const btnY   = gameHeight - this._paletteH() + (this._paletteH() - btnH) / 2;
+        const ROW_SZ = 7;
+        const btnW   = 116;
+        const btnH   = 46;
+        const startX = 40;
+        const btnGap = 6;
+        const pY     = gameHeight - this._paletteH();
+        const row0Y  = pY + 8;
+        const row1Y  = row0Y + btnH + 6;
 
         BuildState.PALETTE.forEach((item, i) => {
-            const bx = startX + i * (btnW + 6);
-            if (mx >= bx && mx <= bx + btnW && my >= btnY && my <= btnY + btnH) {
+            const row   = Math.floor(i / ROW_SZ);
+            const col_i = i % ROW_SZ;
+            const bx    = startX + col_i * (btnW + btnGap);
+            const by    = row === 0 ? row0Y : row1Y;
+
+            if (mx >= bx && mx <= bx + btnW && my >= by && my <= by + btnH) {
                 if (this._tokenCount(item.type) <= 0) return;
                 this._selectedType = this._selectedType === item.type ? null : item.type;
             }
