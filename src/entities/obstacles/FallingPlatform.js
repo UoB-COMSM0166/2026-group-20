@@ -17,27 +17,27 @@ export class FallingPlatform extends Obstacle {
         super(p, x, y);
         this._startY       = y;
         this._falling      = false;
+        this._gone         = false;  // true once fallen off-screen; never resets
         this._vy           = 0;
         this._standTimer   = 0;
-        this._playerOnTop  = false; // set each frame by applyEffect, read by update
-        this._shakeOffset  = 0;     // visual shake while about to fall
+        this._playerOnTop  = false;
+        this._shakeOffset  = 0;
     }
 
     get isSolid()  { return !this._falling; }
     get isHazard() { return false; }
 
     update(deltaTime, _gameWidth, gameHeight) {
+        if (this._gone) return;
+
         if (this._falling) {
             this._vy  += GameConfig.FALLING_PLATFORM_GRAVITY;
             this.y    += this._vy;
             this._shakeOffset = 0;
 
-            // Reset once it drops off-screen
+            // Once off-screen, mark permanently gone — no respawn
             if (this.y > (gameHeight ?? 800) + 60) {
-                this.y           = this._startY;
-                this._falling    = false;
-                this._vy         = 0;
-                this._standTimer = 0;
+                this._gone = true;
             }
             this._playerOnTop = false;
             return;
@@ -63,7 +63,7 @@ export class FallingPlatform extends Obstacle {
     }
 
     applyEffect(player) {
-        if (this._falling) return;
+        if (this._falling || this._gone) return;
         // Feet-based check — aabbIntersects fails due to skin offset (player lands
         // at obs.y - skin, so no overlap). Match the fix used in IcePlatform/BouncePad.
         const feetY = player.y + player.h;
@@ -75,6 +75,7 @@ export class FallingPlatform extends Obstacle {
     }
 
     draw() {
+        if (this._gone) return;
         const p  = this.p;
         const ox = this._shakeOffset;
         p.noStroke();

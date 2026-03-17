@@ -1,5 +1,6 @@
 import { Obstacle } from '../Obstacle.js';
 import { GameConfig } from '../../config/GameConfig.js';
+import { aabbIntersects } from '../../systems/PhysicsSystem.js';
 
 /**
  * IceBlock — a special-effect obstacle that is neither solid nor hazardous.
@@ -16,15 +17,17 @@ export class IceBlock extends Obstacle {
     get isHazard() { return false; }
 
     /**
-     * preEffect runs BEFORE player.update(), so slideMode is available when
-     * horizontalMovement() reads prevSlide to decide whether to preserve momentum.
+     * preEffect runs BEFORE player.update(), so speedMultiplier and slideMode
+     * are available when horizontalMovement() reads them.
+     *
+     * Effect: player moves 60% faster inside the block, and slides (preserves
+     * momentum) when they release input while overlapping it.
      */
     preEffect(player) {
-        const cx = player.x + player.w / 2;
-        const cy = player.y + player.h / 2;
-        const inside = cx > this.x && cx < this.x + this.w &&
-                       cy > this.y && cy < this.y + this.h;
-        if (inside) player.slideMode = true;
+        if (!aabbIntersects(player.x, player.y, player.w, player.h,
+                             this.x, this.y, this.w, this.h)) return;
+        player.speedMultiplier = 1.6;
+        player.slideMode       = true;
     }
 
     draw() {

@@ -49,6 +49,13 @@ export class Player {
         this.slideMode = false;
 
         /**
+         * Speed multiplier applied this frame by IceBlock.
+         * 1.0 = normal. IceBlock sets it to > 1 while player is inside.
+         * Reset to 1.0 at the start of every horizontalMovement() call.
+         */
+        this.speedMultiplier = 1.0;
+
+        /**
          * Persistent obstacle inventory — survives across rounds.
          * Map of ObstacleType string → count.
          * Populated by ShopState, consumed by BuildState.
@@ -69,17 +76,19 @@ export class Player {
      * @memberof Player
      */
     horizontalMovement() {
-        const prevSlide = this.slideMode;
-        this.slideMode  = false; // reset each frame; ice obstacles re-set it before this call
+        const prevSlide      = this.slideMode;
+        const speedMult      = this.speedMultiplier;
+        this.slideMode       = false; // reset; ice obstacles re-set before this call
+        this.speedMultiplier = 1.0;   // reset; IceBlock re-sets before this call
 
         const noInput = !this.input.left && !this.input.right;
         if (noInput && prevSlide) {
-            // Ice: preserve momentum with light friction instead of zeroing
+            // Sliding: preserve momentum with light friction instead of zeroing
             this.vx *= 0.97;
         } else {
             this.vx = 0;
-            if (this.input.left)  this.vx -= this.speed;
-            if (this.input.right) this.vx += this.speed;
+            if (this.input.left)  this.vx -= this.speed * speedMult;
+            if (this.input.right) this.vx += this.speed * speedMult;
         }
     }
 

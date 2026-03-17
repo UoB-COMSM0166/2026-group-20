@@ -21,18 +21,19 @@ export class SpikePlatform extends Obstacle {
     get isHazard() { return false; } // directional — handled manually in applyEffect
 
     applyEffect(player, _allPlayers, respawnManager) {
-        // Expand the AABB slightly so skin-offset contacts (player resolved just
-        // outside the surface by PhysicsSystem) still register.
-        const margin = 3;
+        // Expand only the obstacle by a small margin so skin-offset contacts
+        // (player resolved just outside by PhysicsSystem) register.
+        // Do NOT shrink the player — that cancels the expansion.
+        const expand = 2;
         if (!aabbIntersects(
-                player.x + margin, player.y + margin,
-                player.w - margin * 2, player.h - margin * 2,
-                this.x - margin, this.y - margin,
-                this.w + margin * 2, this.h + margin * 2)) return;
+                player.x,          player.y,
+                player.w,          player.h,
+                this.x - expand,   this.y - expand,
+                this.w + expand * 2, this.h + expand * 2)) return;
 
-        // Safe zone: player's feet are close to the top surface.
+        // Safe zone: player's feet are on the top surface.
         // Any other contact (sides, bottom) is lethal.
-        const feetY           = player.y + player.h;
+        const feetY = player.y + player.h;
         const landedFromAbove = feetY >= this.y - 2 && feetY <= this.y + 6;
         if (!landedFromAbove) {
             respawnManager.triggerDeath(player, DeathReason.TRAP);
