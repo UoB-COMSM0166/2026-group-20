@@ -40,24 +40,9 @@ export function moveAndCollideX(entity, dx, allPlayers, p, obstacles = []) {
     const tx = dx > 0 ? right : left;
     for (let ty = top; ty <= bottom; ty++) {
         if (!isSolid(tx, ty)) continue;
-        const tileX = tx * GameConfig.TILE,
-            tileY = ty * GameConfig.TILE;
-        if (
-            aabbIntersects(
-                entity.x,
-                entity.y,
-                entity.w,
-                entity.h,
-                tileX,
-                tileY,
-                GameConfig.TILE,
-                GameConfig.TILE,
-            )
-        ) {
-            entity.x =
-                dx > 0
-                    ? tileX - entity.w - entity.skin
-                    : tileX + GameConfig.TILE + entity.skin;
+        const tileX = tx * GameConfig.TILE, tileY = ty * GameConfig.TILE;
+        if (aabbIntersects(entity.x, entity.y, entity.w, entity.h, tileX, tileY, GameConfig.TILE, GameConfig.TILE)) {
+            entity.x = dx > 0 ? (tileX - entity.w - entity.skin) : (tileX + GameConfig.TILE + entity.skin);
         }
     }
 
@@ -99,20 +84,8 @@ export function moveAndCollideY(entity, dy, allPlayers, p, obstacles = []) {
     const ty = dy > 0 ? bottom : top;
     for (let tx = left; tx <= right; tx++) {
         if (!isSolid(tx, ty)) continue;
-        const tileX = tx * GameConfig.TILE,
-            tileY = ty * GameConfig.TILE;
-        if (
-            aabbIntersects(
-                entity.x,
-                entity.y,
-                entity.w,
-                entity.h,
-                tileX,
-                tileY,
-                GameConfig.TILE,
-                GameConfig.TILE,
-            )
-        ) {
+        const tileX = tx * GameConfig.TILE, tileY = ty * GameConfig.TILE;
+        if (aabbIntersects(entity.x, entity.y, entity.w, entity.h, tileX, tileY, GameConfig.TILE, GameConfig.TILE)) {
             if (dy > 0) {
                 entity.y = tileY - entity.h - entity.skin;
                 entity.vy = 0;
@@ -167,20 +140,8 @@ export function checkSpikeCollision(entity, p, obstacles = []) {
     for (let ty = top; ty <= bottom; ty++) {
         for (let tx = left; tx <= right; tx++) {
             if (!isSpike(tx, ty)) continue;
-            const tileX = tx * GameConfig.TILE,
-                tileY = ty * GameConfig.TILE;
-            if (
-                aabbIntersects(
-                    entity.x,
-                    entity.y,
-                    entity.w,
-                    entity.h,
-                    tileX,
-                    tileY,
-                    GameConfig.TILE,
-                    GameConfig.TILE,
-                )
-            ) {
+            const tileX = tx * GameConfig.TILE, tileY = ty * GameConfig.TILE;
+            if (aabbIntersects(entity.x, entity.y, entity.w, entity.h, tileX, tileY, GameConfig.TILE, GameConfig.TILE)) {
                 return true;
             }
         }

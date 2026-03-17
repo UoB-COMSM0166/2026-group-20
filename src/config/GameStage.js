@@ -23,9 +23,6 @@ export const GameStage = Object.freeze({
     BUILD:   'BUILD',
     RUN:     'RUN',
     RESULTS: 'RESULTS',
-<<<<<<< HEAD
-=======
     SHOP:    'SHOP',
->>>>>>> origin/feature/shop
     MAP2:    'MAP2',
 });
