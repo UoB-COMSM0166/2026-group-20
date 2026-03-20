@@ -12,7 +12,8 @@ import { RunState }     from './states/RunState.js';
 import { ResultsState } from './states/ResultsState.js';
 import { ShopState }    from './states/ShopState.js';
 import { Map2State }    from './states/Map2State.js';
-
+import { AnimationConfig } from "./config/AnimationConfig.js";
+import { AnimationConfig2 } from "./config/AnimationConfig2.js";
 /**
  * Root p5 sketch.
  *
@@ -35,14 +36,31 @@ export const sketch = (p) => {
     let offsetX     = 0;
     let offsetY     = 0;
 
-    // ── Setup ──────────────────────────────────────────────────────────────
+    //let cowImg; 
+    //let bunnyImg;
+    //let smallChickenImg;
+    let chickenAllFrames2;
+    let bunnyAllFrames;
+
+    p.preload = function(){
+      //cowImg = p.loadImage("src/assets/sprites/cow_frames.png");
+      //bunnyImg = p.loadImage("src/assets/sprites/bunny_frames.png");
+      //smallChickenImg= p.loadImage("src/assets/sprites/small_chicken.png");
+      chickenAllFrames2= p.loadImage("src/assets/sprites/chicken_all_frames2.png");
+      bunnyAllFrames= p.loadImage("src/assets/sprites/bunny_all_frames.png");
+    
+    };
+
+    // ── Setup ──
 
     p.setup = function () {
         p.createCanvas(p.windowWidth, p.windowHeight);
 
         const players      = [
-            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 0),
-            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 1),
+            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 0, 
+                chickenAllFrames2, AnimationConfig),
+            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 1, 
+                bunnyAllFrames, AnimationConfig2),
         ];
         const scoreManager = new ScoreManager(players);
 
@@ -82,7 +100,7 @@ export const sketch = (p) => {
         goTo(GameStage.BOOT);
     };
 
-    // ── Draw ───────────────────────────────────────────────────────────────
+    // ── Draw ──
 
     p.draw = function () {
         p.background(0);
@@ -105,7 +123,8 @@ export const sketch = (p) => {
         p.pop();
     };
 
-    // ── Input ──────────────────────────────────────────────────────────────
+
+    // ── Input ──
 
     p.mousePressed = function () {
         const mx = (p.mouseX - offsetX) / scaleFactor;

@@ -1,3 +1,8 @@
+/**
+ * A player entity in the game.
+ * Handles movement, animation frames and life state.
+ */
+
 import { GameConfig } from "../config/GameConfig.js";
 import { HandleInput } from "../systems/HandleInput.js";
 import { PlayerMovementState } from "../config/PlayerMovementState.js";
@@ -6,12 +11,11 @@ import { PlayerGameState } from '../config/PlayerGameState.js';
 import { DeathReason } from "../config/DeathReason.js";
 
 
-
 import { moveAndCollideX, moveAndCollideY, checkSpikeCollision } from "../systems/PhysicsSystem.js";
 
 
 export class Player {
-    constructor(p, x, y, playerNo) {
+    constructor(p, x, y, playerNo, spriteSheet, animationconfig) {
         this.p = p;
         this.playerNo = playerNo;
         this.spawnX = x;
@@ -64,16 +68,42 @@ export class Player {
         this.inventory = new Map();
 
         this.input = new HandleInput(p, playerNo);
-        this.state = PlayerMovementState.IDLE;
+        //this.state = PlayerMovementState.IDLE;
         this.facingRight = true;
 
         this.respawnCountdown = 0;
-    }
+        this.spriteSheet = spriteSheet;
+        this.framesArr=[];
+
+        //split frames 
+        this.splitAnimation();
+
+         this.frameIndexIdle=0;
+         this.frameIndexRun=0;
+         this.frameIndexJump=0;
+         this.frameIndexFall=0;
+         this.frameIndexRespawning=0;
+         this.animationconfig=animationconfig; 
+
+      }
+   
+    /**
+     * Splits the sprite sheet into individual frames.
+    */
+    splitAnimation(){
+      const frameWidth= 28;
+      const frameHeight= 34;
+
+      for(let j=0; j<this.spriteSheet.width;j+=frameWidth){
+            let frame= this.spriteSheet.get(j,0,frameWidth,frameHeight);
+            this.framesArr.push(frame);
+         }
+      }
+    //}
+    
 
     /**
-     *
-     *
-     * @memberof Player
+     * Handles horizontal player movement based on input.
      */
     horizontalMovement() {
         const prevSlide      = this.slideMode;
@@ -91,7 +121,9 @@ export class Player {
             if (this.input.right) this.vx += this.speed * speedMult;
         }
     }
-
+    /**
+     * Handles vertical player movement based on input.
+     */
     jumpUp(){
          if(this.onGround){
             this.jumpsLeft=this.maxJumps;
@@ -108,14 +140,13 @@ export class Player {
     /**
      *
      *
-     * @param {*} allPlayers
-     * @param {*} respawnManager
-     * @return {*} 
-     * @memberof Player
+      * @param {Player[]} allPlayers - List of players
+     * @param {*} respawnManager 
+     * @param {Array} obstacles - List of obstacles
      */
 
     //move
-    update(allPlayers, respawnManager, obstacles = []) {
+    update(allPlayers, respawnManager, obstacles=[]) {
         if (this.lifeState !== PlayerState.ALIVE) {
             return;
         }
@@ -131,13 +162,23 @@ export class Player {
 
         this.updateMovementState();
     }
-
+    /**
+     * Applies gravity to the player.
+    */
      comeDown(){
         this.vy += this.gravity;
         if (this.vy > this.maxFall) {
             this.vy = this.maxFall;
         }
      }
+
+
+    /**
+    * Moves the player and resolves collisions.
+    *
+    * @param {Player[]} allPlayers - List of players.
+    * @param {Array} obstacles - List of obstacles
+    */
 
      //change name this is horrible 
      //move to sparate file; handle collisions and the world
@@ -148,10 +189,8 @@ export class Player {
      }
 
     /**
-     *
-     *
-     * @memberof Player
-     */
+    * Updates the movement state (idle, run, jump, fall).
+    */
     updateMovementState() {
         if (this.vx > 0) {
          this.facingRight = true;
@@ -167,57 +206,11 @@ export class Player {
         }
     }
 
-    /**
-     *
-     *
-     * @return {*} //???
-     * @memberof Player
-     */
-
-   //  display() {
-   //      if (!this.isVisible) {
-   //          return;
-   //      }
-   //      const p = this.p;
-   //      p.noStroke();
-   //      let alpha;
-   //      if(PlayerState.RESPAWNING===this.lifeState){
-   //          alpha=120;
-   //      }
-   //      else{
-   //          alpha=255;
-   //      }
-
-   //      let playerColor;
-   //      if (this.playerNo === 0) {
-   //          playerColor = p.color(90, 170, 255, alpha);
-   //      } 
-   //      else {
-   //          playerColor = p.color(255, 200, 80, alpha);
-   //      }
-   //      p.fill(playerColor);
-   //      p.rect(this.x, this.y, this.w, this.h, 6);
-   //      p.fill(255);
-   //      p.textAlign(p.CENTER, p.BOTTOM);
-   //      p.textSize(16);
-   //      p.textFont('Arial');
-
-   //      if (this.lifeState === PlayerState.RESPAWNING) {
-   //          p.fill(255, 100, 100);
-   //          p.text(Math.ceil(this.respawnCountdown) + "s", this.x + this.w / 2, this.y - 5);
-   //      } 
-   //      else {
-   //          p.text(this.movementState, this.x + this.w / 2, this.y - 5);
-   //      }
-   //  }
-
-    /**
-     *
-     *
-     * @param {*} reason
-     * @return {*} 
-     * @memberof Player
-     */
+   /**
+    * Kills the player and output the reason.
+    *
+    * @param {DeathReason} reason - the reason a player dies 
+    */
     die(reason) {
         if (this.lifeState === PlayerState.DEAD) {
             return;
@@ -231,10 +224,8 @@ export class Player {
         console.log(`Player ${this.playerNo} died due to: ${reason}`);
     }
 
-    /**
-     *
-     *
-     * @memberof Player
+     /**
+     * Moves the player to spawn position and prepares respawn animation.
      */
     prepareRespawn() {
         this.lifeState = PlayerState.RESPAWNING;
@@ -244,10 +235,8 @@ export class Player {
     }
 
     /**
-     *
-     *
-     * @memberof Player
-     */
+    * Finishes the respawn process and returns the player to gameplay.
+    */
     //Needs to be moved to a separate class 
      finishRespawn() {
         this.lifeState = PlayerState.ALIVE;
@@ -257,25 +246,20 @@ export class Player {
     
 
     /**
-     *
-     *
-     * @readonly
-     * @memberof Player
+     * Returns whether the player should currently be visible or not.
+     * @returns {boolean}
      */
+
     get isVisible() {
-        // Player is visible only when alive
         return this.lifeState === PlayerState.ALIVE || this.lifeState === PlayerState.RESPAWNING;
-        // Player is invisible when dead 
-        // but could be transparent when respawning
     }
 
     /**
-     *
-     *
-     * @param {*} newState
-     * @memberof Player
+     * Changes the current game state for the player.
+     * @param {PlayerGameState} newState
      */
     setGameState(newState) {
         this.gameState = newState;
     }
+    
 }
