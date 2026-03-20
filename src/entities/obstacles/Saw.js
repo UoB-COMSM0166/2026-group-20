@@ -26,9 +26,14 @@ export class Saw extends Obstacle {
      * @param {number} x - World x (top-left, tile-snapped)
      * @param {number} y - World y (top-left, tile-snapped)
      */
-    constructor(p, x, y) {
-        super(p, x, y);
+    constructor(p, x, y, obstacleSheet) {
+        super(p, x, y, obstacleSheet);
         this._angle = 0;
+        this.obstacleSheet = obstacleSheet;
+        this.frameIndex=0;
+        this.sawWidth=38;
+        this.sawHeight=38;
+        this.splitAnimation(this.sawWidth, this.sawHeight); 
     }
 
     // ── Obstacle interface ────────────────────────────────────────────────
@@ -59,13 +64,22 @@ export class Saw extends Obstacle {
         const T  = GameConfig.TILE;
         const cx = this.x + T / 2;
         const cy = this.y + T / 2;
+        const frame = this.framesArr[this.frameIndex];
 
         p.push();
         p.translate(cx, cy);
-        p.rotate(this._angle);
-        p.noStroke();
+        //p.image(this.framesArr[this.frameIndex], cx, cy);
+        //this.frameIndex = (this.frameIndex+1)% this.framesArr.length;
+         //p.rotate(this._angle);  // you can re-enable this now
+         if (frame) {
+            p.image(frame, -frame.width / 2, -frame.height / 2);  // centred at origin
+         }
+         this.frameIndex = (this.frameIndex + 1) % this.framesArr.length;
 
-        this._drawBlade(p, T);
+       // p.rotate(this._angle);
+        //p.noStroke();
+
+        //this._drawBlade(p, T);
 
         p.pop();
     }

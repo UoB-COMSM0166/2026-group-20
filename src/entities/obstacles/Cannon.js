@@ -13,7 +13,6 @@ export const CannonDir = Object.freeze({
     DOWN:  'DOWN',
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Projectile — a single cannonball fired by a Cannon.
@@ -86,7 +85,6 @@ class Projectile {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Cannon — a placeable obstacle that fires projectiles in one direction.
@@ -124,7 +122,7 @@ export class Cannon extends Obstacle {
         this._angle       = this._directionAngle(direction);
     }
 
-    // ── Obstacle interface ────────────────────────────────────────────────
+    // ── Obstacle interface --
 
     /** The cannon body blocks movement — players can stand on top. */
     get isSolid() { return true; }
@@ -132,7 +130,7 @@ export class Cannon extends Obstacle {
     /** The body itself is not a hazard — only projectiles kill. */
     get isHazard() { return false; }
 
-    // ── Per-frame ─────────────────────────────────────────────────────────
+    // ── Per-frame ───
 
     /**
      * Advance the fire timer, spawn projectiles, and update all active ones.
@@ -166,7 +164,7 @@ export class Cannon extends Obstacle {
         }
     }
 
-    // ── Collision ─────────────────────────────────────────────────────────
+    // ── Collision ──
 
     /**
      * Check whether any active projectile has hit the given player.
@@ -186,7 +184,7 @@ export class Cannon extends Obstacle {
         return false;
     }
 
-    // ── Build-phase ghost ─────────────────────────────────────────────────
+    // ── Build-phase ghost ──
 
     /**
      * Draw a semi-transparent placement preview.

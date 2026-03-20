@@ -41,6 +41,10 @@ export const sketch = (p) => {
     //let smallChickenImg;
     let chickenAllFrames2;
     let bunnyAllFrames;
+    let sawFrames;
+    let fireFrames;
+    //let trampolineIdle;
+    let trampolineBouncing;
 
     p.preload = function(){
       //cowImg = p.loadImage("src/assets/sprites/cow_frames.png");
@@ -48,7 +52,12 @@ export const sketch = (p) => {
       //smallChickenImg= p.loadImage("src/assets/sprites/small_chicken.png");
       chickenAllFrames2= p.loadImage("src/assets/sprites/chicken_all_frames2.png");
       bunnyAllFrames= p.loadImage("src/assets/sprites/bunny_all_frames.png");
-    
+      sawFrames= p.loadImage("src/assets/obstacles/Saw/On (38x38).png");
+      fireFrames=p.loadImage("src/assets/obstacles/Fire/On (16x32).png");
+      //trampolineIdle= p.loadImage("src/assets/obstacles/Trampoline/Idle.png");
+      trampolineBouncing= p.loadImage("src/assets/obstacles/Trampoline/Jump (28x28).png");
+      console.log("Sheet:", sawFrames);
+      console.log("Sheet:", fireFrames);
     };
 
     // ── Setup ──
@@ -90,7 +99,8 @@ export const sketch = (p) => {
             [GameStage.BOOT]:    new BootState(ctx, goTo),
             [GameStage.MENU]:    new MenuState(ctx, goTo),
             [GameStage.MAPMENU]: new MapMenuState(ctx, goTo),
-            [GameStage.BUILD]:   new BuildState(ctx, goTo),
+            [GameStage.BUILD]:   new BuildState(ctx, goTo, sawFrames, fireFrames, 
+               trampolineBouncing),
             [GameStage.RUN]:     new RunState(ctx, goTo),
             [GameStage.RESULTS]: new ResultsState(ctx, goTo),
             [GameStage.SHOP]:    new ShopState(ctx, goTo),

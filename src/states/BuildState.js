@@ -53,6 +53,14 @@ const PLAYER_COLOURS = [
  *   ESC                  — return to map menu
  */
 export class BuildState extends State {
+   constructor(ctx, goTo, sawFrames,fireFrames,
+      trampolineBouncing) {
+      super(ctx, goTo);
+      this.sawFrames = sawFrames;
+      this.fireFrames= fireFrames;
+      this.trampolineBouncing= trampolineBouncing;
+      //this.trampolineIdle= trampolineIdle;
+   }
 
     static PALETTE = [
         // Solid
@@ -478,11 +486,11 @@ export class BuildState extends State {
             case ObstacleType.MOVING_PLATFORM:  return new MovingPlatform(p, x, y);
             case ObstacleType.FALLING_PLATFORM: return new FallingPlatform(p, x, y);
             case ObstacleType.ICE_PLATFORM:     return new IcePlatform(p, x, y);
-            case ObstacleType.BOUNCE_PAD:       return new BouncePad(p, x, y);
+            case ObstacleType.BOUNCE_PAD:       return new BouncePad(p, x, y, this.trampolineBouncing);
             case ObstacleType.SPIKE:            return new SpikeObstacle(p, x, y);
             case ObstacleType.CANNON:           return new Cannon(p, x, y, this._cannonDir);
-            case ObstacleType.SAW:              return new Saw(p, x, y);
-            case ObstacleType.FLAME:            return new Flame(p, x, y);
+            case ObstacleType.SAW:              return new Saw(p, x, y, this.sawFrames);
+            case ObstacleType.FLAME:            return new Flame(p, x, y, this.fireFrames);
             case ObstacleType.SPIKE_PLATFORM:   return new SpikePlatform(p, x, y);
             case ObstacleType.ICE_BLOCK:        return new IceBlock(p, x, y);
             case ObstacleType.WIND_ZONE:        return new WindZone(p, x, y, this._windDir);

@@ -18,11 +18,16 @@ import { aabbIntersects } from '../../systems/PhysicsSystem.js';
  */
 export class Flame extends Obstacle {
 
-    constructor(p, x, y) {
+    constructor(p, x, y, obstacleSheet) {
         super(p, x, y);
         this._timer    = 0;
         this._active   = true; // starts active
         this._age      = 0;    // used for flicker animation
+        this.obstacleSheet = obstacleSheet;
+        this.frameIndex=0;
+        this.sawWidth=16;
+        this.sawHeight=32;
+        this.splitAnimation(this.sawWidth, this.sawHeight); 
     }
 
     get isSolid()  { return false; }
@@ -48,39 +53,50 @@ export class Flame extends Obstacle {
         const T   = GameConfig.TILE;
         const cx  = this.x + T / 2;
         const cy  = this.y + T;
+        const frame = this.framesArr[this.frameIndex];
+      
+        p.push();
+        p.translate(cx, cy);
+        if (frame) {
+            p.image(frame, -frame.width/2, -frame.height);  
+         }
+         this.frameIndex = (this.frameIndex + 1) % this.framesArr.length;
+
 
         // Base embers (always visible)
-        p.noStroke();
-        p.fill(180, 80, 20, 200);
-        p.circle(cx, cy - 4, 10);
-        p.fill(220, 120, 30, 180);
-        p.circle(cx - 5, cy - 2, 7);
-        p.circle(cx + 4, cy - 3, 6);
+      //   p.noStroke();
+      //   p.fill(180, 80, 20, 200);
+      //   p.circle(cx, cy - 4, 10);
+      //   p.fill(220, 120, 30, 180);
+      //   p.circle(cx - 5, cy - 2, 7);
+      //   p.circle(cx + 4, cy - 3, 6);
 
-        if (!this._active) return; // inactive — only embers shown
+      //   if (!this._active) return; // inactive — only embers shown
 
-        // Flicker offset
-        const flicker = Math.sin(this._age * 0.018) * 3;
-        const phase   = this._timer / GameConfig.FLAME_ON_MS;
+      //   // Flicker offset
+      //   const flicker = Math.sin(this._age * 0.018) * 3;
+      //   const phase   = this._timer / GameConfig.FLAME_ON_MS;
 
-        // Outer flame (large, orange)
-        p.fill(240, 100, 20, 200);
-        p.ellipse(cx + flicker * 0.5, cy - T * 0.45, T * 0.65, T * 0.9);
+      //   // Outer flame (large, orange)
+      //   p.fill(240, 100, 20, 200);
+      //   p.ellipse(cx + flicker * 0.5, cy - T * 0.45, T * 0.65, T * 0.9);
 
-        // Mid flame (yellow-orange)
-        p.fill(255, 180, 40, 220);
-        p.ellipse(cx - flicker * 0.3, cy - T * 0.52, T * 0.42, T * 0.72);
+      //   // Mid flame (yellow-orange)
+      //   p.fill(255, 180, 40, 220);
+      //   p.ellipse(cx - flicker * 0.3, cy - T * 0.52, T * 0.42, T * 0.72);
 
-        // Inner core (bright yellow-white)
-        p.fill(255, 240, 120, 240);
-        p.ellipse(cx + flicker * 0.1, cy - T * 0.55, T * 0.22, T * 0.42);
+      //   // Inner core (bright yellow-white)
+      //   p.fill(255, 240, 120, 240);
+      //   p.ellipse(cx + flicker * 0.1, cy - T * 0.55, T * 0.22, T * 0.42);
 
-        // Fade-out near end of active period
-        if (phase > 0.75) {
-            const fadeAlpha = (1 - phase) / 0.25 * 160;
-            p.fill(20, 20, 20, fadeAlpha);
-            p.ellipse(cx, cy - T * 0.45, T * 0.65, T * 0.9);
-        }
+      //   // Fade-out near end of active period
+      //   if (phase > 0.75) {
+      //       const fadeAlpha = (1 - phase) / 0.25 * 160;
+      //       p.fill(20, 20, 20, fadeAlpha);
+      //       p.ellipse(cx, cy - T * 0.45, T * 0.65, T * 0.9);
+      //   }
+
+       p.pop();
     }
 
     static drawGhost(p, x, y) {

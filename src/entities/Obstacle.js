@@ -16,13 +16,18 @@ export class Obstacle {
      * @param {number} x - World x position in pixels (top-left, snapped to tile grid)
      * @param {number} y - World y position in pixels (top-left, snapped to tile grid)
      */
-    constructor(p, x, y) {
+    constructor(p, x, y, obstacleSheet) {
         this.p      = p;
         this.x      = x;
         this.y      = y;
         this.w      = GameConfig.TILE;
         this.h      = GameConfig.TILE;
         this.active = true;
+
+        this.obstacleSheet= obstacleSheet;
+        this.framesArr=[];
+        //this.splitAnimation(frameWidth, frameHeight);
+        //this.animationconfig= animationconfig;
     }
 
     /** @returns {boolean} true if this obstacle should block player movement */
@@ -65,6 +70,16 @@ export class Obstacle {
      * @param {object[]} _players
      */
     carryPlayers(_players) {}
+
+    splitAnimation(frameWidth,frameHeight){
+      //const frameWidth=38;
+      //const frameHeight=38;
+
+      for(let j=0; j<this.obstacleSheet.width; j+=frameWidth){
+         let frame= this.obstacleSheet.get(j,0,frameWidth,frameHeight);
+         this.framesArr.push(frame);
+      }
+    }
 
     /** Render the obstacle. Must be overridden. */
     draw() {}
