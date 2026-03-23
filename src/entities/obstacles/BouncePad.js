@@ -18,11 +18,12 @@ export class BouncePad extends Obstacle {
         super(p, x, y, obstacleSheet);
         this.obstacleSheet = obstacleSheet;
         this.frameIndex=0;
+        
         this.sawWidth=28;
         this.sawHeight=28;
         this.splitAnimation(this.sawWidth, this.sawHeight); 
         this._isActivated = false;
-        this._compressTimer = 0; // ms of compression animation remaining
+        this._compressTimer = 0; 
         this.idleFrames    = this.framesArr.slice(0,1);   
         this.activeFrames  = this.framesArr;   
         this._currentFrames = this.idleFrames;
@@ -68,7 +69,7 @@ export class BouncePad extends Obstacle {
          const cy = this.y + T / 2;
          const frames = this._currentFrames;
 
-         if (!frames || frames.length === 0) return;
+         if (!frames||frames.length === 0) return;
 
          const frame = frames[this.frameIndex];
 
@@ -111,12 +112,21 @@ export class BouncePad extends Obstacle {
       //   p.rect(this.x + 4, this.y + T * 0.27 + comp * T * 0.15, this.w - 8, padH * 0.35, 2);
     }
 
-    static drawGhost(p, x, y) {
+    static drawGhost(p, x, y, sheet) {
         const T = GameConfig.TILE;
-        p.noStroke();
-        p.fill(80, 200, 100, 120);
-        p.rect(x + 2, y + T * 0.25, T - 4, T * 0.28, 3);
-        p.fill(40, 90, 50, 120);
-        p.rect(x, y + T * 0.55, T, T * 0.45, 2);
+        if (!sheet) return;
+
+        const frameW = 28;
+        const frameH = 28;
+        p.push();
+        p.tint(255, 150);
+        p.image(sheet, x, y, T, T, 0, 0, frameW, frameH);
+        p.pop();
+
+        // p.noStroke();
+        // p.fill(80, 200, 100, 120);
+        // p.rect(x + 2, y + T * 0.25, T - 4, T * 0.28, 3);
+        // p.fill(40, 90, 50, 120);
+        // p.rect(x, y + T * 0.55, T, T * 0.45, 2);
     }
 }

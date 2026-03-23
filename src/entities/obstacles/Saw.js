@@ -92,24 +92,31 @@ export class Saw extends Obstacle {
      * @param {number} x
      * @param {number} y
      */
-    static drawGhost(p, x, y) {
+    static drawGhost(p, x, y, sheet) {
         const T  = GameConfig.TILE;
-        const cx = x + T / 2;
-        const cy = y + T / 2;
-
+        const frameW = 38;
+        const frameH = 38;
         p.push();
-        p.translate(cx, cy);
-        p.noStroke();
-
-        // Outer ring
-        p.fill(200, 60, 60, 100);
-        p.circle(0, 0, T * 0.84);
-
-        // Hub
-        p.fill(160, 50, 50, 100);
-        p.circle(0, 0, T * 0.28);
-
+        p.tint(255, 150);
+        p.image(sheet, x, y, T, T, 0, 0, frameW, frameH);
         p.pop();
+
+        // const cx = x + T / 2;
+        // const cy = y + T / 2;
+
+        // p.push();
+        // p.translate(cx, cy);
+        // p.noStroke();
+
+        // // Outer ring
+        // p.fill(200, 60, 60, 100);
+        // p.circle(0, 0, T * 0.84);
+
+        // // Hub
+        // p.fill(160, 50, 50, 100);
+        // p.circle(0, 0, T * 0.28);
+
+        // p.pop();
     }
 
     // ── Private ───────────────────────────────────────────────────────────

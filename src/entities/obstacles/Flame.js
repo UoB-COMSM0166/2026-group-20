@@ -99,14 +99,21 @@ export class Flame extends Obstacle {
        p.pop();
     }
 
-    static drawGhost(p, x, y) {
+    static drawGhost(p, x, y, sheet) {
         const T  = GameConfig.TILE;
-        const cx = x + T / 2;
-        const cy = y + T;
-        p.noStroke();
-        p.fill(240, 100, 20, 100);
-        p.ellipse(cx, cy - T * 0.45, T * 0.65, T * 0.9);
-        p.fill(255, 180, 40, 120);
-        p.ellipse(cx, cy - T * 0.52, T * 0.42, T * 0.72);
+        // const cx = x + T / 2;
+        // const cy = y + T;
+        const frameW = 16;
+        const frameH = 32;
+        p.push();
+        p.tint(255, 150);
+        p.image(sheet, x, y, T, T, 0, 0, frameW, frameH);
+        p.pop();
+
+        // p.noStroke();
+        // p.fill(240, 100, 20, 100);
+        // p.ellipse(cx, cy - T * 0.45, T * 0.65, T * 0.9);
+        // p.fill(255, 180, 40, 120);
+        // p.ellipse(cx, cy - T * 0.52, T * 0.42, T * 0.72);
     }
 }

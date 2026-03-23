@@ -338,11 +338,17 @@ export class BuildState extends State {
             case ObstacleType.MOVING_PLATFORM:  MovingPlatform.drawGhost(p, x, y);                  break;
             case ObstacleType.FALLING_PLATFORM: FallingPlatform.drawGhost(p, x, y);                 break;
             case ObstacleType.ICE_PLATFORM:     IcePlatform.drawGhost(p, x, y);                     break;
-            case ObstacleType.BOUNCE_PAD:       BouncePad.drawGhost(p, x, y);                       break;
+            case ObstacleType.BOUNCE_PAD:       
+                BouncePad.drawGhost(p, x, y, this.trampolineBouncing);                       
+                break;
             case ObstacleType.SPIKE:            SpikeObstacle.drawGhost(p, x, y);                   break;
             case ObstacleType.CANNON:           Cannon.drawGhost(p, x, y, this._cannonDir);          break;
-            case ObstacleType.SAW:              Saw.drawGhost(p, x, y);                             break;
-            case ObstacleType.FLAME:            Flame.drawGhost(p, x, y);                           break;
+            case ObstacleType.SAW:              
+                Saw.drawGhost(p, x, y, this.sawFrames);                             
+                break;
+            case ObstacleType.FLAME:            
+                Flame.drawGhost(p, x, y, this.fireFrames);                           
+                break;
             case ObstacleType.SPIKE_PLATFORM:   SpikePlatform.drawGhost(p, x, y);                   break;
             case ObstacleType.ICE_BLOCK:        IceBlock.drawGhost(p, x, y);                        break;
             case ObstacleType.WIND_ZONE:        WindZone.drawGhost(p, x, y, this._windDir);          break;
