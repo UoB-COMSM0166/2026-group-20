@@ -362,13 +362,13 @@ Additionally, we wanted users to experience the core gameplay at an early stage 
 
 #### 6.3. Sprint Workflow  
 
-| Sprint | Date | Objective | Scrum Master | <div align="center">Key Tasks<div> | Outcome |  <div align="center">Issues <div> | 
-|:---:|:---:|:---:|:---:|:--- |:---:| :--- |
-| Sprint 1 | 15 Feb - 1 Mar | Initial game prototype | Megi | • Project file structure setup <br> • CI/CD pipeline setup <br> • Basic player movement <br> • Win/Lose detection <br> • Platform detection and Hitbox system <br> • Start screen <br> • Death/Respawn system | Initial playable prototype (v0.1.0) completed | • Initial prototype required refactoring to improve code structure |
-| Sprint 2 | 2 Mar - 16 Mar | Core gameplay systems | Maran | • HUD Overlay and Scoreboard <br> • Reward Algorithm <br> • Character animation <br> • Character sprites and animation <br> • Map data structure and map design <br> • Coin entity and wallet system <br> • State manager | Core gameplay mechanics implemented | • Screen scaling not dynamic <br> • Merge conflicts occurred when integrating features|
-| Sprint 3 | 17 Mar - 30 Mar | Feature expansion | Jacqueline | • Ice and forest maps <br> • Global configuration system <br> • Shop system and player inventory <br> • Audio implementation <br> • Return buttons and UI improvements <br> • AI obstacle placement <br> • Obstacle animation <br> • Lore  <br> • Tutorial <br> • Lobby <br> • Pause Manager | - | |
-| Sprint 4 | 31 Mar - 13 Apr | Testing and gameplay refinement | - | • Bug fixing <br> • UI improvement (add) | - |  |
-| Sprint 5 | 14 Apr - 24 Apr | Final polishing and deployment preparation | - | • Final bug fixing <br> • Final testing <br> • Deployment preparation | - |  |
+| Sprint | Date | Objective | Scrum Master | <div align="center">Key Tasks<div> | Outcome |
+|:---:|:---:|:---:|:---:|:--- |:---:| 
+| Sprint 1 | 15 Feb-1 Mar | Initial game prototype | Megi | • Project file structure setup <br> • CI/CD pipeline setup <br> • Basic player movement <br> • Win/Lose detection <br> • Platform detection and Hitbox system <br> • Start screen <br> • Death/Respawn system | Initial playable prototype (v0.1.0) completed |
+| Sprint 2 | 2 Mar-16 Mar | Core gameplay systems | Maran | • HUD Overlay and Scoreboard <br> • Reward Algorithm <br> • Character animation <br> • Character sprites and animation <br> • Map data structure and map design <br> • Coin entity and wallet system <br> • State manager | Core gameplay mechanics implemented | 
+| Sprint 3 | 17 Mar-30 Mar | Feature expansion | Jacqueline | • Ice and forest maps <br> • Global configuration system <br> • Shop system and player inventory <br> • Audio implementation <br> • Return buttons and UI improvements <br> • AI obstacle placement <br> • Obstacle animation <br> • Lore  <br> • Tutorial <br> • Lobby <br> • Pause Manager | - | 
+| Sprint 4 | 31 Mar-13 Apr | Testing and gameplay refinement | - | • Bug fixing <br> • UI improvement (add) | - |  
+| Sprint 5 | 14 Apr-24 Apr | Final polishing and deployment preparation | - | • Final bug fixing <br> • Final testing <br> • Deployment preparation | - |  
 
 
 #### 6.4. Branching Strategy
@@ -382,7 +382,7 @@ Our repository follows a structured branching strategy to ensure code quality an
 
 **Approval**: Every PR must be reviewed and approved by at least one other team member. 
 
-Example of our branch structure:
+Our branch structure:
 
 ```
 main
@@ -391,6 +391,7 @@ main
       ├── feature/shop
       ├── feature/mapDesign
       └── feature/sharedKeyboard
+      ...
 ```
 
 #### 6.5 Project File Structure 
