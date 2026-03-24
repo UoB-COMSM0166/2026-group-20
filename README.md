@@ -105,16 +105,42 @@ Given the academic context of our game, we did not need to account for legal or 
 Building on our stakeholder analysis, we defined a set of epics (high-level requirements). These requirements were designed to satisfy the expectations of each stakeholder group, as the goal of the project was to develop a game aligns with user expectations.
 
 
-| <div align="center">Stakeholder Group<div> | <div align="center">High Level Requirements<div>|
+| <div align="center">Stakeholder Group<div> | <div align="center">Epics<div>|
 | :---: | :--- |
-|  **Gamers** | • Retro / Nostalgic visuals <br> • Twists or added gameplay features <br> • Visually stimulating design <br> • Background audio and sound effects <br> • Game lore <br> • Core features (wallet system, scoreboard, intro tutorial) <br> • Good UX <br> • Multi-device compatibility |
+|  **Gamers** | • Retro / Nostalgic visuals <br> • Twists or added gameplay features <br> • Visually stimulating design <br> • Background audio and sound effects <br> • Game lore <br> • Core features (wallet system, scoreboard, intro tutorial) <br> • Good UX <br> • Cross-browser compatibility |
 | **Lecturers** | • Learning concept integration and application <br> • Clear demonstration of technical challenges <br> • Achievable within the project timeline <br> • Collaborative work <br> • Continuous progress updates <br> • Originality  |
 | **Students** | • Social features <br> • Easy to pick up <br> • Short game sessions |
 
-#### 2.4 User Stories
+#### 2.4 System Requirements
+After defining the epics, we created a set of system requirements to describe what the game should do and how it should perform. The following table presents the key requirements that guided the development of the system.
+
+**Functional Requirements**
+| <div align="center">ID<div> | <div align="center"> Category<div> | <div align="center"> Requirement<div>| 
+| :---: | :---: | :--- | 
+| FR-1 | Input | Two players shall be able to move left, right and jump. Player 1 uses `A`, `D` and `W` keys, whereas player 2 uses `Left`, `Right` and `Up` arrow keys. | 
+| FR-2 | Physics | The system shall detect collisions between players and obstacles. | 
+| FR-3 | Economy | The game shall implement a wallet system to track coins collected by each player. | 
+| FR-4 | Scoreboard | The game shall display a scoreboard to track player progress. | 
+| FR-5 | Shop | The game shall provide a shop where players can purchase obstacles using in-game coins. | 
+| FR-6 | Respawn | The system shall reset the player to the starting position when the player collides with an obstacle. | 
+| FR-7 | Inventory | The game shall allow players to select obstacles from their inventory during gameplay. | 
+| FR-8 | Map | The game shall include multiple maps for players to navigate. | 
+| FR-9 | Tutorial | The game shall provide a tutorial to introduce new players to the basic gameplay mechanics. | 
+| FR-10 | Narrative | The game shall include a lore section to provide background information about the game world and characters. | 
+
+**Non-Functional Requirements**
+| <div align="center">ID<div> | <div align="center"> Category<div> | <div align="center"> Requirement<div>| 
+| :---: | :---: | :--- | 
+| NFR-1 | Visual | The game shall feature retro-style visuals to match the intended theme. | 
+| NFR-2 | Audio | The game shall include background music to enhance player immersion. | 
+| NFR-3 | Usability | The game interface shall be easy to understand for new players. | 
+| NFR-4 | Performance | The game shall maintain smooth gameplay without noticeable lag during play. | 
+
+#### 2.5 User Stories
 
 -> detailed requirements
-After defining the epics, we deconstructed them into a set of user stories to describe the specific features and functionalities of the game from the perspective of the identified stakeholders.
+
+We deconstructed them into a set of user stories to describe the specific features and functionalities of the game from the perspective of the identified stakeholders.
 
 #### Students
 
@@ -135,7 +161,7 @@ After defining the epics, we deconstructed them into a set of user stories to de
 - As a gamer, I want intuitive menus and clear navigation, so that I can easily access and play the game without confusion.
 - As a gamer, I want responsive sound effects and visual feedback for my actions, so that the game feels immersive and satisfying.
 
-#### 2.5 Use Case Diagram
+#### 2.6 Use Case Diagram
 
 (~100 words) -> visual overview
 add a paragraph here
@@ -282,9 +308,11 @@ However, while the usability is acceptable at this stage, the results also sugge
     <img src="docs/quantitative-evaluation/SUS_ave.png" alt="SUS Results" width="300">
 </div>
 
-add Appendix B, captions, gif 
+add Appendix B, captions
 
 #### 5.3 Testing 
+
+
 
 ### 6. Process
 
@@ -296,12 +324,33 @@ Version control and branching strategies
 CICD
 
 
-#### 6.1 Development Methodology
-The development of this game followed an Agile methodology. The team organised the project into two-week sprints to continuously build, test, and refine core gameplay systems. All project requirements were recorded in a product backlog, which is the central list of tasks and features needed to be implemented throughout the project. At the start of each sprint, sprint planning was conducted, during which team members selected tasks from the prioritised backlog for the upcoming sprint. 
+#### 6.1 Team Organisation 
+Our team operated under a flat and collaborative structure where responsibilities were shared among all members. We did not assign fixed roles for individual team members. Instead, everyone contributed to implementing gameplay systems and programming tasks, while also participating in testing and project management. 
 
-Our team did not assign a fixed Scrum Master role as all members wanted to focus primarily on programming tasks. As a result, the Scrum Master’s responsibility rotated among team members for each sprint. During each sprint, the designated Scrum Master led the prioritisation of the backlog based on gameplay dependencies and development urgency. Consequently, everyone on the team took turns to contribute to sprint planning and coordinating overall progress. 
+The team adopted a rotating Scrum Master role to support sprint coordination. At the beginning of each sprint, a different team member was selected to act as the Scrum Master. The Scrum Master was responsible for facilitating sprint planning, prioritising tasks in the backlog and monitoring overall progress. Every team member took turns contributing to sprint planning and coordinating overall progress. 
 
-#### 6.2 Development Strategy
+#### 6.2 Tools and Communication 
+- **Github**: used for version control and mandatory pull request reviews. 
+
+- **WhatsApp**: primarily channel for day-to-day discussion and coordination. 
+
+- **Lucidspark**: used as a central hub for meeting minutes, brainstorming and the team’s Kanban board.
+
+We held informal daily stand-up meetings while on campus and formal weekly meeting to review overall progress. Additional meetings were arranged when necessary. 
+
+#### 6.3 Development Methodology
+The development of this game followed an Agile methodology, organised into two-week sprints to continuously build, test and refine core systems.
+
+**6.3.1. The Product Backlog and Sprint Planning**
+
+The product backlog contained all requirements for the game. These requirements were proposed by team members and agreed upon during the planning phase. 
+
+At the start of each sprint, a sprint planning meeting was conducted by the Scrum Master. After this meeting, team members selected tasks from the prioritised backlog for the upcoming sprint.
+
+During each sprint, the team worked collaboratively to implement features, test functionality and integrate new systems into the existing game framework. Progress was monitored throughout the sprint, and completed tasks were reviewed before moving into the next development cycle.
+
+**6.3.2 Horizontal Development Strategy**
+
 Our team adopted a horizontal development approach to support iterative development. Instead of completing individual systems sequentially, we implemented simplified versions of multiple core systems early in the development process. For example, the player movement system, map layout, obstacle mechanics and wallet system were developed simultaneously using placeholder assets.
 
 This approach was chosen because the gameplay relies heavily on interactions between multiple systems. Mechanics such as player movement must integrate correctly with collision detection and environmental obstacles. Developing these systems independently could delay the discovery of integration issues. For instance, the behaviour of the player movement system can only be properly evaluated when interacting with platforms, obstacles, and other game objects. If such issues are discovered at a later stage of development, the team may have needed to perform refactoring, which could significantly increase development time and complexity.
@@ -311,7 +360,7 @@ Additionally, we wanted users to experience the core gameplay at an early stage 
 (add a diagram here) 
 
 
-#### 6.2. Sprint Workflow  
+#### 6.3. Sprint Workflow  
 
 | Sprint | Date | Objective | Scrum Master | <div align="center">Key Tasks<div> | Outcome |  <div align="center">Issues <div> | 
 |:---:|:---:|:---:|:---:|:--- |:---:| :--- |
@@ -322,21 +371,36 @@ Additionally, we wanted users to experience the core gameplay at an early stage 
 | Sprint 5 | 14 Apr - 24 Apr | Final polishing and deployment preparation | - | • Final bug fixing <br> • Final testing <br> • Deployment preparation | - |  |
 
 
-#### 6.3. Version Control & Collaboration 
-branching stategies 
-merge and review process 
+#### 6.4. Branching Strategy
+Our repository follows a structured branching strategy to ensure code quality and deployment stability: 
+
+- **Main branch** - The `main` branch always hosts production-ready and stable code. Code is only merged into `main` after it has been fully tested in the development branch. All merges into `main` require a Pull Request (PR). 
+
+- **Development branch** - The `dev` branch is an integration branch. All new features and fixes are merged here first. Code in  `dev` must be carefully tested and validated before it is promoted to the `main` branch. 
+
+- **Feature branches** - The `feature` branches are used to develop individual features in isolation. These branches are created from `dev`. Merging a feature branch back to `dev` also require a PR. 
+
+**Approval**: Every PR must be reviewed and approved by at least one other team member. 
+
+Example of our branch structure:
+
+```
+main
+ └── dev
+      ├── feature/basicMovement
+      ├── feature/shop
+      ├── feature/mapDesign
+      └── feature/sharedKeyboard
+```
+
+#### 6.5 Project File Structure 
 
 
 
-#### 6.4 Project Managment Tools 
+#### 6.7. Build and Deployment Pipeline 
+ 
 
-
-
-#### 6.5. Build and Deployment Pipeline 
-
-#### 6.6. Challenges and Adaptation 
-
-#### 6.7. Reflection on Teamwork 
+#### 6.8. Reflection on Teamwork 
 
 
 
