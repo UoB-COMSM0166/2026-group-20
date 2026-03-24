@@ -51,6 +51,7 @@ GROUP PHOTO. Add a group photo here.
 
 
 
+
 ### 2. Requirements
 
 -> outlines the requirements engineering process (15% ~750 words)
@@ -81,7 +82,7 @@ Based on this comparison, **The Ultimate Chicken Horse** was selected as the bas
 
 -> Add Appendix A: selection process
 
-#### 2.2 Stakeholders
+#### 2.2 Stakeholders 
 
 -> who is involved
 
@@ -177,26 +178,13 @@ GameEnd --> [*]
 
 - Describe implementation of your game, in particular highlighting the TWO areas of _technical challenge_ in developing your game.
 
-note: the process of translating game design documents, concepts and assests into a playable game.
+note: How the game was built, code architecture 
 
-### 4.1 Development Approach 
-During the planning phase of our project, we conducted a trade-off analysis between vertical development and horizontal development to determine which methodology would best suit the iterative design of a platformer game. 
+### 4.2 
 
-The process of vertical development typically progresses through the full lifecycle of a feature before moving on to the next. In our case, the team would focus entirely on the player movement system first, including jumping mechanics, movement animations and the visual design of the character. After completing this feature, development would proceed sequentially to other systems such as the game map, obstacle mechanics and the wallet system. 
+### 4.3 Technical Challenge 1 (250 words)
 
-In contrast, horizontal development prioritises the breadth of the system architecture. In this approach, our team implements basic versions of multiple systems early in the development process. For example, the player movement system, map layout, obstacles and wallet mechanics would be implemented simultaneously using placeholder assets. 
-
-When considering the characteristics of our platformer game, adopting a vertical development approach presented several risks. First, our gameplay relies on the interaction between multiple systems, meaning that mechanics such as player movement must integrate correctly with collision detection and environmental obstacles. Developing these systems independently could delay the discovery of integration issues. For example, the behaviour of the player movement system can only be properly evaluated when it interacts with platforms, obstacles and other game objects. If such issues are discovered at a later stage of development, our team may need to perform extensive refactoring, which could significantly increase development time and complexity.
-
-Second, we wanted users to be able to experience the core gameplay at an early stage so that we could collect feedback and identify areas for improvement. For this reason, it was important to develop a Minimum Viable Product (MVP) within a short timeframe. Therefore, we adopted a horizontal development approach, enabling the team to rapidly implement simplified versions of key systems using placeholder assets while iteratively refining gameplay mechanics in later development stages.
-
-
-(add a diagram here) 
-
-
-### 4.2 Core systems
-
-### 4.3 Technical Challenges
+### 4.4 Technical Challenge 2 (250 words)
 
 
 
@@ -213,7 +201,7 @@ To ensure a robust evaluation of the game’s usability and user experience, we 
 (add paragraph)
 
 <div align="center">
-<img src="docs/assets/gif/v0.1.0.gif" alt="Basic version" width="300">
+<img src="docs/assets/gif/v0.1.0.gif" alt="Basic version" width="400">
 </div>
 
 **A. Think Aloud**
@@ -237,14 +225,14 @@ The think-aloud method was selected for its efficiency and minimal commitment fr
 
 To complement user testing, we conducted a Nielsen’s heuristic evaluation, a well-established approach to identify usability issues. This method allowed us to evaluate the interface and identify potential design problems based on recognised usability guidelines.
 
-| Problem No. | Issues | Heuristics Violated | Severity (0-4) |
-| :---: |:---:|:---:|:---:|
-| 1 | Interface lacked visual guidance (button, spikes, time limit and goal were not clear enough for players to understand what actions to take) | H1 - Visibilty of System Status| |
-| 2 | Start button had low contrast with the background | H8 – Aesthetic and Minimalist Design | |
-| 3 | No instructions for game controls | H10 – Help and Documentation | |
-| 4 | Goal detection only worked on one edge | H5 – Error Prevention | |
-| 5 | Players started at different positions (an uneven distance to the goal) | H4 – Consistency and Standards | |
-| 6 | No undo or quick restart option for mistakes | H3 - User Control and Freedom | |
+| Problem No. | Issues | Heuristics Violated | Frequency (0-4) | Impact (0-4) | Persistence (0-4) | Severity |
+| :---: |:---:|:---:|:---:|:---:|:---:|:---:|
+| 1 | Interface lacked visual guidance (button, spikes, time limit and goal were not clear enough for players to understand what actions to take) | H1 - Visibilty of System Status| 4 | 4 | 4 | 4.0 |
+| 2 | Start button had low contrast with the background | H8 – Aesthetic and Minimalist Design | 2 | 3 | 4 | 3.0 |
+| 3 | No instructions for game controls | H10 – Help and Documentation | 3 | 4 | 4 | 3.2 |
+| 4 | Goal detection only worked on one edge | H5 – Error Prevention | 2 | 3 | 4 | 3.0 |
+| 5 | Players started at different positions (an uneven distance to the goal) | H4 – Consistency and Standards | 1 | 1 | 4 | 2.0 |
+| 6 | No undo or quick restart option for mistakes | H3 - User Control and Freedom | 3 | 4 | 2 | 3.0 |
 
 
 The presentation of this table is adapted from the template (4).
@@ -259,8 +247,8 @@ s
     <th><p align="center">Harder Version</p></th>
   </tr>
   <tr>
-    <td><img src="docs/assets/gif/v0.1.0_basic.gif" alt="Basic version" width="300"></td>
-    <td><img src="docs/assets/gif/v0.1.0_harder.gif" alt="Harder version" width="300"></td>
+    <td><img src="docs/assets/gif/v0.1.0_basic.gif" alt="Basic version" width="400"></td>
+    <td><img src="docs/assets/gif/v0.1.0_harder.gif" alt="Harder version" width="400"></td>
   </tr>
 </table>
 
@@ -296,6 +284,7 @@ However, while the usability is acceptable at this stage, the results also sugge
 
 add Appendix B, captions, gif 
 
+#### 5.3 Testing 
 
 ### 6. Process
 
@@ -303,7 +292,53 @@ add Appendix B, captions, gif
 
 - Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project.
 
-add the sprint table ASAP
+Version control and branching strategies 
+CICD
+
+
+#### 6.1 Development Methodology
+The development of this game followed an Agile methodology. The team organised the project into two-week sprints to continuously build, test, and refine core gameplay systems. All project requirements were recorded in a product backlog, which is the central list of tasks and features needed to be implemented throughout the project. At the start of each sprint, sprint planning was conducted, during which team members selected tasks from the prioritised backlog for the upcoming sprint. 
+
+Our team did not assign a fixed Scrum Master role as all members wanted to focus primarily on programming tasks. As a result, the Scrum Master’s responsibility rotated among team members for each sprint. During each sprint, the designated Scrum Master led the prioritisation of the backlog based on gameplay dependencies and development urgency. Consequently, everyone on the team took turns to contribute to sprint planning and coordinating overall progress. 
+
+#### 6.2 Development Strategy
+Our team adopted a horizontal development approach to support iterative development. Instead of completing individual systems sequentially, we implemented simplified versions of multiple core systems early in the development process. For example, the player movement system, map layout, obstacle mechanics and wallet system were developed simultaneously using placeholder assets.
+
+This approach was chosen because the gameplay relies heavily on interactions between multiple systems. Mechanics such as player movement must integrate correctly with collision detection and environmental obstacles. Developing these systems independently could delay the discovery of integration issues. For instance, the behaviour of the player movement system can only be properly evaluated when interacting with platforms, obstacles, and other game objects. If such issues are discovered at a later stage of development, the team may have needed to perform refactoring, which could significantly increase development time and complexity.
+
+Additionally, we wanted users to experience the core gameplay at an early stage so that we could gather feedback and identify areas for improvement. For this reason, the team developed basic versions of key systems to produce a Minimum Viable Product (MVP) as early as possible. The game was then progressively refined through subsequent sprint cycles, with placeholder assets replaced and mechanics polished iteratively.
+
+(add a diagram here) 
+
+
+#### 6.2. Sprint Workflow  
+
+| Sprint | Date | Objective | Scrum Master | <div align="center">Key Tasks<div> | Outcome |  <div align="center">Issues <div> | 
+|:---:|:---:|:---:|:---:|:--- |:---:| :--- |
+| Sprint 1 | 15 Feb - 1 Mar | Initial game prototype | Megi | • Project file structure setup <br> • CI/CD pipeline setup <br> • Basic player movement <br> • Win/Lose detection <br> • Platform detection and Hitbox system <br> • Start screen <br> • Death/Respawn system | Initial playable prototype (v0.1.0) completed | • Initial prototype required refactoring to improve code structure |
+| Sprint 2 | 2 Mar - 16 Mar | Core gameplay systems | Maran | • HUD Overlay and Scoreboard <br> • Reward Algorithm <br> • Character animation <br> • Character sprites and animation <br> • Map data structure and map design <br> • Coin entity and wallet system <br> • State manager | Core gameplay mechanics implemented | • Screen scaling not dynamic <br> • Merge conflicts occurred when integrating features|
+| Sprint 3 | 17 Mar - 30 Mar | Feature expansion | Jacqueline | • Ice and forest maps <br> • Global configuration system <br> • Shop system and player inventory <br> • Audio implementation <br> • Return buttons and UI improvements <br> • AI obstacle placement <br> • Obstacle animation <br> • Lore  <br> • Tutorial <br> • Lobby <br> • Pause Manager | - | |
+| Sprint 4 | 31 Mar - 13 Apr | Testing and gameplay refinement | - | • Bug fixing <br> • UI improvement (add) | - |  |
+| Sprint 5 | 14 Apr - 24 Apr | Final polishing and deployment preparation | - | • Final bug fixing <br> • Final testing <br> • Deployment preparation | - |  |
+
+
+#### 6.3. Version Control & Collaboration 
+branching stategies 
+merge and review process 
+
+
+
+#### 6.4 Project Managment Tools 
+
+
+
+#### 6.5. Build and Deployment Pipeline 
+
+#### 6.6. Challenges and Adaptation 
+
+#### 6.7. Reflection on Teamwork 
+
+
 
 ### 7. Conclusion
 
@@ -318,6 +353,7 @@ add the sprint table ASAP
 
 ### Reference
 [1]J. Joe, S. Chaudhuri, T. Le, H. Thompson, and G. Demiris, “The use of think-aloud and instant data analysis in evaluation research: Exemplar and lessons learned,” Journal of Biomedical Informatics, vol. 56, pp. 284–291, Aug. 2015, doi: 10.1016/j.jbi.2015.06.001. (add to why choose think aloud)
+
 [2]“A comparison of heuristics applied for studying the usability of websites,” Procedia Computer Science, vol. 176, pp. 3571–3580, doi: 10.1016/j.procs.2020.09.029. (add to why we choose heuristics)
 
 [3]J. Nielsen, “10 Usability Heuristics for User Interface Design,” Nielsen Norman Group, Apr. 24, 1994. Accessed: Mar. 16, 2026. [Online]. Available: https://www.nngroup.com/articles/ten-usability-heuristics/ (heuristics principles for Nielsen)
