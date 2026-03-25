@@ -88,7 +88,10 @@ Based on this comparison, **The Ultimate Chicken Horse** was selected as the bas
 
 To begin our game design process, we identified all relevant stakeholders including individuals and entities that needed to be taken into account when developing our game. These stakeholders were visualised using an onion model diagram.
 
-![onion model](docs/assets/images/onion-model.png)
+<div align="center">
+  <img src="docs/assets/images/onion-model.png" alt="Onion Model" width="700">
+</div>
+
 
 Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users to whom we had direct access. We categorised the most relevant stakeholders into three groups: gamers, lecturers, and other students, to better identify the qualities each group would expect in a game.
 
@@ -112,7 +115,7 @@ Building on our stakeholder analysis, we defined a set of epics (high-level requ
 | **Students** | • Social features <br> • Easy to pick up <br> • Short game sessions |
 
 #### 2.4 System Requirements
-After defining the epics, we created a set of system requirements to describe what the game should do and how it should perform. The following table presents the key requirements that guided the development of the system.
+After defining the epics, we created a set of system requirements to describe what the game should do and how it should perform. The following table outlines the key requirements for the development.
 
 **Functional Requirements**
 | <div align="center">ID<div> | <div align="center"> Category<div> | <div align="center"> Requirement<div>| 
@@ -140,7 +143,7 @@ After defining the epics, we created a set of system requirements to describe wh
 
 -> detailed requirements
 
-We deconstructed them into a set of user stories to describe the specific features and functionalities of the game from the perspective of the identified stakeholders.
+We deconstructed epics into a set of user stories to describe the specific features and functionalities of the game from the perspective of the identified stakeholders.
 
 #### Students
 
@@ -163,8 +166,11 @@ We deconstructed them into a set of user stories to describe the specific featur
 
 #### 2.6 Use Case Diagram
 
-(~100 words) -> visual overview
-add a paragraph here
+Based on the requirements identified in the previous section, the system design was developed to support the key gameplay interactions. The following use case diagram shows the interactions between the player and the game system, including starting the game, placing obstacles, collecting coins and using the AI recommendation feature.
+
+<div align="center">
+  <img src="docs/assets/images/use-case-diagram.png" alt="Use Case Diagram" width="600">
+</div>
 
 ### 3. Design
 
@@ -172,8 +178,18 @@ add a paragraph here
 
 - System architecture. Class diagrams, behavioural diagrams.
 
-#### 3.3 Behaviourial Diagram
+#### 3.1 System Architecture
+describe our entity-component system design
 
+
+#### 3.2 Class Diagram 
+class diagram and explain 
+
+
+#### 3.3 Behaviourial Diagram
+Sequence diagram
+
+State diagram
 ```mermaid
 stateDiagram-v2
 
@@ -197,6 +213,7 @@ Gameplay --> GameEnd : time limit reached
 
 GameEnd --> [*]
 ```
+
 
 ### 4. Implementation
 
@@ -312,16 +329,13 @@ add Appendix B, captions
 
 #### 5.3 Testing 
 
-
+add testing 
 
 ### 6. Process
 
 (15% ~750 words)
 
 - Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project.
-
-Version control and branching strategies 
-CICD
 
 
 #### 6.1 Team Organisation 
