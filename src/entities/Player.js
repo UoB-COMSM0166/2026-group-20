@@ -11,7 +11,7 @@ import { moveAndCollideX, moveAndCollideY, checkSpikeCollision } from "../system
 
 
 export class Player {
-    constructor(p, x, y, playerNo) {
+    constructor(p, x, y, playerNo, spriteSheet) {
         this.p = p;
         this.playerNo = playerNo;
         this.spawnX = x;
@@ -31,21 +31,67 @@ export class Player {
         this.maxFall = GameConfig.MAX_FALL_SPEED;
         this.skin = GameConfig.SKIN_WIDTH;
 
-        //Double jump 
-        this.maxJumps=2;
-        this.jumpsLeft=this.maxJumps;
-        this.secondJump=false;
-         //
-        this.lifeState = PlayerState.ALIVE;
+        // Double jump
+        this.maxJumps  = 2;
+        this.jumpsLeft = this.maxJumps;
+        this.secondJump = false;
+
+        this.lifeState     = PlayerState.ALIVE;
         this.movementState = PlayerMovementState.IDLE;
-        this.gameState = PlayerGameState.PLAYING;
+        this.gameState     = PlayerGameState.PLAYING;
         this.lastDeathReason = null;
 
-        this.input = new HandleInput(p, playerNo);
-        this.state = PlayerMovementState.IDLE;
-        this.facingRight = true;
+        /**
+         * Set to true by IcePlatform / IceBlock each frame the player is in contact.
+         * When true, horizontal momentum is preserved (multiplied) instead of zeroed.
+         * Reset to false at the start of every horizontalMovement() call.
+         */
+        this.slideMode = false;
 
+        /**
+         * Speed multiplier applied this frame by IceBlock.
+         * 1.0 = normal. IceBlock sets it to > 1 while player is inside.
+         * Reset to 1.0 at the start of every horizontalMovement() call.
+         */
+        this.speedMultiplier = 1.0;
+
+        /**
+         * Persistent obstacle inventory — survives across rounds.
+         * Map of ObstacleType string → count.
+         * Populated by ShopState, consumed by BuildState.
+         * @type {Map<string, number>}
+         */
+        this.inventory = new Map();
+
+        this.input        = new HandleInput(p, playerNo);
+        this.facingRight  = true;
         this.respawnCountdown = 0;
+
+        // ── Sprite animation ─────────────────────────────────────────────
+        this.spriteSheet     = spriteSheet ?? null;
+        this.framesArr       = [];
+        this.frameIndexIdle       = 0;
+        this.frameIndexRun        = 0;
+        this.frameIndexJump       = 0;
+        this.frameIndexFall       = 0;
+        this.frameIndexRespawning = 0;
+        this.animationConfig = null; // set each frame by DrawPlayer
+
+        if (this.spriteSheet) {
+            this._splitAnimation();
+        }
+    }
+
+    /**
+     * Slice the horizontal sprite sheet into individual 28×34 frames.
+     * @private
+     */
+    _splitAnimation() {
+        const fw = this.w;
+        const fh = this.h;
+        for (let x = 0; x < this.spriteSheet.width; x += fw) {
+            this.framesArr.push(this.spriteSheet.get(x, 0, fw, fh));
+        }
     }
 
     /**
@@ -54,12 +100,19 @@ export class Player {
      * @memberof Player
      */
     horizontalMovement() {
-        this.vx = 0;
-        if (this.input.left) {
-            this.vx -= this.speed;
-        }
-        if (this.input.right) {
-            this.vx += this.speed;
+        const prevSlide      = this.slideMode;
+        const speedMult      = this.speedMultiplier;
+        this.slideMode       = false; // reset; ice obstacles re-set before this call
+        this.speedMultiplier = 1.0;   // reset; IceBlock re-sets before this call
+
+        const noInput = !this.input.left && !this.input.right;
+        if (noInput && prevSlide) {
+            // Sliding: preserve momentum with light friction instead of zeroing
+            this.vx *= 0.97;
+        } else {
+            this.vx = 0;
+            if (this.input.left)  this.vx -= this.speed * speedMult;
+            if (this.input.right) this.vx += this.speed * speedMult;
         }
     }
 
@@ -86,7 +139,7 @@ export class Player {
      */
 
     //move
-    update(allPlayers, respawnManager) {
+    update(allPlayers, respawnManager, obstacles = []) {
         if (this.lifeState !== PlayerState.ALIVE) {
             return;
         }
@@ -94,9 +147,9 @@ export class Player {
         this.horizontalMovement();
         this.jumpUp();
         this.comeDown();
-        this.moveAndCollide(allPlayers);
+        this.moveAndCollide(allPlayers, obstacles);
         
-        if (checkSpikeCollision(this, this.p)) {
+        if (checkSpikeCollision(this, this.p, obstacles)) {
             respawnManager.triggerDeath(this, DeathReason.TRAP);
         }
 
@@ -113,9 +166,9 @@ export class Player {
      //change name this is horrible 
      //move to sparate file; handle collisions and the world
      //move
-     moveAndCollide(allPlayers){
-        moveAndCollideX(this, this.vx, allPlayers, this.p);
-        moveAndCollideY(this, this.vy, allPlayers, this.p);
+     moveAndCollide(allPlayers, obstacles = []) {
+        moveAndCollideX(this, this.vx, allPlayers, this.p, obstacles);
+        moveAndCollideY(this, this.vy, allPlayers, this.p, obstacles);
      }
 
     /**
