@@ -232,7 +232,48 @@ class diagram and explain
 #### 3.3 Behaviourial Diagram
 Sequence diagram
 
+```mermaid
+---
+config:
+  theme: mc
+---
+sequenceDiagram
+    actor Player
+    participant Sketch as Game Controller
+    participant Input as HandleInput
+    participant P as Player Object
+    participant Physics as PhysicsSystem
+    participant Respawn as RespawnManager
+    participant Timer as TimeManager
+
+    Player->>Input: press movement keys
+    Sketch->>Input: read Input
+
+    Input-->>Sketch: key press
+
+    Sketch->>P: update
+
+    P->>Physics: check movement and collision
+    Physics-->>P: update position
+
+
+
+    alt player hits spike
+        Physics-->>P: collision detected
+        P->>Respawn: trigger death
+        Respawn->>P: respawn player
+        Physics-->>P: continue
+    end
+
+    P->>Timer: check game time
+
+    Sketch->>P: render player
+    Timer->>Timer: record finish
+```
+
+
 State diagram
+
 ```mermaid
 ---
 config:
