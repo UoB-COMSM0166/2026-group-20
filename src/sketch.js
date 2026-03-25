@@ -4,14 +4,15 @@ import { GameStage } from './config/GameStage.js';
 import { GameConfig } from './config/GameConfig.js';
 import { MAP } from './maps/MapLoader.js';
 
-import { BootState }    from './states/BootState.js';
-import { MenuState }    from './states/MenuState.js';
-import { MapMenuState } from './states/MapMenuState.js';
-import { BuildState }   from './states/BuildState.js';
-import { RunState }     from './states/RunState.js';
-import { ResultsState } from './states/ResultsState.js';
-import { ShopState }    from './states/ShopState.js';
-import { Map2State }    from './states/Map2State.js';
+import { BootState }       from './states/BootState.js';
+import { MenuState }       from './states/MenuState.js';
+import { CharSelectState } from './states/CharSelectState.js';
+import { MapMenuState }    from './states/MapMenuState.js';
+import { BuildState }      from './states/BuildState.js';
+import { RunState }        from './states/RunState.js';
+import { ResultsState }    from './states/ResultsState.js';
+import { ShopState }       from './states/ShopState.js';
+import { Map2State }       from './states/Map2State.js';
 
 /**
  * Root p5 sketch.
@@ -35,15 +36,19 @@ export const sketch = (p) => {
     let offsetX     = 0;
     let offsetY     = 0;
 
-    // Sprite sheets — loaded in preload, passed to Player constructors in setup
+    // Sprite sheets — loaded in preload, placed in ctx.sprites for CharSelectState
     let chickenSheet;
     let bunnySheet;
+    let duckSheet;
+    let polarSheet;
 
     // ── Preload ────────────────────────────────────────────────────────────
 
     p.preload = function () {
         chickenSheet = p.loadImage('src/assets/sprites/chicken_all_frames2.png');
         bunnySheet   = p.loadImage('src/assets/sprites/bunny_all_frames.png');
+        duckSheet    = p.loadImage('src/assets/sprites/duck_all_frames.png');
+        polarSheet   = p.loadImage('src/assets/sprites/polar_all_frames.png');
     };
 
     // ── Setup ──────────────────────────────────────────────────────────────
@@ -51,17 +56,18 @@ export const sketch = (p) => {
     p.setup = function () {
         p.createCanvas(p.windowWidth, p.windowHeight);
 
+        // Players created without a sprite sheet — CharSelectState assigns one
         const players = [
-            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 0, chickenSheet),
-            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 1, bunnySheet),
+            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 0),
+            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 1),
         ];
         const scoreManager = new ScoreManager(players);
 
         /**
          * Shared session context.
+         * sprites        — all loaded sprite sheets; CharSelectState reads these.
          * placedObstacles — written by BuildState, read by RunState.
-         *                   Lives here so it survives the BUILD → RUN transition.
-         * Obstacle tokens are now stored per-player in player.inventory (Map).
+         * shopHasRun     — true after first shop phase.
          */
         const ctx = {
             p,
@@ -69,8 +75,14 @@ export const sketch = (p) => {
             gameHeight,
             players,
             scoreManager,
+            sprites: {
+                chicken: chickenSheet,
+                bunny:   bunnySheet,
+                duck:    duckSheet,
+                polar:   polarSheet,
+            },
             placedObstacles: [],
-            shopHasRun: false, // true after first shop phase; gates strict build-phase token enforcement
+            shopHasRun: false,
         };
 
         const goTo = (stage) => {
@@ -80,14 +92,15 @@ export const sketch = (p) => {
         };
 
         states = {
-            [GameStage.BOOT]:    new BootState(ctx, goTo),
-            [GameStage.MENU]:    new MenuState(ctx, goTo),
-            [GameStage.MAPMENU]: new MapMenuState(ctx, goTo),
-            [GameStage.BUILD]:   new BuildState(ctx, goTo),
-            [GameStage.RUN]:     new RunState(ctx, goTo),
-            [GameStage.RESULTS]: new ResultsState(ctx, goTo),
-            [GameStage.SHOP]:    new ShopState(ctx, goTo),
-            [GameStage.MAP2]:    new Map2State(ctx, goTo),
+            [GameStage.BOOT]:        new BootState(ctx, goTo),
+            [GameStage.MENU]:        new MenuState(ctx, goTo),
+            [GameStage.CHAR_SELECT]: new CharSelectState(ctx, goTo),
+            [GameStage.MAPMENU]:     new MapMenuState(ctx, goTo),
+            [GameStage.BUILD]:       new BuildState(ctx, goTo),
+            [GameStage.RUN]:         new RunState(ctx, goTo),
+            [GameStage.RESULTS]:     new ResultsState(ctx, goTo),
+            [GameStage.SHOP]:        new ShopState(ctx, goTo),
+            [GameStage.MAP2]:        new Map2State(ctx, goTo),
         };
 
         goTo(GameStage.BOOT);

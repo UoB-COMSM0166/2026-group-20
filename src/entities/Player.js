@@ -75,11 +75,30 @@ export class Player {
         this.frameIndexJump       = 0;
         this.frameIndexFall       = 0;
         this.frameIndexRespawning = 0;
-        this.animationConfig = null; // set each frame by DrawPlayer
+        /** Animation frame-index map set by setSprite() or DrawPlayer. */
+        this.animConfig      = null;
 
         if (this.spriteSheet) {
             this._splitAnimation();
         }
+    }
+
+    /**
+     * Assign a new sprite sheet and animation config at runtime.
+     * Called by CharSelectState after the player picks a character.
+     * @param {p5.Image} sheet
+     * @param {object}   animConfig
+     */
+    setSprite(sheet, animConfig) {
+        this.spriteSheet          = sheet;
+        this.animConfig           = animConfig;
+        this.framesArr            = [];
+        this.frameIndexIdle       = 0;
+        this.frameIndexRun        = 0;
+        this.frameIndexJump       = 0;
+        this.frameIndexFall       = 0;
+        this.frameIndexRespawning = 0;
+        this._splitAnimation();
     }
 
     /**

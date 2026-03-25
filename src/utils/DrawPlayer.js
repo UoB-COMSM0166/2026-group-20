@@ -21,9 +21,10 @@ export function DrawPlayer(player) {
 
     // ── Sprite path ───────────────────────────────────────────────────────
     if (player.framesArr.length > 0) {
-        // Assign animation config based on player number
-        const cfg = player.playerNo === 0 ? AnimationConfig : AnimationConfig2;
-        player.animationConfig = cfg;
+        // Use the character's own animConfig (set by setSprite / CharSelectState).
+        // Fall back to playerNo-based default so the game works before char select runs.
+        const cfg = player.animConfig
+            ?? (player.playerNo === 0 ? AnimationConfig : AnimationConfig2);
 
         const state     = player.movementState;
         const lifeState = player.lifeState;
