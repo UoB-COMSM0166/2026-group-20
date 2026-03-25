@@ -168,9 +168,52 @@ We deconstructed epics into a set of user stories to describe the specific featu
 
 Based on the requirements identified in the previous section, the system design was developed to support the key gameplay interactions. The following use case diagram shows the interactions between the player and the game system, including starting the game, placing obstacles, collecting coins and using the AI recommendation feature.
 
-<div align="center">
-  <img src="docs/assets/images/use-case-diagram.png" alt="Use Case Diagram" width="600">
-</div>
+```mermaid
+flowchart LR
+ subgraph TheGame["The Game"]
+    direction TB
+        UC_Start(["Start Game"])
+        UC_Join(["Join Session"])
+        UC_Tutorial(["View Tutorial"])
+        UC_Move(["Move Character"])
+        UC_Coins(["Collect Coins"])
+        UC_Goal(["Reach Goal"])
+        UC_End(["End Round"])
+        UC_Place(["Place Obstacles"])
+        UC_Purchase(["Purchase Obstacles"])
+        UC_PurchaseRec(["Purchase AI Obstacle Recommendation"])
+        UC_Generate(["Generate Obstacle Recommendation"])
+        UC_Score(["View Scoreboard"])
+  end
+    UC_Start --- Player(["Player"])
+    UC_Join --- Player
+    UC_Tutorial --- Player
+    UC_Move --- Player
+    UC_Place --- Player
+    UC_Score --- Player
+    AISolver(["AI Solver"]) --- UC_Generate
+    UC_Coins -. &lt;&lt;extend&gt;&gt; .-> UC_Move
+    UC_Goal -. &lt;&lt;extend&gt;&gt; .-> UC_Move & UC_End
+    UC_PurchaseRec -. &lt;&lt;extend&gt;&gt; .-> UC_Purchase
+    UC_PurchaseRec -. &lt;&lt;include&gt;&gt; .-> UC_Generate
+    UC_Purchase -. &lt;&lt;include&gt;&gt; .-> UC_Place
+
+    style UC_Start fill:#BBDEFB,stroke:#000000
+    style UC_Join fill:#BBDEFB,stroke:#000000
+    style UC_Tutorial fill:#BBDEFB,stroke:#000000
+    style UC_Move fill:#BBDEFB,stroke:#000000
+    style UC_Coins fill:#BBDEFB,stroke:#000000
+    style UC_Goal fill:#BBDEFB,stroke:#000000
+    style UC_End fill:#BBDEFB,stroke:#000000
+    style UC_Place fill:#BBDEFB,stroke:#000000
+    style UC_Purchase fill:#BBDEFB,stroke:#000000
+    style UC_PurchaseRec fill:#BBDEFB,stroke:#000000
+    style UC_Generate fill:#C8E6C9,stroke:#000000
+    style UC_Score fill:#BBDEFB,stroke:#000000
+    style Player fill:#FFCDD2,stroke:#000000
+    style AISolver fill:#FFCDD2,stroke:#000000
+    style TheGame fill:#ffffff,stroke:#000000
+```
 
 ### 3. Design
 
@@ -191,27 +234,25 @@ Sequence diagram
 
 State diagram
 ```mermaid
-stateDiagram-v2
-
-[*] --> StartMenu
-StartMenu --> Lobby
-Lobby --> PreGameSetup
-
-state "Pre-Game Setup" as PreGameSetup {
-    direction LR
-    Character --> Map
-    Map --> Obstacle
-    Obstacle --> Placement
-}
-
-PreGameSetup --> GameStart
-GameStart --> Gameplay
-Gameplay --> ReachGoal
-
-ReachGoal --> GameEnd : goal reached
-Gameplay --> GameEnd : time limit reached
-
-GameEnd --> [*]
+---
+config:
+  layout: dagre
+  theme: default
+---
+stateDiagram
+  direction LR
+  [*] --> StartMenu
+  StartMenu --> Lobby
+  Lobby --> CharacterSetup
+  CharacterSetup --> MapSetup
+  MapSetup --> ObstacleSetup
+  ObstacleSetup --> PlacementSetup
+  PlacementSetup --> Gameplay
+  Gameplay --> ReachGoal:goal reached
+  Gameplay --> GameEnd:time limit reached
+  ReachGoal --> GameEnd
+  GameEnd --> [*]
+  style StartMenu,Lobby,CharacterSetup,MapSetup,ObstacleSetup,PlacementSetup,Gameplay,ReachGoal,GameEnd
 ```
 
 
