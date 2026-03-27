@@ -180,7 +180,7 @@ export class ShopState extends State {
         p.line(TABLE_PAD_X + colW, tableTop, TABLE_PAD_X + colW, tableTop + tableH);
         p.noStroke();
 
-        // ── Done button ───────────────────────────────────────────────────
+        // ── Done button ────────────────
         const doneY  = gameHeight - 44;
         const doneW  = 160;
         const doneH  = 34;
@@ -330,7 +330,7 @@ export class ShopState extends State {
             CANNON:           [100, 100, 115],
             SAW:              [200, 60,  60],
             FLAME:            [240, 100, 20],
-            SPIKE_PLATFORM:   [170, 80,  40],
+            SPIKED_BALL:        [170, 80,  40],
             ICE_BLOCK:        [120, 190, 230],
             WIND_ZONE:        [60,  185, 185],
             TELEPORTER:       [160, 80,  240],

@@ -3,7 +3,6 @@ import { ScoreManager } from './systems/ScoreManager.js';
 import { GameStage } from './config/GameStage.js';
 import { GameConfig } from './config/GameConfig.js';
 import { MAP } from './maps/MapLoader.js';
-
 import { BootState }    from './states/BootState.js';
 import { MenuState }    from './states/MenuState.js';
 import { MapMenuState } from './states/MapMenuState.js';
@@ -36,15 +35,14 @@ export const sketch = (p) => {
     let offsetX     = 0;
     let offsetY     = 0;
 
-    //let cowImg; 
-    //let bunnyImg;
-    //let smallChickenImg;
     let chickenAllFrames2;
     let bunnyAllFrames;
     let sawFrames;
     let fireFrames;
-    //let trampolineIdle;
     let trampolineBouncing;
+    let spikedBallImg; 
+    let cannonImg;
+    let fallingPlatformFrames;
 
     p.preload = function(){
       //cowImg = p.loadImage("src/assets/sprites/cow_frames.png");
@@ -56,8 +54,11 @@ export const sketch = (p) => {
       fireFrames=p.loadImage("src/assets/obstacles/Fire/On (16x32).png");
       //trampolineIdle= p.loadImage("src/assets/obstacles/Trampoline/Idle.png");
       trampolineBouncing= p.loadImage("src/assets/obstacles/Trampoline/Jump (28x28).png");
-      console.log("Sheet:", sawFrames);
-      console.log("Sheet:", fireFrames);
+      spikedBallImg = p.loadImage("src/assets/obstacles/Spiked Ball/Spiked Ball.png");
+      cannonImg= p.loadImage("src/assets/obstacles/Cannon/cannon (30x18).png");
+      fallingPlatformFrames=p.loadImage("src/assets/obstacles/Falling Platforms/On (32x10).png");
+
+      //console.log("Sheet:", sawFrames);
     };
 
     // ── Setup ──
@@ -100,7 +101,7 @@ export const sketch = (p) => {
             [GameStage.MENU]:    new MenuState(ctx, goTo),
             [GameStage.MAPMENU]: new MapMenuState(ctx, goTo),
             [GameStage.BUILD]:   new BuildState(ctx, goTo, sawFrames, fireFrames, 
-               trampolineBouncing),
+               trampolineBouncing, spikedBallImg, cannonImg, fallingPlatformFrames),
             [GameStage.RUN]:     new RunState(ctx, goTo),
             [GameStage.RESULTS]: new ResultsState(ctx, goTo),
             [GameStage.SHOP]:    new ShopState(ctx, goTo),

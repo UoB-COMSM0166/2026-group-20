@@ -82,7 +82,7 @@ export const GameConfig = {
         ICE_PLATFORM:    4,
         BOUNCE_PAD:      5,
         FLAME:           6,
-        SPIKE_PLATFORM:  7,
+        SPIKED_BALL:     7,
         ICE_BLOCK:       4,
         WIND_ZONE:       6,
         TELEPORTER:      10,

@@ -101,13 +101,16 @@ export class Flame extends Obstacle {
 
     static drawGhost(p, x, y, sheet) {
         const T  = GameConfig.TILE;
-        // const cx = x + T / 2;
-        // const cy = y + T;
+        const cx = x + T / 2;
+        const cy = y + T;
         const frameW = 16;
         const frameH = 32;
         p.push();
+       
+        p.translate(cx, cy);
         p.tint(255, 150);
-        p.image(sheet, x, y, T, T, 0, 0, frameW, frameH);
+        p.image(sheet, -frameW/2, -frameH, frameW, frameH, 0, 0, frameW, frameH);
+        //p.image(sheet, -frameW/2, -frameH/2, frameW, frameH);
         p.pop();
 
         // p.noStroke();

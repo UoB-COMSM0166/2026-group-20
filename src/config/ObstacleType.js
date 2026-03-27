@@ -15,9 +15,10 @@ export const ObstacleType = Object.freeze({
     CANNON: 'CANNON',  // fires projectiles
     SAW:    'SAW',     // spinning blade
     FLAME:  'FLAME',   // pulses on/off; kills only when active
+    SPIKED_BALL: 'SPIKED_BALL', //static kill zone
 
     // Solid + hazard
-    SPIKE_PLATFORM: 'SPIKE_PLATFORM', // safe from above, deadly from sides/below
+    //SPIKE_PLATFORM: 'SPIKE_PLATFORM', // safe from above, deadly from sides/below
 
     // Special effect (neither solid nor hazard)
     ICE_BLOCK:  'ICE_BLOCK',  // applies sliding physics to nearby players

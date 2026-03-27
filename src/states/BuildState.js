@@ -11,7 +11,7 @@ import { SpikeObstacle } from '../entities/obstacles/SpikeObstacle.js';
 import { Cannon, CannonDir } from '../entities/obstacles/Cannon.js';
 import { Saw } from '../entities/obstacles/Saw.js';
 import { Flame } from '../entities/obstacles/Flame.js';
-import { SpikePlatform } from '../entities/obstacles/SpikePlatform.js';
+import { SpikedBall } from '../entities/obstacles/SpikedBall.js';
 import { IceBlock } from '../entities/obstacles/IceBlock.js';
 import { WindZone, WindDir } from '../entities/obstacles/WindZone.js';
 import { Teleporter } from '../entities/obstacles/Teleporter.js';
@@ -54,11 +54,14 @@ const PLAYER_COLOURS = [
  */
 export class BuildState extends State {
    constructor(ctx, goTo, sawFrames,fireFrames,
-      trampolineBouncing) {
+      trampolineBouncing, spikedBallImg, cannonImg, fallingPlatformFrames) {
       super(ctx, goTo);
       this.sawFrames = sawFrames;
       this.fireFrames= fireFrames;
       this.trampolineBouncing= trampolineBouncing;
+      this.spikedBallImg = spikedBallImg;
+      this.cannonImg = cannonImg;
+      this.fallingPlatformFrames=fallingPlatformFrames;
       //this.trampolineIdle= trampolineIdle;
    }
 
@@ -75,7 +78,7 @@ export class BuildState extends State {
         { type: ObstacleType.SAW,              label: 'Saw',         hint: 'Spinning blade',   color: [200, 60,  60]  },
         { type: ObstacleType.FLAME,            label: 'Flame',       hint: 'Pulses on/off',    color: [240, 100, 20]  },
         // Solid + hazard
-        { type: ObstacleType.SPIKE_PLATFORM,   label: 'SpikePlatform',hint:'Safe top, deadly sides',color:[170, 80, 40] },
+        { type: ObstacleType.SPIKED_BALL,   label: 'SpikedBall',hint:'Kills on touch',color:[170, 80, 40] },
         // Special effect
         { type: ObstacleType.ICE_BLOCK,        label: 'IceBlock',    hint: 'Slide through',    color: [120, 190, 230] },
         { type: ObstacleType.WIND_ZONE,        label: 'WindZone',    hint: 'Push direction',   color: [60,  185, 185] },
@@ -336,20 +339,20 @@ export class BuildState extends State {
         switch (type) {
             case ObstacleType.PLATFORM:         Platform.drawGhost(p, x, y);                        break;
             case ObstacleType.MOVING_PLATFORM:  MovingPlatform.drawGhost(p, x, y);                  break;
-            case ObstacleType.FALLING_PLATFORM: FallingPlatform.drawGhost(p, x, y);                 break;
+            case ObstacleType.FALLING_PLATFORM: FallingPlatform.drawGhost(p, x, y, this.fallingPlatformFrames);                 break;
             case ObstacleType.ICE_PLATFORM:     IcePlatform.drawGhost(p, x, y);                     break;
             case ObstacleType.BOUNCE_PAD:       
                 BouncePad.drawGhost(p, x, y, this.trampolineBouncing);                       
                 break;
             case ObstacleType.SPIKE:            SpikeObstacle.drawGhost(p, x, y);                   break;
-            case ObstacleType.CANNON:           Cannon.drawGhost(p, x, y, this._cannonDir);          break;
+            case ObstacleType.CANNON:           Cannon.drawGhost(p, x, y, this._cannonDir, this.cannonImg);          break;
             case ObstacleType.SAW:              
                 Saw.drawGhost(p, x, y, this.sawFrames);                             
                 break;
             case ObstacleType.FLAME:            
                 Flame.drawGhost(p, x, y, this.fireFrames);                           
                 break;
-            case ObstacleType.SPIKE_PLATFORM:   SpikePlatform.drawGhost(p, x, y);                   break;
+            case ObstacleType.SPIKED_BALL:   SpikedBall.drawGhost(p, x, y, this.spikedBallImg);                   break;
             case ObstacleType.ICE_BLOCK:        IceBlock.drawGhost(p, x, y);                        break;
             case ObstacleType.WIND_ZONE:        WindZone.drawGhost(p, x, y, this._windDir);          break;
             case ObstacleType.TELEPORTER:       Teleporter.drawGhost(p, x, y);                      break;
@@ -490,14 +493,14 @@ export class BuildState extends State {
         switch (type) {
             case ObstacleType.PLATFORM:         return new Platform(p, x, y);
             case ObstacleType.MOVING_PLATFORM:  return new MovingPlatform(p, x, y);
-            case ObstacleType.FALLING_PLATFORM: return new FallingPlatform(p, x, y);
+            case ObstacleType.FALLING_PLATFORM: return new FallingPlatform(p, x, y, this.fallingPlatformFrames);
             case ObstacleType.ICE_PLATFORM:     return new IcePlatform(p, x, y);
             case ObstacleType.BOUNCE_PAD:       return new BouncePad(p, x, y, this.trampolineBouncing);
             case ObstacleType.SPIKE:            return new SpikeObstacle(p, x, y);
-            case ObstacleType.CANNON:           return new Cannon(p, x, y, this._cannonDir);
+            case ObstacleType.CANNON:           return new Cannon(p, x, y, this._cannonDir, this.cannonImg);
             case ObstacleType.SAW:              return new Saw(p, x, y, this.sawFrames);
             case ObstacleType.FLAME:            return new Flame(p, x, y, this.fireFrames);
-            case ObstacleType.SPIKE_PLATFORM:   return new SpikePlatform(p, x, y);
+            case ObstacleType.SPIKED_BALL:      return new SpikedBall(p, x, y, this.spikedBallImg);
             case ObstacleType.ICE_BLOCK:        return new IceBlock(p, x, y);
             case ObstacleType.WIND_ZONE:        return new WindZone(p, x, y, this._windDir);
             case ObstacleType.TELEPORTER:       return new Teleporter(p, x, y);

@@ -66,7 +66,7 @@ export class BouncePad extends Obstacle {
          const p    = this.p;
          const T    = GameConfig.TILE;
          const cx = this.x + T / 2;
-         const cy = this.y + T / 2;
+         const cy = this.y +T;
          const frames = this._currentFrames;
 
          if (!frames||frames.length === 0) return;
@@ -118,9 +118,17 @@ export class BouncePad extends Obstacle {
 
         const frameW = 28;
         const frameH = 28;
+        const cx = x + T / 2;
+        const cy = y + T ;
+
         p.push();
-        p.tint(255, 150);
-        p.image(sheet, x, y, T, T, 0, 0, frameW, frameH);
+        
+        p.translate(cx, cy);
+        
+        //p.imageMode(p.CENTER);
+
+        //p.image(sheet, x, y, -frameW/2, -frameH/2, 0, 0, frameW, frameH);
+        p.image(sheet, -frameW/2, -frameH/2, frameW, frameH, 0, 0, frameW, frameH);
         p.pop();
 
         // p.noStroke();
