@@ -56,7 +56,7 @@ GROUP PHOTO. Add a group photo here.
 
 -> outlines the requirements engineering process (15% ~750 words)
 
-Our team began by brainstorming various game ideas and collectively selected the concept to develop. After the game was selected, we identified the stakeholders to understand who would be affected by the system and whose needs should be considered during the design process. Based on this understanding, we outlined epics for the game's key features, followed by user stories describing the detailed functional requirements. The overall game flow was then designed to show how players interact with the system.
+Our team began by brainstorming various game ideas and collectively selected the concept to develop. After the game was selected, we identified the stakeholders to understand who would be affected by the system and whose needs should be considered during the design process. Based on this understanding, we outlined epics for the game's key features, followed by user stories describing the detailed functional requirements. 
 
 #### 2.1 Ideation and Game Selection
 
@@ -222,8 +222,16 @@ flowchart LR
 - System architecture. Class diagrams, behavioural diagrams.
 
 #### 3.1 System Architecture
-describe our entity-component system design
 
+The project adopts a modular game architecture that combines an entity-based design (for sure, add reference) with a system-driven update model (not sure). The codebase is organised into several folders, including `entities`, `systems`, `state`, `config` and `UI`, which seperate different reponsibilities within the project.
+
+In this architecture, entities represent the main objects within the game world such as players, coins and obstacles. These objects are defined with `entities` folder. The data associated with these entities, such as player movement speed and initial jump velocity, are stored in configuration files. Separating data in configuration files allows us to modify object attributes easily without altering the core implementation. 
+ 
+Game logic is implemented through a set of systems located in the `systems` folder that update entities during each iteration of the game loop. These systems are responsible for processing the behaviour associated with different enities and implementing core gameplay mechanics. Example of the systems include respawning, collisions and time management. 
+
+The `state` folder defines high-level flow of the game. Each state represents a different phase of the game, and only one stage is active at any given time. For example, when the game starts, the Boot state is the brief loading screen. After this phase, the game transitions to the Build state, where the game environment is prepared and objects such as players and obstacles are created and positioned within the game world. 
+
+The user interface components are located in the `UI` folder and responsible for managing the presentation layer of the game. These components includes visual components such as heads-up display (HUD), scoreboard and other on-screen elements. They provide visual feedback and information that help the players understand the current state of the game during gameplay. 
 
 #### 3.2 Class Diagram 
 class diagram and explain 
