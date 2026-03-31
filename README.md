@@ -166,7 +166,11 @@ We deconstructed epics into a set of user stories to describe the specific featu
 
 #### 2.6 Use Case Diagram
 
-Based on the requirements identified in the previous section, the system design was developed to support the key gameplay interactions. The following use case diagram shows the interactions between the player and the game system, including starting the game, placing obstacles, collecting coins and using the AI recommendation feature.
+Based on the requirements identified in the previous section, the system design was developed to support the key gameplay interactions. The following use case diagram illustrates the interactions between the player and the game system. 
+
+The primary actor is the **Player**. The player can perform core actions such as starting the game, joining a session, viewing the tutorial, moving the character, placing obstacles and montinoring their progression via the scoreboard. During the game, the player may also collect coins, reach the goal and end the round. Additionally, the play can optionally use coins collected during the game to purchase new obstacles or request an AI-generated obstacle recommendation.
+
+The **AI solver** acts as a secondary actor responsible for generating obstacle recommendations when requested by the player. 
 
 ```mermaid
 flowchart LR
@@ -221,25 +225,34 @@ flowchart LR
 
 - System architecture. Class diagrams, behavioural diagrams.
 
-#### 3.1 System Architecture
+#### 3.1 System Architecture Overview
 
-The project adopts a modular game architecture that combines an entity-based design (for sure, add reference) with a system-driven update model (not sure). The codebase is organised into several folders, including `entities`, `systems`, `state`, `config` and `UI`, which seperate different reponsibilities within the project.
+The project adopts a modular game architecture that combines **Entity–Component–System (ECS) architecture**(in ref 6) and traditional **object-centric design (OCD) architecture** (in ref 5). In a pure ECS architecture, entities are simple identifiers that store data, while systems contain all the logic that processes this data. In contrast, traditional OOP designs usually combine data and behaviour within the same class. For example, in an OCD design, a **Player** class might manage its own position, movement logic and collision detection within a single object. In a pure ECS design, the player would instead store data, while external systems would handle all gameplay logic.
 
-In this architecture, entities represent the main objects within the game world such as players, coins and obstacles. These objects are defined with `entities` folder. The data associated with these entities, such as player movement speed and initial jump velocity, are stored in configuration files. Separating data in configuration files allows us to modify object attributes easily without altering the core implementation. 
+
+The system architecture in this project follows a hybrid approach, which combines some aspects of both ECS and OCD. The player is represented as an **entity** that stores data such as position and movement speed, whereas certain gameplay behaviours are handled by independent systems. For instance, the Physics System processes collision detection between the player and obstacles, and the Respawn Manager handles resetting the player when the character collides with a hazard. However, some game logic, such as the player’s movement, remains implemented within the player object itself.
+
+This hybrid architectural approach is reflected in the organisation of the project’s codebase. The codebase is organised into several folders: `entities`, `systems`, `state`, `config` and `UI`. Each is responsible for a specific aspect of the game.
+
+#### 3.2 Entities 
+**Entities** represent the main objects within the game world, such as players, coins and obstacles. To align with the hybrid ECS-inspired architecture, these entities mainly function as containers for data and properties rather than implementing complex internal logic. This structure is supported by a data-driven design approach (ref 5, p1025), where specific parameters such as movement speed and initial jump velocity are stored in configuration files in the `config` folder. As described by **change to author name**(ref p1024), this separation could improve development iteration speed and system maintainability.
+
+During runtime, entities are updated through the **game loop**. The entities are stored in a list, and the `update()` function iterates through this list during each frame to update the state of each entity sequentially. This mechanism ensures that all entities are updated consistently during each iteration of the simulation.
+
+(p1088 in 5) 
  
-Game logic is implemented through a set of systems located in the `systems` folder that update entities during each iteration of the game loop. These systems are responsible for processing the behaviour associated with different enities and implementing core gameplay mechanics. Example of the systems include respawning, collisions and time management. 
+#### 3.3 Systems
+**Systems** are responsible for processing behaviours associated with different enities and implementing core gameplay mechanics. While **entities** mainly store data, **systems** contain the logic that operates on this data during each iteration of the game loop. These systems are implemented within the `system` directory. 
 
-The `state` folder defines high-level flow of the game. Each state represents a different phase of the game, and only one stage is active at any given time. For example, when the game starts, the Boot state is the brief loading screen. After this phase, the game transitions to the Build state, where the game environment is prepared and objects such as players and obstacles are created and positioned within the game world. 
+Examples of systems include:
 
-The user interface components are located in the `UI` folder and responsible for managing the presentation layer of the game. These components includes visual components such as heads-up display (HUD), scoreboard and other on-screen elements. They provide visual feedback and information that help the players understand the current state of the game during gameplay. 
+- Physics System - detects collisions between the player and other entities (e.g. coins or obstacles)
 
-#### 3.2 Class Diagram 
-class diagram and explain 
+- Respawn Manager - manager the respawning of the players and ensures they are correctly repositioned at the starting point.
 
+- Time Manager - manager gameplay timing during a round.
 
-#### 3.3 Behaviourial Diagram
-Sequence diagram
-
+The following sequence diagram display how the plater interact with these systems during gameplay.
 ```mermaid
 ---
 config:
@@ -280,8 +293,23 @@ sequenceDiagram
 ```
 
 
-State diagram
+#### 3.4 Finite State Machine (FSM)
+The overall flow of the game is controlled using a **Finite State Machine** implemented in `state` folder. Each state represents a different phase of the game, and only one state can be active at any given time. This ensures that the game transitions between different phases in a predictable manner. 
 
+The lifecycle of the game follows several states:
+
+- Boot state - loads the game briefing 
+
+- Build state - 
+- Map Menu state - 
+- Play State - 
+- Result State - 
+- Run State - 
+- Shop State - 
+
+The following diagram illustrates the transitions between different game states.
+
+re edit this diagram 
 ```mermaid
 ---
 config:
@@ -303,6 +331,19 @@ stateDiagram
   GameEnd --> [*]
   style StartMenu,Lobby,CharacterSetup,MapSetup,ObstacleSetup,PlacementSetup,Gameplay,ReachGoal,GameEnd
 ```
+
+
+#### 3.5 User Interface
+The user interface components, located in the `UI` directory, are responsible for managing the presentation layer of the game. The UI is responsible only for displaying information to the player and does not directly control gameplay logic. The interface includes elements such as the heads-up display (HUD) and the scoreboard. 
+
+#### 3.6 Rescource Manager 
+p493 in ref 5 
+
+The game utilises a resource management system to handle game assets. (ref 5 p571)
+
+The game processes player input through Human Interface Devices (HID) such as keyboards or controllers. 
+
+Quoted: Every resource manager is comprised of two distinct but integrated components.One component manages the chain of offline tools used to create the assets and transform them into their engine-ready form. The other component manages the resources at runtime, ensuring that they are loaded into memory in advance of being needed by the game and making sure they are unloaded from memory when no longer needed. 
 
 
 ### 4. Implementation
@@ -530,6 +571,10 @@ main
 
 [4]K. Chaudhary, X. Dai, and J. Grundy, “Experiences in Developing a Micro-payment System for Peer-to-Peer Networks,” International Journal of Information Technology and Web Engineering, vol. 5, no. 1, pp. 23–42, Jan. 2010, doi: 10.4018/jitwe.2010010102. (heurstics format)
 
+[5]J. Gregory, Game Engine Architecture. CRC Press, 2017. (entity-based)
+  
+[6]F. Pouhela, D. Krummacker, and H. D. Schotten, “Entity Component System Architecture for Scalable, Modular, and Power-Efficient IoT-Brokers,” in 2023 IEEE 21st International Conference on Industrial Informatics (INDIN), IEEE, Jul. 2023, pp. 1–6. Accessed: Mar. 30, 2026. [Online]. Available: https://doi.org/10.1109/indin51400.2023.10218094
+  
 
 
 ### Appendix
