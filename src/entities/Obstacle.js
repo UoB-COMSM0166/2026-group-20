@@ -15,6 +15,7 @@ export class Obstacle {
      * @param {p5}    p
      * @param {number} x - World x position in pixels (top-left, snapped to tile grid)
      * @param {number} y - World y position in pixels (top-left, snapped to tile grid)
+     * @param obstacleSheet
      */
     constructor(p, x, y, obstacleSheet) {
         this.p      = p;
@@ -56,7 +57,6 @@ export class Obstacle {
      * Apply special physics/effects to a player each frame.
      * Called after all player movement is resolved.
      * Override in: IcePlatform, BouncePad, SpikePlatform, Teleporter, Flame.
-     *
      * @param {object}     _player
      * @param {object[]}   _allPlayers
      * @param {object}     _respawnManager

@@ -13,6 +13,17 @@ import { ShopState }    from './states/ShopState.js';
 import { Map2State }    from './states/Map2State.js';
 import { AnimationConfig } from "./config/AnimationConfig.js";
 import { AnimationConfig2 } from "./config/AnimationConfig2.js";
+// import images 
+import chickenSprite from './assets/sprites/chicken_all_frames2.png';
+import bunnySprite from './assets/sprites/bunny_all_frames.png';
+import saw from './assets/obstacles/Saw/On (38x38).png';
+import fire from './assets/obstacles/Fire/On (16x32).png';
+import trampoline from './assets/obstacles/Trampoline/Jump (28x28).png';
+import spikedBall from './assets/obstacles/Spiked Ball/Spiked Ball.png';
+import cannon from './assets/obstacles/Cannon/cannon (30x18).png';
+import fallingPlatform from './assets/obstacles/Falling Platforms/On (32x10).png'; 
+
+
 /**
  * Root p5 sketch.
  *
@@ -35,7 +46,7 @@ export const sketch = (p) => {
     let offsetX     = 0;
     let offsetY     = 0;
 
-    let chickenAllFrames2;
+    let chickenAllFrames;
     let bunnyAllFrames;
     let sawFrames;
     let fireFrames;
@@ -45,20 +56,22 @@ export const sketch = (p) => {
     let fallingPlatformFrames;
 
     p.preload = function(){
-      //cowImg = p.loadImage("src/assets/sprites/cow_frames.png");
-      //bunnyImg = p.loadImage("src/assets/sprites/bunny_frames.png");
-      //smallChickenImg= p.loadImage("src/assets/sprites/small_chicken.png");
-      chickenAllFrames2= p.loadImage("src/assets/sprites/chicken_all_frames2.png");
-      bunnyAllFrames= p.loadImage("src/assets/sprites/bunny_all_frames.png");
-      sawFrames= p.loadImage("src/assets/obstacles/Saw/On (38x38).png");
-      fireFrames=p.loadImage("src/assets/obstacles/Fire/On (16x32).png");
-      //trampolineIdle= p.loadImage("src/assets/obstacles/Trampoline/Idle.png");
-      trampolineBouncing= p.loadImage("src/assets/obstacles/Trampoline/Jump (28x28).png");
-      spikedBallImg = p.loadImage("src/assets/obstacles/Spiked Ball/Spiked Ball.png");
-      cannonImg= p.loadImage("src/assets/obstacles/Cannon/cannon (30x18).png");
-      fallingPlatformFrames=p.loadImage("src/assets/obstacles/Falling Platforms/On (32x10).png");
-
-      //console.log("Sheet:", sawFrames);
+      chickenAllFrames= p.loadImage(chickenSprite);
+      bunnyAllFrames = p.loadImage(bunnySprite); 
+      sawFrames= p.loadImage(saw); 
+      fireFrames = p.loadImage(fire);
+      trampolineBouncing = p.loadImage(trampoline); 
+      spikedBallImg = p.loadImage(spikedBall);
+      cannonImg= p.loadImage(cannon);
+      fallingPlatformFrames = p.loadImage(fallingPlatform);
+      //chickenAllFrames2= p.loadImage("./assets/sprites/chicken_all_frames2.png");
+      //bunnyAllFrames= p.loadImage("./assets/sprites/bunny_all_frames.png");
+      //sawFrames= p.loadImage("./assets/obstacles/Saw/On (38x38).png");
+      //fireFrames=p.loadImage("./assets/obstacles/Fire/On (16x32).png");
+      //trampolineBouncing= p.loadImage("./assets/obstacles/Trampoline/Jump (28x28).png");
+      //spikedBallImg = p.loadImage("./assets/obstacles/Spiked Ball/Spiked Ball.png");
+      //cannonImg= p.loadImage("./assets/obstacles/Cannon/cannon (30x18).png");
+      //fallingPlatformFrames=p.loadImage("./assets/obstacles/Falling Platforms/On (32x10).png");
     };
 
     // ── Setup ──
@@ -68,7 +81,7 @@ export const sketch = (p) => {
 
         const players      = [
             new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 0, 
-                chickenAllFrames2, AnimationConfig),
+                chickenAllFrames, AnimationConfig),
             new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 1, 
                 bunnyAllFrames, AnimationConfig2),
         ];

@@ -4,13 +4,25 @@ import { GameConfig } from "../config/GameConfig.js";
 /**
  * Axis-aligned bounding box overlap test.
  * Exported so other modules (e.g. Coin) can import it from one place.
- *
+ * @param ax
+ * @param ay
+ * @param aw
+ * @param ah
+ * @param bx
+ * @param by
+ * @param bw
+ * @param bh
  * @returns {boolean} true if the two rectangles overlap
  */
 export function aabbIntersects(ax, ay, aw, ah, bx, by, bw, bh) {
     return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }
 
+/**
+ *
+ * @param entity
+ * @param p
+ */
 function getTileRange(entity, p) {
     return {
         left:   p.floor(entity.x / GameConfig.TILE),
@@ -25,7 +37,6 @@ function getTileRange(entity, p) {
  *   - solid map tiles
  *   - other players
  *   - solid placed obstacles
- *
  * @param {object}     entity
  * @param {number}     dx
  * @param {Player[]}   allPlayers
@@ -68,7 +79,6 @@ export function moveAndCollideX(entity, dx, allPlayers, p, obstacles = []) {
  *   - solid map tiles
  *   - other players
  *   - solid placed obstacles
- *
  * @param {object}     entity
  * @param {number}     dy
  * @param {Player[]}   allPlayers
@@ -129,7 +139,6 @@ export function moveAndCollideY(entity, dy, allPlayers, p, obstacles = []) {
 /**
  * Returns true if the entity overlaps any spike — either a map 'S' tile
  * or a placed hazard obstacle.
- *
  * @param {object}     entity
  * @param {p5}         p
  * @param {Obstacle[]} obstacles

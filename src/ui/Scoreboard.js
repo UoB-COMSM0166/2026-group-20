@@ -30,7 +30,6 @@ export class Scoreboard {
     /**
      * Render the full scoreboard overlay.
      * Call every frame while isGameOver is true.
-     *
      * @param {ScoreManager} scoreManager
      */
     render(scoreManager) {
@@ -160,6 +159,8 @@ export class Scoreboard {
 
     /**
      * Returns x-centre positions for each column given a panel origin and width.
+     * @param panelX
+     * @param panelW
      * @private
      */
     _colPositions(panelX, panelW) {

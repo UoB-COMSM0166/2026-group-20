@@ -16,6 +16,11 @@ export const MAP = [
   "########################",
 ];
 
+/**
+ *
+ * @param tx
+ * @param ty
+ */
 export function createBlocks(tx, ty) {
   if(ty===NaN){
       ty=0;
@@ -27,14 +32,28 @@ export function createBlocks(tx, ty) {
   return MAP[ty][tx];
 }
 
+/**
+ *
+ * @param tx
+ * @param ty
+ */
 export function isSolid(tx, ty) {
   return createBlocks(tx, ty) === "#";
 }
 
+/**
+ *
+ * @param tx
+ * @param ty
+ */
 export function isSpike(tx, ty) {
   return createBlocks(tx, ty) === "S";
 }
 
+/**
+ *
+ * @param p
+ */
 export function drawMap(p) {
         p.noStroke();
         for (let y = 0; y < MAP.length; y++) {

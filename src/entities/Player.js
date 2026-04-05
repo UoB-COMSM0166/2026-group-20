@@ -89,7 +89,7 @@ export class Player {
    
     /**
      * Splits the sprite sheet into individual frames.
-    */
+     */
     splitAnimation(){
       const frameWidth= 28;
       const frameHeight= 34;
@@ -140,7 +140,7 @@ export class Player {
     /**
      *
      *
-      * @param {Player[]} allPlayers - List of players
+     * @param {Player[]} allPlayers - List of players
      * @param {*} respawnManager 
      * @param {Array} obstacles - List of obstacles
      */
@@ -164,7 +164,7 @@ export class Player {
     }
     /**
      * Applies gravity to the player.
-    */
+     */
      comeDown(){
         this.vy += this.gravity;
         if (this.vy > this.maxFall) {
@@ -174,11 +174,10 @@ export class Player {
 
 
     /**
-    * Moves the player and resolves collisions.
-    *
-    * @param {Player[]} allPlayers - List of players.
-    * @param {Array} obstacles - List of obstacles
-    */
+     * Moves the player and resolves collisions.
+     * @param {Player[]} allPlayers - List of players.
+     * @param {Array} obstacles - List of obstacles
+     */
 
      //change name this is horrible 
      //move to sparate file; handle collisions and the world
@@ -189,8 +188,8 @@ export class Player {
      }
 
     /**
-    * Updates the movement state (idle, run, jump, fall).
-    */
+     * Updates the movement state (idle, run, jump, fall).
+     */
     updateMovementState() {
         if (this.vx > 0) {
          this.facingRight = true;
@@ -208,7 +207,6 @@ export class Player {
 
    /**
     * Kills the player and output the reason.
-    *
     * @param {DeathReason} reason - the reason a player dies 
     */
     die(reason) {
@@ -225,8 +223,8 @@ export class Player {
     }
 
      /**
-     * Moves the player to spawn position and prepares respawn animation.
-     */
+      * Moves the player to spawn position and prepares respawn animation.
+      */
     prepareRespawn() {
         this.lifeState = PlayerState.RESPAWNING;
         this.x = this.spawnX;
@@ -235,8 +233,8 @@ export class Player {
     }
 
     /**
-    * Finishes the respawn process and returns the player to gameplay.
-    */
+     * Finishes the respawn process and returns the player to gameplay.
+     */
     //Needs to be moved to a separate class 
      finishRespawn() {
         this.lifeState = PlayerState.ALIVE;

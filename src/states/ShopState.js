@@ -265,6 +265,9 @@ export class ShopState extends State {
 
     /**
      * Attempt to buy one unit of an item. Does NOT end the turn.
+     * @param item
+     * @param player
+     * @param scoreManager
      * @private
      */
     _buyItem(item, player, scoreManager) {
@@ -298,6 +301,11 @@ export class ShopState extends State {
 
     /**
      * Compute the Buy button rect for item index i.
+     * @param i
+     * @param tableTop
+     * @param colW
+     * @param headerH
+     * @param itemsPerCol
      * @private
      */
     _buyBtnRect(i, tableTop, colW, headerH, itemsPerCol) {
@@ -317,6 +325,7 @@ export class ShopState extends State {
 
     /**
      * Return a display colour for an obstacle type.
+     * @param type
      * @private
      */
     _itemColor(type) {

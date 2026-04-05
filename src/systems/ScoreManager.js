@@ -54,7 +54,6 @@ export class ScoreManager {
     /**
      * Called by TimeManager when a player reaches the finish tile.
      * Awards (finish reward + round coins) to wallet, snapshots stats.
-     *
      * @param {Player} player
      * @param {number} rank        — 1-indexed finish position
      * @param {number} elapsedSecs — seconds elapsed since round start
@@ -84,7 +83,6 @@ export class ScoreManager {
     /**
      * Called by TimeManager when a player fails (time up without finishing).
      * Round coins are lost; wallet unchanged; stats snapshotted.
-     *
      * @param {Player} player
      */
     onPlayerFail(player) {
@@ -113,7 +111,6 @@ export class ScoreManager {
      *   3. Among failed:   more coins collected = higher rank (consolation).
      *
      * Also stamps rank back onto each PlayerScore.
-     *
      * @returns {PlayerScore[]}
      */
     getRankedScores() {

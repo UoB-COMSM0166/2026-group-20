@@ -2,6 +2,10 @@ import { PlayerState } from "../config/PlayerState.js";
 import { PlayerMovementState } from "../config/PlayerMovementState.js";
 
 
+/**
+ *
+ * @param player
+ */
 export function DrawPlayer(player) {
       // if (player.playerNo === 0){
       //    player.animationconfig = AnimationConfig; 
