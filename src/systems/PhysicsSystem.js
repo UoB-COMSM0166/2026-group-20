@@ -4,14 +4,7 @@ import { GameConfig } from "../config/GameConfig.js";
 /**
  * Axis-aligned bounding box overlap test.
  * Exported so other modules (e.g. Coin) can import it from one place.
- * @param ax
- * @param ay
- * @param aw
- * @param ah
- * @param bx
- * @param by
- * @param bw
- * @param bh
+ *
  * @returns {boolean} true if the two rectangles overlap
  */
 export function aabbIntersects(ax, ay, aw, ah, bx, by, bw, bh) {

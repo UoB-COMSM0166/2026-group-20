@@ -8,6 +8,10 @@ import { MAP1 as MAP } from './Map1.js';
 /**
  * Returns the tile character at grid position (tx, ty).
  * Treats out-of-bounds positions as solid '#' walls.
+<<<<<<< HEAD
+=======
+ *
+>>>>>>> feature/charSelect
  * @param {number} tx - Tile column index
  * @param {number} ty - Tile row index
  * @returns {string} Single tile character
@@ -37,6 +41,10 @@ export function isSpike(tx, ty) {
 
 /**
  * Draws the full tile map using the active p5 instance.
+<<<<<<< HEAD
+=======
+ *
+>>>>>>> feature/charSelect
  * @param {p5} p - The p5 instance
  */
 export function drawMap(p) {
@@ -67,6 +75,10 @@ export function drawMap(p) {
 /**
  * Parses the active map and returns a Coin instance for every 'C' tile.
  * Call once during setup; the returned array is the live coin list.
+<<<<<<< HEAD
+=======
+ *
+>>>>>>> feature/charSelect
  * @param {p5} p - The p5 instance
  * @returns {Coin[]}
  */

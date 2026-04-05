@@ -5,17 +5,21 @@ import { GameConfig } from './config/GameConfig.js';
 import { MAP } from './maps/MapLoader.js';
 import { BootState }    from './states/BootState.js';
 import { MenuState }    from './states/MenuState.js';
+import { CharSelectState } from './states/CharSelectState.js';
 import { MapMenuState } from './states/MapMenuState.js';
 import { BuildState }   from './states/BuildState.js';
 import { RunState }     from './states/RunState.js';
 import { ResultsState } from './states/ResultsState.js';
 import { ShopState }    from './states/ShopState.js';
 import { Map2State }    from './states/Map2State.js';
-import { AnimationConfig } from "./config/AnimationConfig.js";
-import { AnimationConfig2 } from "./config/AnimationConfig2.js";
+import { AnimationConfigChick } from "./config/AnimationConfigChick.js";
+import { AnimationConfigBunny } from "./config/AnimationConfigBunny.js";
 // import images 
 import chickenSprite from './assets/sprites/chicken_all_frames2.png';
 import bunnySprite from './assets/sprites/bunny_all_frames.png';
+import duckSprite from './assets/sprites/duck_all_frames_flipped.png';
+import polarSprite from './assets/sprites/polar_all_frames_flipped.png';
+
 import saw from './assets/obstacles/Saw/On (38x38).png';
 import fire from './assets/obstacles/Fire/On (16x32).png';
 import trampoline from './assets/obstacles/Trampoline/Jump (28x28).png';
@@ -46,8 +50,6 @@ export const sketch = (p) => {
     let offsetX     = 0;
     let offsetY     = 0;
 
-    let chickenAllFrames;
-    let bunnyAllFrames;
     let sawFrames;
     let fireFrames;
     let trampolineBouncing;
@@ -55,9 +57,16 @@ export const sketch = (p) => {
     let cannonImg;
     let fallingPlatformFrames;
 
+    let chickenSheet;
+    let bunnySheet;
+    let duckSheet;
+    let polarSheet;
+
     p.preload = function(){
-      chickenAllFrames= p.loadImage(chickenSprite);
-      bunnyAllFrames = p.loadImage(bunnySprite); 
+      chickenSheet= p.loadImage(chickenSprite);
+      bunnySheet = p.loadImage(bunnySprite); 
+      duckSheet = p.loadImage(duckSprite); 
+      polarSheet = p.loadImage(polarSprite); 
       sawFrames= p.loadImage(saw); 
       fireFrames = p.loadImage(fire);
       trampolineBouncing = p.loadImage(trampoline); 
@@ -73,9 +82,9 @@ export const sketch = (p) => {
 
         const players      = [
             new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 0, 
-                chickenAllFrames, AnimationConfig),
+                chickenSheet, AnimationConfigChick),
             new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 1, 
-                bunnyAllFrames, AnimationConfig2),
+                bunnySheet, AnimationConfigBunny),
         ];
         const scoreManager = new ScoreManager(players);
 
@@ -91,8 +100,14 @@ export const sketch = (p) => {
             gameHeight,
             players,
             scoreManager,
+            sprites: {
+                chicken: chickenSheet,
+                bunny:   bunnySheet,
+                duck:    duckSheet,
+                polar:   polarSheet,
+            },
             placedObstacles: [],
-            shopHasRun: false, // true after first shop phase; gates strict build-phase token enforcement
+            shopHasRun: false,
         };
 
         const goTo = (stage) => {
@@ -104,6 +119,7 @@ export const sketch = (p) => {
         states = {
             [GameStage.BOOT]:    new BootState(ctx, goTo),
             [GameStage.MENU]:    new MenuState(ctx, goTo),
+            [GameStage.CHAR_SELECT]: new CharSelectState(ctx, goTo),
             [GameStage.MAPMENU]: new MapMenuState(ctx, goTo),
             [GameStage.BUILD]:   new BuildState(ctx, goTo, sawFrames, fireFrames, 
                trampolineBouncing, spikedBallImg, cannonImg, fallingPlatformFrames),

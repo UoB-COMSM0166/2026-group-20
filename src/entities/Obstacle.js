@@ -72,9 +72,6 @@ export class Obstacle {
     carryPlayers(_players) {}
 
     splitAnimation(frameWidth,frameHeight){
-      //const frameWidth=38;
-      //const frameHeight=38;
-
       for(let j=0; j<this.obstacleSheet.width; j+=frameWidth){
          let frame= this.obstacleSheet.get(j,0,frameWidth,frameHeight);
          this.framesArr.push(frame);

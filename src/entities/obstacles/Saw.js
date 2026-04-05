@@ -68,23 +68,15 @@ export class Saw extends Obstacle {
 
         p.push();
         p.translate(cx, cy);
-        //p.image(this.framesArr[this.frameIndex], cx, cy);
-        //this.frameIndex = (this.frameIndex+1)% this.framesArr.length;
-         //p.rotate(this._angle);  // you can re-enable this now
          if (frame) {
             p.image(frame, -frame.width / 2, -frame.height / 2);  // centred at origin
          }
          this.frameIndex = (this.frameIndex + 1) % this.framesArr.length;
 
-       // p.rotate(this._angle);
-        //p.noStroke();
-
-        //this._drawBlade(p, T);
-
         p.pop();
     }
 
-    // ── Build-phase ghost ─────────────────────────────────────────────────
+    // ── Build-phase ghost 
 
     /**
      * Draw a semi-transparent placement preview (no rotation).
@@ -100,23 +92,6 @@ export class Saw extends Obstacle {
         p.tint(255, 150);
         p.image(sheet, x, y, T, T, 0, 0, frameW, frameH);
         p.pop();
-
-        // const cx = x + T / 2;
-        // const cy = y + T / 2;
-
-        // p.push();
-        // p.translate(cx, cy);
-        // p.noStroke();
-
-        // // Outer ring
-        // p.fill(200, 60, 60, 100);
-        // p.circle(0, 0, T * 0.84);
-
-        // // Hub
-        // p.fill(160, 50, 50, 100);
-        // p.circle(0, 0, T * 0.28);
-
-        // p.pop();
     }
 
     // ── Private ───────────────────────────────────────────────────────────

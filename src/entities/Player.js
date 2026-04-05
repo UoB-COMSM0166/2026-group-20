@@ -35,14 +35,14 @@ export class Player {
         this.maxFall = GameConfig.MAX_FALL_SPEED;
         this.skin = GameConfig.SKIN_WIDTH;
 
-        //Double jump 
-        this.maxJumps=2;
-        this.jumpsLeft=this.maxJumps;
-        this.secondJump=false;
-         //
-        this.lifeState = PlayerState.ALIVE;
+        // Double jump
+        this.maxJumps  = 2;
+        this.jumpsLeft = this.maxJumps;
+        this.secondJump = false;
+
+        this.lifeState     = PlayerState.ALIVE;
         this.movementState = PlayerMovementState.IDLE;
-        this.gameState = PlayerGameState.PLAYING;
+        this.gameState     = PlayerGameState.PLAYING;
         this.lastDeathReason = null;
 
         /**
@@ -71,36 +71,70 @@ export class Player {
         //this.state = PlayerMovementState.IDLE;
         this.facingRight = true;
 
+        /**
+         * Speed multiplier applied this frame by IceBlock.
+         * 1.0 = normal. IceBlock sets it to > 1 while player is inside.
+         * Reset to 1.0 at the start of every horizontalMovement() call.
+         */
+        this.speedMultiplier = 1.0;
+
+        /**
+         * Persistent obstacle inventory — survives across rounds.
+         * Map of ObstacleType string → count.
+         * Populated by ShopState, consumed by BuildState.
+         * @type {Map<string, number>}
+         */
+        this.inventory = new Map();
+
+        this.input        = new HandleInput(p, playerNo);
+        this.facingRight  = true;
         this.respawnCountdown = 0;
-        this.spriteSheet = spriteSheet;
-        this.framesArr=[];
 
-        //split frames 
-        this.splitAnimation();
+        // ── Sprite animation ─
+        this.spriteSheet     = spriteSheet ?? null;
+        this.framesArr       = [];
+        this.frameIndexIdle       = 0;
+        this.frameIndexRun        = 0;
+        this.frameIndexJump       = 0;
+        this.frameIndexFall       = 0;
+        this.frameIndexRespawning = 0;
+        /** Animation frame-index map set by setSprite() or DrawPlayer. */
+        this.animConfig      = null;
 
-         this.frameIndexIdle=0;
-         this.frameIndexRun=0;
-         this.frameIndexJump=0;
-         this.frameIndexFall=0;
-         this.frameIndexRespawning=0;
-         this.animationconfig=animationconfig; 
+        if (this.spriteSheet) {
+            this._splitAnimation();
+        }
+    }
 
-      }
-   
     /**
-     * Splits the sprite sheet into individual frames.
+     * Assign a new sprite sheet and animation config at runtime.
+     * Called by CharSelectState after the player picks a character.
+     * @param {p5.Image} sheet
+     * @param {object}   animConfig
      */
-    splitAnimation(){
-      const frameWidth= 28;
-      const frameHeight= 34;
+    setSprite(sheet, animConfig) {
+        this.spriteSheet          = sheet;
+        this.animConfig           = animConfig;
+        this.framesArr            = [];
+        this.frameIndexIdle       = 0;
+        this.frameIndexRun        = 0;
+        this.frameIndexJump       = 0;
+        this.frameIndexFall       = 0;
+        this.frameIndexRespawning = 0;
+        this._splitAnimation();
+    }
 
-      for(let j=0; j<this.spriteSheet.width;j+=frameWidth){
-            let frame= this.spriteSheet.get(j,0,frameWidth,frameHeight);
-            this.framesArr.push(frame);
-         }
-      }
-    //}
-    
+    /**
+     * Slice the horizontal sprite sheet into individual 28×34 frames.
+     * @private
+     */
+    _splitAnimation() {
+        const fw = this.w;
+        const fh = this.h;
+        for (let x = 0; x < this.spriteSheet.width; x += fw) {
+            this.framesArr.push(this.spriteSheet.get(x, 0, fw, fh));
+        }
+    }
 
     /**
      * Handles horizontal player movement based on input.

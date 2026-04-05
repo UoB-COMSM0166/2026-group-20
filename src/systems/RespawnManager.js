@@ -13,6 +13,10 @@ export class RespawnManager {
     /**
      * Kills a player and queues them for respawn.
      * Also increments their death count in ScoreManager if one is set.
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> feature/charSelect
      * @param {Player} player
      * @param {string} reason - DeathReason value
      */

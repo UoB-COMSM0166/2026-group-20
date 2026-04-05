@@ -206,21 +206,13 @@ export class Cannon extends Obstacle {
         p.push();
         p.translate(x+T/2, y+T/2);
         p.rotate(Cannon._staticAngle(direction));
-        // p.noStroke();
-        // p.fill(80, 80, 90, 130);
-        // p.rect(-T * 0.35, -T * 0.35, T * 0.7, T * 0.7, 4);
-        // p.fill(60, 60, 70, 130);
-        // p.rect(0, -T * 0.12, T * 0.45, T * 0.24, 3);
         p.tint(255, 150);
         p.scale(-1, 1);
-        //p.image(sheet, x, y, frameW, frameH, 0, 0, frameW, frameH);
         p.image(sheet, -dw/2, -dh/2, dw, dh);
-        //p.image(sheet, -frameW / 2, -frameH / 2, frameW*1.6, frameH*1.6, 0, 0, frameW, frameH); 
         p.pop();
     }
 
-    // ── Private ───────────────────────────────────────────────────────────
-
+    // ── Private ───
     /**
      * Spawn one projectile from the cannon mouth, travelling in this.direction.
      * @private
@@ -262,49 +254,11 @@ export class Cannon extends Obstacle {
         p.push();
         p.translate(cx, cy);
         p.rotate(this._angle);
-        // p.image(this.obstacleSheet, -this.cannonW, -this.cannonH); 
         p.scale(-1, 1);
-        //this.obstacleSheet.resize(55, 34);
         p.image(this.obstacleSheet, -dw/2, -dh/2, dw, dh);
         p.noSmooth();
-        //p.noStroke();
-
-        // Base — dark iron square
-        // p.fill(70, 70, 80);
-        // p.rect(-T * 0.35, -T * 0.35, T * 0.7, T * 0.7, 4);
-
-        // Base highlight
-        // p.fill(100, 100, 110);
-        // p.rect(-T * 0.35, -T * 0.35, T * 0.7, T * 0.12, 4);
-
-        // Barrel — pointing right before rotation
-        // p.fill(55, 55, 65);
-        // p.rect(0, -T * 0.12, T * 0.48, T * 0.24, 3);
-
-        // Barrel mouth ring
-        // p.fill(40, 40, 48);
-        // p.rect(T * 0.38, -T * 0.14, T * 0.12, T * 0.28, 2);
-
-        // Wheel hub decoration
-        // p.fill(50, 50, 58);
-        // p.circle(0, 0, T * 0.22);
-        // p.fill(80, 80, 90);
-        // p.circle(0, 0, T * 0.1);
-
-        // Direction indicator dot so it's readable in build phase
-
-        //what is this for
-        //p.fill(220, 80, 80);
-        //p.circle(T * 0.22, 0, T * 0.1);
-
+        
         p.pop();
-
-        // Outline
-        // p.stroke(40, 40, 50);
-        // p.strokeWeight(1.5);
-        // p.noFill();
-        // p.rect(this.x, this.y, T, T, 3);
-        // p.noStroke();
     }
 
     /**

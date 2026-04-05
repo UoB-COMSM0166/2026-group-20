@@ -62,40 +62,6 @@ export class Flame extends Obstacle {
          }
          this.frameIndex = (this.frameIndex + 1) % this.framesArr.length;
 
-
-        // Base embers (always visible)
-      //   p.noStroke();
-      //   p.fill(180, 80, 20, 200);
-      //   p.circle(cx, cy - 4, 10);
-      //   p.fill(220, 120, 30, 180);
-      //   p.circle(cx - 5, cy - 2, 7);
-      //   p.circle(cx + 4, cy - 3, 6);
-
-      //   if (!this._active) return; // inactive — only embers shown
-
-      //   // Flicker offset
-      //   const flicker = Math.sin(this._age * 0.018) * 3;
-      //   const phase   = this._timer / GameConfig.FLAME_ON_MS;
-
-      //   // Outer flame (large, orange)
-      //   p.fill(240, 100, 20, 200);
-      //   p.ellipse(cx + flicker * 0.5, cy - T * 0.45, T * 0.65, T * 0.9);
-
-      //   // Mid flame (yellow-orange)
-      //   p.fill(255, 180, 40, 220);
-      //   p.ellipse(cx - flicker * 0.3, cy - T * 0.52, T * 0.42, T * 0.72);
-
-      //   // Inner core (bright yellow-white)
-      //   p.fill(255, 240, 120, 240);
-      //   p.ellipse(cx + flicker * 0.1, cy - T * 0.55, T * 0.22, T * 0.42);
-
-      //   // Fade-out near end of active period
-      //   if (phase > 0.75) {
-      //       const fadeAlpha = (1 - phase) / 0.25 * 160;
-      //       p.fill(20, 20, 20, fadeAlpha);
-      //       p.ellipse(cx, cy - T * 0.45, T * 0.65, T * 0.9);
-      //   }
-
        p.pop();
     }
 
@@ -105,18 +71,11 @@ export class Flame extends Obstacle {
         const cy = y + T;
         const frameW = 16;
         const frameH = 32;
-        p.push();
-       
+        p.push(); 
         p.translate(cx, cy);
         p.tint(255, 150);
         p.image(sheet, -frameW/2, -frameH, frameW, frameH, 0, 0, frameW, frameH);
-        //p.image(sheet, -frameW/2, -frameH/2, frameW, frameH);
         p.pop();
 
-        // p.noStroke();
-        // p.fill(240, 100, 20, 100);
-        // p.ellipse(cx, cy - T * 0.45, T * 0.65, T * 0.9);
-        // p.fill(255, 180, 40, 120);
-        // p.ellipse(cx, cy - T * 0.52, T * 0.42, T * 0.72);
     }
 }

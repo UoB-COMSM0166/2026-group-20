@@ -30,6 +30,10 @@ export class Scoreboard {
     /**
      * Render the full scoreboard overlay.
      * Call every frame while isGameOver is true.
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> feature/charSelect
      * @param {ScoreManager} scoreManager
      */
     render(scoreManager) {
@@ -159,8 +163,11 @@ export class Scoreboard {
 
     /**
      * Returns x-centre positions for each column given a panel origin and width.
+<<<<<<< HEAD
      * @param panelX
      * @param panelW
+=======
+>>>>>>> feature/charSelect
      * @private
      */
     _colPositions(panelX, panelW) {
