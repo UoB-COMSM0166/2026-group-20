@@ -236,6 +236,14 @@ add class diagram here
 
 ### 3.2 Entities 
 **Entities** represent the main objects within the game world, such as players, coins and obstacles. To align with the ECS architecture, these entities mainly function as containers for data and properties rather than implementing complex internal logic. This structure is supported by a data-driven design approach (ref 5, p1025), where specific parameters such as movement speed and initial jump velocity are stored in configuration files in the `config` folder. As described by **change to author name**(ref p1024), this separation could improve development iteration speed and system maintainability.
+<<<<<<< HEAD
+=======
+
+**add class diagram here**
+
+#### 3.2 Entities 
+**Entities** represent the main objects within the game world, such as players, coins and obstacles. To align with the hybrid ECS-inspired architecture, these entities mainly function as containers for data and properties rather than implementing complex internal logic. This structure is supported by a data-driven design approach (ref 5, p1025), where specific parameters such as movement speed and initial jump velocity are stored in configuration files in the `config` folder. As described by **change to author name**(ref p1024), this separation could improve development iteration speed and system maintainability.
+>>>>>>> 10424a559613e909c0c29034932ad5b8cde8a976
 
 During runtime, entities are updated through the **game loop**. The entities are stored in a list, and the `update()` function iterates through this list during each frame to update the state of each entity sequentially. This mechanism ensures that all entities are updated consistently during each iteration of the simulation.
 
