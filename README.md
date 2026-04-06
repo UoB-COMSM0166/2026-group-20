@@ -44,7 +44,7 @@ GROUP PHOTO. Add a group photo here.
 
 <h2 align="center">Project Report</h2>
 
-### 1. Introduction
+## 1. Introduction
 
 - 5% ~250 words
 - Describe your game, what is based on, what makes it novel? (what's the "twist"?)
@@ -52,13 +52,13 @@ GROUP PHOTO. Add a group photo here.
 
 
 
-### 2. Requirements
+## 2. Requirements
 
 -> outlines the requirements engineering process (15% ~750 words)
 
 Our team began by brainstorming various game ideas and collectively selected the concept to develop. After the game was selected, we identified the stakeholders to understand who would be affected by the system and whose needs should be considered during the design process. Based on this understanding, we outlined epics for the game's key features, followed by user stories describing the detailed functional requirements. 
 
-#### 2.1 Ideation and Game Selection
+### 2.1 Ideation and Game Selection
 
 -> how the idea started
 
@@ -82,7 +82,7 @@ Based on this comparison, **The Ultimate Chicken Horse** was selected as the bas
 
 -> Add Appendix A: selection process
 
-#### 2.2 Stakeholders 
+### 2.2 Stakeholders 
 
 -> who is involved
 
@@ -101,7 +101,7 @@ Given the academic context of our game, we did not need to account for legal or 
 
 - **Other students**: As peer testers, they provide critical feedbacks on bugs and playability.
 
-#### 2.3 Epics
+### 2.3 Epics
 
 -> high level requirements
 
@@ -114,7 +114,7 @@ Building on our stakeholder analysis, we defined a set of epics (high-level requ
 | **Lecturers** | • Learning concept integration and application <br> • Clear demonstration of technical challenges <br> • Achievable within the project timeline <br> • Collaborative work <br> • Continuous progress updates <br> • Originality  |
 | **Students** | • Social features <br> • Easy to pick up <br> • Short game sessions |
 
-#### 2.4 System Requirements
+### 2.4 System Requirements
 After defining the epics, we created a set of system requirements to describe what the game should do and how it should perform. The following table outlines the key requirements for the development.
 
 **Functional Requirements**
@@ -139,32 +139,32 @@ After defining the epics, we created a set of system requirements to describe wh
 | NFR-3 | Usability | The game interface shall be easy to understand for new players. | 
 | NFR-4 | Performance | The game shall maintain smooth gameplay without noticeable lag during play. | 
 
-#### 2.5 User Stories
+### 2.5 User Stories
 
 -> detailed requirements
 
 We deconstructed epics into a set of user stories to describe the specific features and functionalities of the game from the perspective of the identified stakeholders.
 
-#### Students
+### Students
 
 - As a student, I want the game to have a multiplayer mode, so that I can play with my friends.
 - As a student, I want the game to have intuitive controls/mechanics, so that I can start playing right away.
 - As a student, I want a game run/level to be short enough so that I can play between class breaks.
 
-#### Lecturers
+### Lecturers
 
 - As a lecturer, I want the game to clearly demonstrate applied programming concepts (e.g., OOP, game logic, UI handling), so that learning outcomes are achieved.
 - As a lecturer, I want the game to include defined challenges with measurable outcomes, so that student understanding can be evaluated.
 - As a lecturer, I want clear evidence of teamwork (shared commits, divided responsibilities, group meeting notes etc.), so that collaboration skills are demonstrated.
 
-#### Gamers
+### Gamers
 
 - As a gamer, I want a scoreboard, so that I can track my performance and try to beat my high score.
 - As a gamer, I want a short interactive tutorial, so that I can quickly understand how to play.
 - As a gamer, I want intuitive menus and clear navigation, so that I can easily access and play the game without confusion.
 - As a gamer, I want responsive sound effects and visual feedback for my actions, so that the game feels immersive and satisfying.
 
-#### 2.6 Use Case Diagram
+### 2.6 Use Case Diagram
 
 Based on the requirements identified in the previous section, the system design was developed to support the key gameplay interactions. The following use case diagram illustrates the interactions between the player and the game system. 
 
@@ -219,38 +219,39 @@ flowchart LR
     style TheGame fill:#ffffff,stroke:#000000
 ```
 
-### 3. Design
+## 3. Design
 
 (15% ~750 words)
 
 - System architecture. Class diagrams, behavioural diagrams.
 
-#### 3.1 System Architecture Overview
+### 3.1 System Architecture Overview
 
 The project adopts a modular game architecture that combines **Entity–Component–System (ECS) architecture**(in ref 6) and traditional **object-centric design (OCD) architecture** (in ref 5). In a pure ECS architecture, entities are simple identifiers that store data, while systems contain all the logic that processes this data. In contrast, traditional OOP designs usually combine data and behaviour within the same class. For example, in an OCD design, a **Player** class might manage its own position, movement logic and collision detection within a single object. In a pure ECS design, the player would instead store data, while external systems would handle all gameplay logic.
 
 
 The system architecture in this project follows a hybrid approach, which combines some aspects of both ECS and OCD. The player is represented as an **entity** that stores data such as position and movement speed, whereas certain gameplay behaviours are handled by independent systems. For instance, the Physics System processes collision detection between the player and obstacles, and the Respawn Manager handles resetting the player when the character collides with a hazard. However, some game logic, such as the player’s movement, remains implemented within the player object itself.
 
-This hybrid architectural approach is reflected in the organisation of the project’s codebase. The codebase is organised into several folders: `entities`, `systems`, `state`, `config` and `UI`. Each is responsible for a specific aspect of the game.
+add class diagram here 
 
-#### 3.2 Entities 
-**Entities** represent the main objects within the game world, such as players, coins and obstacles. To align with the hybrid ECS-inspired architecture, these entities mainly function as containers for data and properties rather than implementing complex internal logic. This structure is supported by a data-driven design approach (ref 5, p1025), where specific parameters such as movement speed and initial jump velocity are stored in configuration files in the `config` folder. As described by **change to author name**(ref p1024), this separation could improve development iteration speed and system maintainability.
+### 3.2 Entities 
+**Entities** represent the main objects within the game world, such as players, coins and obstacles. To align with the ECS architecture, these entities mainly function as containers for data and properties rather than implementing complex internal logic. This structure is supported by a data-driven design approach (ref 5, p1025), where specific parameters such as movement speed and initial jump velocity are stored in configuration files in the `config` folder. As described by **change to author name**(ref p1024), this separation could improve development iteration speed and system maintainability.
 
 During runtime, entities are updated through the **game loop**. The entities are stored in a list, and the `update()` function iterates through this list during each frame to update the state of each entity sequentially. This mechanism ensures that all entities are updated consistently during each iteration of the simulation.
 
 (p1088 in 5) 
  
-#### 3.3 Systems
+### 3.3 Systems
 **Systems** are responsible for processing behaviours associated with different enities and implementing core gameplay mechanics. While **entities** mainly store data, **systems** contain the logic that operates on this data during each iteration of the game loop. These systems are implemented within the `system` directory. 
 
-Examples of systems include:
+Example of system include: 
+should we list all? or some?
 
-- Physics System - detects collisions between the player and other entities (e.g. coins or obstacles)
+- `Physics System` - detects collisions between the player and other entities (e.g. coins or obstacles)
 
-- Respawn Manager - manager the respawning of the players and ensures they are correctly repositioned at the starting point.
+- `Respawn Manager` - manager the respawning of the players and ensures they are correctly repositioned at the starting point.
 
-- Time Manager - manager gameplay timing during a round.
+- `Time Manager` - manager gameplay timing during a round.
 
 The following sequence diagram display how the plater interact with these systems during gameplay.
 ```mermaid
@@ -293,19 +294,19 @@ sequenceDiagram
 ```
 
 
-#### 3.4 Finite State Machine (FSM)
+### 3.4 Finite State Machine (FSM)
 The overall flow of the game is controlled using a **Finite State Machine** implemented in `state` folder. Each state represents a different phase of the game, and only one state can be active at any given time. This ensures that the game transitions between different phases in a predictable manner. 
 
 The lifecycle of the game follows several states:
 
-- Boot state - loads the game briefing 
+- `Boot state` - loads the game briefing 
 
-- Build state - 
-- Map Menu state - 
-- Play State - 
-- Result State - 
-- Run State - 
-- Shop State - 
+- `Build state` - 
+- `Map Menu state` - 
+- `Play State` - 
+- `Result State` - 
+- `Run State`- 
+- `Shop State` - 
 
 The following diagram illustrates the transitions between different game states.
 
@@ -333,10 +334,10 @@ stateDiagram
 ```
 
 
-#### 3.5 User Interface
-The user interface components, located in the `UI` directory, are responsible for managing the presentation layer of the game. The UI is responsible only for displaying information to the player and does not directly control gameplay logic. The interface includes elements such as the heads-up display (HUD) and the scoreboard. 
+### 3.5 User Interface
+The user interface components are located in the `UI` directory and are responsible for managing the presentation layer of the game. These components include elements such as the heads-up display (HUD), score indicators and timers. The UI layer is separated from gameplay logic to maintain a clear separation between presentation and game mechanics.
 
-#### 3.6 Rescource Manager 
+### 3.6 Rescource Manager 
 p493 in ref 5 
 
 The game utilises a resource management system to handle game assets. (ref 5 p571)
@@ -345,59 +346,79 @@ The game processes player input through Human Interface Devices (HID) such as ke
 
 Quoted: Every resource manager is comprised of two distinct but integrated components.One component manages the chain of offline tools used to create the assets and transform them into their engine-ready form. The other component manages the resources at runtime, ensuring that they are loaded into memory in advance of being needed by the game and making sure they are unloaded from memory when no longer needed. 
 
+### 3.7 Asset Pipeline and Formats
+The game utilises various asset types. Each asset type is managed by a corresponding resource manager to handle the loading and management of game resources during runtime. The main asset categories are:
 
-### 4. Implementation
+- **Visual Assets**: Sprite sheets (PNG) for players, obstacles and other entities.
+
+- **Audio Assets**: 
+
+- **Data Assets**: configuration files (JSON) that define gameplay parameters for map titles.
+
+## 4. Implementation
 
 (15% ~750 words)
 
 - Describe implementation of your game, in particular highlighting the TWO areas of _technical challenge_ in developing your game.
 
-note: How the game was built, code architecture 
+## 4.1 Implementaion Overall
+The game was implemented using a modular architecture that follows the hybrid Entity–Component–System (ECS) and object-oriented design described in Section 3. To ensure a clean execution environment, the project utilises **p5.js instance mode** (add ref), which encapsulates the sketch within a dedicated object and prevents conflicts in the global namespace. The codebase is organised into several modules: `entities`, `systems`, `state`, `config` and `UI`, each responsible for a specific part of the game logic.
 
-### 4.2 
+Within this structure, `sketch.js` acts as the main entry point and controller of the game. In `sketch.js`, the `setup()` function initialises the game environment and loading required resources, while the `draw()` function runs continuously as the main game loop. During each frame, the game first processes player input and updates the state of game entities. It then executes gameplay systems responsible for core mechanics such as collision detection, respawning and timing control.
 
-### 4.3 Technical Challenge 1 (250 words)
+Player entities respond to keyboard input to perform actions such as movement and jumping. Systems such as `Physics System`, `Respawn Manager` and `Time Manager` operate on these entities to handle interactions with obstacles, player resets and gameplay timing. Finally, the updated game state is rendered to the screen. 
 
-### 4.4 Technical Challenge 2 (250 words)
+## 4.2 Technical Challenge 1: CI/CD Pipeline 
+
+## 4.3 Technical Challenge 2: AI 
 
 
-
-### 5. Evaluation
+## 5. Evaluation
 
 (15% ~750 words)
 - One qualitative evaluation (of your choice)
 - One quantitative evaluation (of your choice)
 - Description of how code was tested.
 
-To ensure a robust evaluation of the game’s usability and user experience, we used a mixed-methods approach consisting of the think-aloud method, heuristic evaluation, the System Usability Scale and NASA-TLX. These methods allowed us to identify usability issues and measure user satisfaction so that we could improve later versions of the game. 
+Evaluating the game’s usability and user experience is essential for identifying design issues and improving future iterations. In this project, we adopted a mixed-methods approach consisting of the **think-aloud method**, **heuristic evaluation**, **the System Usability Scale** and **NASA-TLX**. These methods allowed us to identify usability issues and measure user satisfaction so that we could improve later versions of the game. 
 
-#### 5.1 Qualitative Evaluation
-(add paragraph)
+### 5.1 Qualitative Evaluation
+The qualitative evaluation aimed to identify usability problems and understand how players interact with the game. Twenty participants, including classmates and attendees of the Testathon event, were recruited to play the game while verbalising their thoughts using the think-aloud method. During the evaluation, participants were instructed to complete the game by reaching the goal while avoiding obstacles. Their verbal feedback and in-game behaviours were recorded and analysed to identify common usability issues. To complement these findings, a heuristic evaluation based on Nielsen’s usability heuristics was conducted to provide a systematic assessment of interface design flaws and the overall user experience.
 
 <div align="center">
 <img src="docs/assets/gif/v0.1.0.gif" alt="Basic version" width="400">
 </div>
+<div align="center">
+<p><em>Figure ?: The version of the game used in the qualitative evaluation.</em></p>
+</div>
 
 **A. Think Aloud**
-
-The think-aloud method was selected for its efficiency and minimal commitment from participants. During this method, users were asked to verbalise their thoughts while playing the game. This enables us to identify specific usability bottlenecks and understand the reasoning behind user errors as they occurred.
+The think-aloud approach is widely used in usability studies because it provides rich qualitative data while requiring relatively little preparation or participant commitment (ref 1). We chose this approach to efficiently identify usability issues and better understand how players interact with the game during gameplay. During this method, users were asked to verbalise their thoughts while playing the game. This approach enabled us to identify specific usability bottlenecks and understand the reasoning behind user errors as they occurred.
 
 - Most users agreed the player movement controls were smooth. 
 - Some users were not aware there was a time limit in the game. 
 - Some users did not know realise the game is designed for two players.
 - Some users did not know the red triangle is an spike.
-- Some users did not know how to start the game as the start button had low constrast with the background
+- Some users did not know how to start the game as the start button had low constrast with the background.
 - The goal was difficult to be identified as it was displayed in light green. 
 - The goal detection only worked one edge. The second player had to jump over the other player to trigger finish. 
 - Most users were unaware that the character could perform a double jump.
 - Some players reported that the two players start at slightly different positions, which makes the distance to the goal uneven and the game is unfair. 
 - One user reported that the message “Game Over” was discouraging.
-- Some users felt that the user interface was too 
+- Some users felt that the user interface was too simple.   
 - Most users reported there were no instructions that explain the key controls for the game.
 
 **B. Heuristic Evaluation**
 
-To complement user testing, we conducted a Nielsen’s heuristic evaluation, a well-established approach to identify usability issues. This method allowed us to evaluate the interface and identify potential design problems based on recognised usability guidelines.
+To complement user testing, we conducted a Nielsen’s heuristic evaluation. This method was selected because it is a well-established and cost-effective approach for identifying usability issues (ref 2). It enabled us to systematically evaluate the interface and identify potential design problems based on recognised usability guidelines. 
+
+Table ? presents the usability issues identified during the heuristic evaluation.
+
+The severity score was calculated by averaging the ratings for frequency, impact and persistence of each problem. From Table ?, we could see that the most severe problem identified was the lack of visual guidance. Many participants were unsure what actions were required to complete the game. In particular, several players did not realise that the game was designed for two players, nor that they needed to avoid obstacles and reach the goal to finish the level. 
+
+The second most severe issue was the absence of instructions for the game controls. Since this is a two-player game, it is essential to clearly display the keyboard controls for each player at the beginning of the game. During the test, several participants appeared confused about how to control their characters. 
+
+Therefore, these two issues should be prioritised during the development process to ensure the players can clearly understand the game mechanics and controls in our final product. 
 
 | Problem No. | Issues | Heuristics Violated | Frequency (0-4) | Impact (0-4) | Persistence (0-4) | Severity |
 | :---: |:---:|:---:|:---:|:---:|:---:|:---:|
@@ -408,13 +429,20 @@ To complement user testing, we conducted a Nielsen’s heuristic evaluation, a w
 | 5 | Players started at different positions (an uneven distance to the goal) | H4 – Consistency and Standards | 1 | 1 | 4 | 2.0 |
 | 6 | No undo or quick restart option for mistakes | H3 - User Control and Freedom | 3 | 4 | 2 | 3.0 |
 
+<div align="center">
+<p><em>Figure ?: Usability issues identified in the heuristic evaluation (Presntation of the table was adapted from ref 4).</em></p>
+</div>
 
-The presentation of this table is adapted from the template (4).
 
-#### 5.2. Quantitative Evaluation
-(add why chose these two tests)
-We conducted a quantitative evaluation to obtain objective and measurable evidence regarding the usability and perceived workload of the two versions of the game. This allowed us to determine whether the increased difficulty affected the usability of the game or the workload experienced by players.
-s
+### 5.2. Quantitative Evaluation
+According to **author name** (ref 7), usabilty does not exist in any absolute sense but must be evaluated in relation to the context in which a system in used. To systematically measure usability and user experience within the context of our game, we adopted two widely used evaluation instruments: the System Usability Scale (SUS) and the NASA Task Load Index (NASA-TLX). 
+
+SUS provides a quick and reliable measure of overall usability, allowing comparison with established benchmarks. NASA-TLX measures perceived workload across several dimensions, including mental demand, effort, and frustration. Using both metrics allows the evaluation to capture not only usability but also the cognitive effort required to play the game.
+
+To perform this evaluation, we recruited ten participants to play both the basic version and the harder version of the game (see Figure ?). After playing each version, participants were asked to completed the SUS and NASA-TLX questionnaires to assess the usability of the game and the workload experienced during gameplay.
+
+The collected responses were then converted into numerical scores according to the standard scoring procedures for SUS and NASA-TLX.
+
 <table align="center">
   <tr>
     <th><p align="center">Basic Version</p></th>
@@ -425,56 +453,100 @@ s
     <td><img src="docs/assets/gif/v0.1.0_harder.gif" alt="Harder version" width="400"></td>
   </tr>
 </table>
+<div align="center">
+<p><em>Figure ?: The versions of the game used in quantitative evaluation.</em></p>
+</div>
 
-To perform this evaluation, we recruited ten participants to play both the basic version and the harder version of the game. After completing each version, participants were asked to complete two standardised questionnaires: the System Usability Scale (SUS) and the NASA Task Load Index (NASA-TLX). The SUS questionnaire was used to measure the overall usability of the game, while the NASA-TLX questionnaire was used to assess the perceived workload experienced by players during gameplay.
 
-The collected responses were then converted into numerical scores according to the standard scoring procedures for SUS and NASA-TLX. 
+To analyse the data, Wilcoxon signed-rank tests were conducted to compare the perceived workload between the basic and harder versions of the game. This non-parametric test was chosen because NASA-TLX responses are measured on ordinal scales. Statistical significance was determined with a threshold of $p < 0.05$.  
+
 
 **A. NASA-TLX**
 
- (add analytical methods)
+The results are summarised in Table ? and plotted in Figure ? and ?. The results indicate that participants experienced a significantly higher workload when playing the harder version of the game compared to the basic version (p = 0.032). This increase in perceived workload was primarily driven by higher ratings in mental demand (p = 0.002), effort (p = 0.003), and frustration (p = 0.046). These findings suggest that the harder version required greater cognitive effort from players and led to increased frustration during gameplay compared to the basic version. This outcome is consistent with the intended design goal of creating a more challenging gameplay experience.
 
-Our NASA-TLX results indicate that participants experienced a significantly higher workload when playing the harder version of the game, compared to the basic version (p = 0.032). This increase in perceived workload was primarily driven by higher ratings in mental demand (p = 0.002), effort (p = 0.003), and frustration (p = 0.046). These findings suggest that the harder version required greater cognitive effort from players and led to increased frustration during gameplay compared to the basic version. This outcome is consistent with the intended design goal of creating a more challenging gameplay experience.
+<div align="center">
+
+| <div align="center">NASA-TLX Dimension<div> | <div align="center"> Basic Version<div> | <div align="center"> Harder Version <div>| <div align="center"> p-value <div>|
+| :---: | :---: | :---: | :---: | 
+| Mental Demand | 4.9 $\pm$ 3.7 | 14.5 $\pm$ 3.1 | **0.002** |
+| Physical Demand | 6.0 $\pm$ 5.5 | 9.6 $\pm$ 4.5 | 0.078 |
+| Temporal Demand | 6.8 $\pm$ 5.9 | 8.4 $\pm$ 5.7 | 0.219 |
+| Performance | 5.0 $\pm$ 6.3 | 5.6 $\pm$ 3.3 | 0.813 |
+| Effort | 4.9 $\pm$ 3.0 | 13.5 $\pm$ 3.3 | **0.004** |
+| Frustration | 3.0 $\pm$ 3.8 | 9.9 $\pm$ 6.8 | 0.047 |
+| **Overall Workload** | **5.1 $\pm$ 1.2** | **10.3 $\pm$ 3.0** | 0.031 |
+<p><em>Table ?: A summary of the NASA-TLX statistical results.</em></p>
+</div>
 
 
 <div align="center">
     <img src="docs/quantitative-evaluation/NASA_all.png" alt="NASA TLX Results (All)" width="600">
+    <p><em>Figure ?: NASA-TLX workload scores for each dimension across the two game versions.</em></p>
+</div>
+
+<div align="center">
     <img src="docs/quantitative-evaluation/NASA_ave.png" alt="NASA TLX Results" width="300">
+    <p><em>Table ?: NASA-TLX overall workload across the two game versions.</em></p>
 </div>
 
 
 **B. System Usability Scale (SUS)**
 
-Our SUS results showed no significant difference in usability between the two versions of the game. A SUS score of approximately 68 is generally considered average usability, while scores above 80 indicate excellent usability. The SUS scores obtained in this evaluation (Basic: 70.75, Hard: 64.25) suggest that the usability of the game is currently around the average level. This indicates that increase in difficulty did not negatively affect the usability of the game, as players were still able to understand and interact with the game mechanics in both versions.
+Our SUS results showed no significant difference in usability between the two versions of the game ($p > 0.05$). A SUS score of approximately 68 is generally considered average usability, while scores above 80 indicate excellent usability. The SUS scores obtained in this evaluation (Basic: 70.75, Hard: 64.25) suggest that the usability of the game is currently around the average level. This indicates that the increase in difficulty did not negatively affect the usability of the game, as players were still able to understand and interact with the game mechanics in both versions.
 
 However, while the usability is acceptable at this stage, the results also suggest that there is room for improvement to achieve a higher SUS score (e.g. above 80). In particular, feedback from testers suggested that the game could benefit from more intuitive keyboard controls and improved game stage management. For example, a tester reported that they could not undo or adjust obstacles if they were placed incorrectly. Therefore, this feedback will be considered in future iterations of the game in order to improve the overall usability.
 
- (add sentences saying no statistical significance found)
+
+<div align="center">
+
+| <div align="center">Question</div> | <div align="center">Basic Version</div> | <div align="center">Harder Version</div> | <div align="center">p-value</div> |
+| :---: | :---: | :---: | :---: |
+| Q1 | 2.6 $\pm$ 0.8 | 3.0 $\pm$ 1.2 | 0.516 |
+| Q2 | 1.8 $\pm$ 1.1 | 2.2 $\pm$ 1.3 | 0.500 |
+| Q3 | 3.2 $\pm$ 1.5 | 3.5 $\pm$ 0.9 | 0.574 |
+| Q4 | 1.5 $\pm$ 0.8 | 2.4 $\pm$ 1.6 | 0.125 |
+| Q5 | 3.2 $\pm$ 0.6 | 3.4 $\pm$ 1.6 | 0.734 |
+| Q6 | 1.9 $\pm$ 0.8 | 2.4 $\pm$ 1.4 | 0.250 |
+| Q7 | 3.8 $\pm$ 1.2 | 3.5 $\pm$ 1.4 | 0.531 |
+| Q8 | 2.0 $\pm$ 1.0 | 1.7 $\pm$ 0.9 | 0.500 |
+| Q9 | 4.0 $\pm$ 1.2 | 3,2 $\pm$ 1.0 | 0.172 |
+| Q10 | 1.3 $\pm$ 0.5 | 2.2 $\pm$ 1.2 | 0.063 |
+| **Overall SUS Score** | **70.75 $\pm$ 15.0** | **64.25 $\pm$ 19.5** | 0.281 |
+<p><em>Table X: A Summary of SUS responses.</em></p>
+</div>
+
 
 <div align="center">
     <img src="docs/quantitative-evaluation/SUS_all.png" alt="SUS Results (All)" width="600">
-    <img src="docs/quantitative-evaluation/SUS_ave.png" alt="SUS Results" width="300">
+      <p><em>Figure ?: SUS responses for each question across the basic and harder versions of the game.</em></p>
 </div>
 
-add Appendix B, captions
+<div align="center">
+    <img src="docs/quantitative-evaluation/SUS_ave.png" alt="SUS Results" width="300">
+    <p><em>Figure ?: Average SUS usability scores for the basic and harder versions of the game.</em></p>
+</div>
 
-#### 5.3 Testing 
+add Appendix B
+
+
+### 5.3 Testing 
 
 add testing 
 
-### 6. Process
+## 6. Process
 
 (15% ~750 words)
 
 - Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project.
 
 
-#### 6.1 Team Organisation 
+### 6.1 Team Organisation 
 Our team operated under a flat and collaborative structure where responsibilities were shared among all members. We did not assign fixed roles for individual team members. Instead, everyone contributed to implementing gameplay systems and programming tasks, while also participating in testing and project management. 
 
 The team adopted a rotating Scrum Master role to support sprint coordination. At the beginning of each sprint, a different team member was selected to act as the Scrum Master. The Scrum Master was responsible for facilitating sprint planning, prioritising tasks in the backlog and monitoring overall progress. Every team member took turns contributing to sprint planning and coordinating overall progress. 
 
-#### 6.2 Tools and Communication 
+### 6.2 Tools and Communication 
 - **Github**: used for version control and mandatory pull request reviews. 
 
 - **WhatsApp**: primarily channel for day-to-day discussion and coordination. 
@@ -483,7 +555,7 @@ The team adopted a rotating Scrum Master role to support sprint coordination. At
 
 We held informal daily stand-up meetings while on campus and formal weekly meeting to review overall progress. Additional meetings were arranged when necessary. 
 
-#### 6.3 Development Methodology
+### 6.3 Development Methodology
 The development of this game followed an Agile methodology, organised into two-week sprints to continuously build, test and refine core systems.
 
 **6.3.1. The Product Backlog and Sprint Planning**
@@ -505,7 +577,7 @@ Additionally, we wanted users to experience the core gameplay at an early stage 
 (add a diagram here) 
 
 
-#### 6.3. Sprint Workflow  
+### 6.3. Sprint Workflow  
 
 | Sprint | Date | Objective | Scrum Master | <div align="center">Key Tasks<div> | Outcome |
 |:---:|:---:|:---:|:---:|:--- |:---:| 
@@ -516,7 +588,7 @@ Additionally, we wanted users to experience the core gameplay at an early stage 
 | Sprint 5 | 14 Apr-24 Apr | Final polishing and deployment preparation | - | • Final bug fixing <br> • Final testing <br> • Deployment preparation | - |  
 
 
-#### 6.4. Branching Strategy
+### 6.4. Branching Strategy
 Our repository follows a structured branching strategy to ensure code quality and deployment stability: 
 
 - **Main branch** - The `main` branch always hosts production-ready and stable code. Code is only merged into `main` after it has been fully tested in the development branch. All merges into `main` require a Pull Request (PR). 
@@ -539,25 +611,21 @@ main
       ...
 ```
 
-#### 6.5 Project File Structure 
-
-
-
-#### 6.7. Build and Deployment Pipeline 
+### 6.5. Build and Deployment Pipeline 
  
 
-#### 6.8. Reflection on Teamwork 
+### 6.6. Reflection on Teamwork 
 
 
 
-### 7. Conclusion
+## 7. Conclusion
 
 (10% ~500 words)
 
 - Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
 
 
-### 8. Contribution Statement
+## 8. Contribution Statement
 
 - Provide a table of everyone's contribution, which _may_ be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
 
@@ -576,6 +644,9 @@ main
 [6]F. Pouhela, D. Krummacker, and H. D. Schotten, “Entity Component System Architecture for Scalable, Modular, and Power-Efficient IoT-Brokers,” in 2023 IEEE 21st International Conference on Industrial Informatics (INDIN), IEEE, Jul. 2023, pp. 1–6. Accessed: Mar. 30, 2026. [Online]. Available: https://doi.org/10.1109/indin51400.2023.10218094
   
 
+
+[7]J. Brooke , “SUS: A ‘Quick and Dirty’ Usability Scale,” in Usability Evaluation In Industry, CRC Press, 1996, pp. 207–212. Accessed: Apr. 06, 2026. [Online]. Available: https://doi.org/10.1201/9781498710411-35
+  
 
 ### Appendix
 
