@@ -27,6 +27,11 @@ function isSpike(MAP, tx, ty) {
     return getMapTile(MAP, tx, ty) === TileType.SPIKE;
 }
 
+/**
+ *
+ * @param entity
+ * @param p
+ */
 function getTileRange(entity, p) {
     return {
         left: p.floor(entity.x / GameConfig.TILE),
@@ -41,7 +46,6 @@ function getTileRange(entity, p) {
  *   - solid map tiles
  *   - other players
  *   - solid placed obstacles
- *
  * @param {object}     entity
  * @param {number}     dx
  * @param {Player[]}   allPlayers
@@ -49,7 +53,14 @@ function getTileRange(entity, p) {
  * @param {Obstacle[]} obstacles
  * @param {Map}          MAP
  */
-export function moveAndCollideX(entity, dx, allPlayers, p, obstacles = [], MAP) {
+export function moveAndCollideX(
+    entity,
+    dx,
+    allPlayers,
+    p,
+    obstacles = [],
+    MAP,
+) {
     if (dx === 0) return;
     entity.x += dx;
 
@@ -80,6 +91,7 @@ export function moveAndCollideX(entity, dx, allPlayers, p, obstacles = [], MAP) 
 
     for (const other of allPlayers) {
         if (other === entity) continue;
+        if (other.lifeState !== 'ALIVE') continue;
         if (
             !aabbIntersects(
                 entity.x,
@@ -123,7 +135,6 @@ export function moveAndCollideX(entity, dx, allPlayers, p, obstacles = [], MAP) 
  *   - solid map tiles
  *   - other players
  *   - solid placed obstacles
- *
  * @param {object}     entity
  * @param {number}     dy
  * @param {Player[]}   allPlayers
@@ -131,7 +142,14 @@ export function moveAndCollideX(entity, dx, allPlayers, p, obstacles = [], MAP) 
  * @param {Obstacle[]} obstacles
  * @param {Map}          MAP
  */
-export function moveAndCollideY(entity, dy, allPlayers, p, obstacles = [], MAP) {
+export function moveAndCollideY(
+    entity,
+    dy,
+    allPlayers,
+    p,
+    obstacles = [],
+    MAP,
+) {
     entity.onGround = false;
     if (dy === 0) return;
     const prevBottom = entity.y + entity.h;
@@ -174,7 +192,8 @@ export function moveAndCollideY(entity, dy, allPlayers, p, obstacles = [], MAP) 
             const surfaceY = tileY + GameConfig.TILE / 2;
             const currBottom = entity.y + entity.h;
             const overlapsX =
-                entity.x + entity.w > tileX && entity.x < tileX + GameConfig.TILE;
+                entity.x + entity.w > tileX &&
+                entity.x < tileX + GameConfig.TILE;
 
             if (
                 overlapsX &&
@@ -222,6 +241,7 @@ export function moveAndCollideY(entity, dy, allPlayers, p, obstacles = [], MAP) 
 
     for (const other of allPlayers) {
         if (other === entity) continue;
+        if (other.lifeState !== 'ALIVE') continue;
         if (
             !aabbIntersects(
                 entity.x,
@@ -275,7 +295,6 @@ export function moveAndCollideY(entity, dy, allPlayers, p, obstacles = [], MAP) 
 /**
  * Returns true if the entity overlaps any spike — either a map 'S' tile
  * or a placed hazard obstacle.
- *
  * @param {object}     entity
  * @param {p5}         p
  * @param {Obstacle[]} obstacles

@@ -30,7 +30,10 @@ export class Scoreboard {
     /**
      * Render the full scoreboard overlay.
      * Call every frame while isGameOver is true.
+<<<<<<< HEAD
+=======
      *
+>>>>>>> feature/charSelect
      * @param {ScoreManager} scoreManager
      */
     render(scoreManager) {
@@ -166,13 +169,18 @@ export class Scoreboard {
         p.fill(120, 120, 150);
         p.textSize(13);
         p.textAlign(p.CENTER, p.BOTTOM);
-        p.text('Press ESC to return to Map Menu', gw / 2, panelY + panelH - 12);
+        p.text('ENTER → Shop  •  ESC → Map Menu', gw / 2, panelY + panelH - 12);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     /**
      * Returns x-centre positions for each column given a panel origin and width.
+<<<<<<< HEAD
+     * @param panelX
+     * @param panelW
+=======
+>>>>>>> feature/charSelect
      * @private
      */
     _colPositions(panelX, panelW) {

@@ -23,7 +23,7 @@ export class MenuState extends State {
     keyPressed() {
         const { p } = this.ctx;
         if (p.key === ' ') {
-            this.goTo(GameStage.MAPMENU);
+            this.goTo(GameStage.CHAR_SELECT);
         }
     }
 }

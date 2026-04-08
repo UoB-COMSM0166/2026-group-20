@@ -1,3 +1,8 @@
+/**
+ * A player entity in the game.
+ * Handles movement, animation frames and life state.
+ */
+
 import { GameConfig } from '../config/GameConfig.js';
 import { HandleInput } from '../systems/HandleInput.js';
 import { PlayerMovementState } from '../config/PlayerMovementState.js';
@@ -13,7 +18,7 @@ import {
 } from '../systems/PhysicsSystem.js';
 
 export class Player {
-    constructor(p, x, y, playerNo) {
+    constructor(p, x, y, playerNo, spriteSheet, animationconfig) {
         this.p = p;
         this.playerNo = playerNo;
         this.spawnX = x;
@@ -33,33 +38,129 @@ export class Player {
         this.maxFall = GameConfig.MAX_FALL_SPEED;
         this.skin = GameConfig.SKIN_WIDTH;
 
-        //Double jump
+        // Double jump
         this.maxJumps = 2;
         this.jumpsLeft = this.maxJumps;
         this.secondJump = false;
-        //
+
         this.lifeState = PlayerState.ALIVE;
         this.movementState = PlayerMovementState.IDLE;
         this.gameState = PlayerGameState.PLAYING;
         this.lastDeathReason = null;
 
+        /**
+         * Set to true by IcePlatform / IceBlock each frame the player is in contact.
+         * When true, horizontal momentum is preserved (multiplied) instead of zeroed.
+         * Reset to false at the start of every horizontalMovement() call.
+         */
+        this.slideMode = false;
+
+        /**
+         * Speed multiplier applied this frame by IceBlock.
+         * 1.0 = normal. IceBlock sets it to > 1 while player is inside.
+         * Reset to 1.0 at the start of every horizontalMovement() call.
+         */
+        this.speedMultiplier = 1.0;
+
+        /**
+         * Persistent obstacle inventory — survives across rounds.
+         * Map of ObstacleType string → count.
+         * Populated by ShopState, consumed by BuildState.
+         * @type {Map<string, number>}
+         */
+        this.inventory = new Map();
+
         this.input = new HandleInput(p, playerNo);
-        this.state = PlayerMovementState.IDLE;
+        //this.state = PlayerMovementState.IDLE;
         this.facingRight = true;
 
+        /**
+         * Speed multiplier applied this frame by IceBlock.
+         * 1.0 = normal. IceBlock sets it to > 1 while player is inside.
+         * Reset to 1.0 at the start of every horizontalMovement() call.
+         */
+        this.speedMultiplier = 1.0;
+
+        /**
+         * Persistent obstacle inventory — survives across rounds.
+         * Map of ObstacleType string → count.
+         * Populated by ShopState, consumed by BuildState.
+         * @type {Map<string, number>}
+         */
+        this.inventory = new Map();
+
+        this.input = new HandleInput(p, playerNo);
+        this.facingRight = true;
         this.respawnCountdown = 0;
+
+        // ── Sprite animation ─
+        this.spriteSheet = spriteSheet ?? null;
+        this.framesArr = [];
+        this.frameIndexIdle = 0;
+        this.frameIndexRun = 0;
+        this.frameIndexJump = 0;
+        this.frameIndexFall = 0;
+        this.frameIndexRespawning = 0;
+        /** Animation frame-index map set by setSprite() or DrawPlayer. */
+        this.animConfig = null;
+
+        if (this.spriteSheet) {
+            this._splitAnimation();
+        }
     }
 
+    /**
+     * Assign a new sprite sheet and animation config at runtime.
+     * Called by CharSelectState after the player picks a character.
+     * @param {p5.Image} sheet
+     * @param {object}   animConfig
+     */
+    setSprite(sheet, animConfig) {
+        this.spriteSheet = sheet;
+        this.animConfig = animConfig;
+        this.framesArr = [];
+        this.frameIndexIdle = 0;
+        this.frameIndexRun = 0;
+        this.frameIndexJump = 0;
+        this.frameIndexFall = 0;
+        this.frameIndexRespawning = 0;
+        this._splitAnimation();
+    }
+
+    /**
+     * Slice the horizontal sprite sheet into individual 28×34 frames.
+     * @private
+     */
+    _splitAnimation() {
+        const fw = this.w;
+        const fh = this.h;
+        for (let x = 0; x < this.spriteSheet.width; x += fw) {
+            this.framesArr.push(this.spriteSheet.get(x, 0, fw, fh));
+        }
+    }
+
+    /**
+     * Handles horizontal player movement based on input.
+     */
     horizontalMovement() {
-        this.vx = 0;
-        if (this.input.left) {
-            this.vx -= this.speed;
-        }
-        if (this.input.right) {
-            this.vx += this.speed;
+        const prevSlide = this.slideMode;
+        const speedMult = this.speedMultiplier;
+        this.slideMode = false; // reset; ice obstacles re-set before this call
+        this.speedMultiplier = 1.0; // reset; IceBlock re-sets before this call
+
+        const noInput = !this.input.left && !this.input.right;
+        if (noInput && prevSlide) {
+            // Sliding: preserve momentum with light friction instead of zeroing
+            this.vx *= 0.97;
+        } else {
+            this.vx = 0;
+            if (this.input.left) this.vx -= this.speed * speedMult;
+            if (this.input.right) this.vx += this.speed * speedMult;
         }
     }
-
+    /**
+     * Handles vertical player movement based on input.
+     */
     jumpUp() {
         if (this.onGround) {
             this.jumpsLeft = this.maxJumps;
@@ -75,10 +176,9 @@ export class Player {
     /**
      *
      *
-     * @param {*} allPlayers
+     * @param {Player[]} allPlayers - List of players
      * @param {*} respawnManager
-     * @return {*}
-     * @memberof Player
+     * @param {Array} obstacles - List of obstacles
      */
 
     //move
@@ -104,13 +204,21 @@ export class Player {
 
         this.updateMovementState();
     }
-
+    /**
+     * Applies gravity to the player.
+     */
     comeDown() {
         this.vy += this.gravity;
         if (this.vy > this.maxFall) {
             this.vy = this.maxFall;
         }
     }
+
+    /**
+     * Moves the player and resolves collisions.
+     * @param {Player[]} allPlayers - List of players.
+     * @param {Array} obstacles - List of obstacles
+     */
 
     //change name this is horrible
     //move to sparate file; handle collisions and the world
@@ -120,6 +228,9 @@ export class Player {
         moveAndCollideY(this, this.vy, allPlayers, this.p, obstacles, MAP);
     }
 
+    /**
+     * Updates the movement state (idle, run, jump, fall).
+     */
     updateMovementState() {
         if (this.vx > 0) {
             this.facingRight = true;
@@ -142,55 +253,8 @@ export class Player {
     }
 
     /**
-     *
-     *
-     * @return {*} //???
-     * @memberof Player
-     */
-
-    //  display() {
-    //      if (!this.isVisible) {
-    //          return;
-    //      }
-    //      const p = this.p;
-    //      p.noStroke();
-    //      let alpha;
-    //      if(PlayerState.RESPAWNING===this.lifeState){
-    //          alpha=120;
-    //      }
-    //      else{
-    //          alpha=255;
-    //      }
-
-    //      let playerColor;
-    //      if (this.playerNo === 0) {
-    //          playerColor = p.color(90, 170, 255, alpha);
-    //      }
-    //      else {
-    //          playerColor = p.color(255, 200, 80, alpha);
-    //      }
-    //      p.fill(playerColor);
-    //      p.rect(this.x, this.y, this.w, this.h, 6);
-    //      p.fill(255);
-    //      p.textAlign(p.CENTER, p.BOTTOM);
-    //      p.textSize(16);
-    //      p.textFont('Arial');
-
-    //      if (this.lifeState === PlayerState.RESPAWNING) {
-    //          p.fill(255, 100, 100);
-    //          p.text(Math.ceil(this.respawnCountdown) + "s", this.x + this.w / 2, this.y - 5);
-    //      }
-    //      else {
-    //          p.text(this.movementState, this.x + this.w / 2, this.y - 5);
-    //      }
-    //  }
-
-    /**
-     *
-     *
-     * @param {*} reason
-     * @return {*}
-     * @memberof Player
+     * Kills the player and output the reason.
+     * @param {DeathReason} reason - the reason a player dies
      */
     die(reason) {
         if (this.lifeState === PlayerState.DEAD) {
@@ -205,6 +269,9 @@ export class Player {
         console.log(`Player ${this.playerNo} died due to: ${reason}`);
     }
 
+    /**
+     * Moves the player to spawn position and prepares respawn animation.
+     */
     prepareRespawn() {
         this.lifeState = PlayerState.RESPAWNING;
         this.x = this.spawnX;
@@ -213,9 +280,7 @@ export class Player {
     }
 
     /**
-     *
-     *
-     * @memberof Player
+     * Finishes the respawn process and returns the player to gameplay.
      */
     //Needs to be moved to a separate class
     finishRespawn() {
@@ -225,26 +290,20 @@ export class Player {
     }
 
     /**
-     *
-     *
-     * @readonly
-     * @memberof Player
+     * Returns whether the player should currently be visible or not.
+     * @returns {boolean}
      */
+
     get isVisible() {
-        // Player is visible only when alive
         return (
             this.lifeState === PlayerState.ALIVE ||
             this.lifeState === PlayerState.RESPAWNING
         );
-        // Player is invisible when dead
-        // but could be transparent when respawning
     }
 
     /**
-     *
-     *
-     * @param {*} newState
-     * @memberof Player
+     * Changes the current game state for the player.
+     * @param {PlayerGameState} newState
      */
     setGameState(newState) {
         this.gameState = newState;

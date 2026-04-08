@@ -1,6 +1,6 @@
 import { GameConfig } from '../config/GameConfig.js';
 import { PlayerState } from '../config/PlayerState.js';
-import { DeathReason } from '../config/DeathReason.js'; 
+import { DeathReason } from '../config/DeathReason.js';
 
 export class RespawnManager {
     /**
@@ -14,7 +14,10 @@ export class RespawnManager {
     /**
      * Kills a player and queues them for respawn.
      * Also increments their death count in ScoreManager if one is set.
+<<<<<<< HEAD
+=======
      *
+>>>>>>> feature/charSelect
      * @param {Player} player
      * @param {string} reason - DeathReason value
      */

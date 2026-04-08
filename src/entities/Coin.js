@@ -32,7 +32,10 @@ export class Coin {
 
     /**
      * Check for player overlap each frame; collect on first hit.
+<<<<<<< HEAD
+=======
      *
+>>>>>>> feature/charSelect
      * @param {Player[]} players
      * @param {ScoreManager} scoreManager
      */

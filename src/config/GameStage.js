@@ -1,6 +1,5 @@
 /**
  * A list of all valid game stages
- *
  * @enum {string}
  *
  * @property {string} BOOT
@@ -8,7 +7,6 @@
  *
  * @property {string} MENU
  * Main menu screen
- *
  * @property {string} MAPMENU
  * Map selection menu
  *
@@ -26,8 +24,10 @@
 export const GameStage = Object.freeze({
     BOOT: 'BOOT',
     MENU: 'MENU',
+    CHAR_SELECT: 'CHAR_SELECT',
     MAPMENU: 'MAPMENU',
     BUILD: 'BUILD',
     RUN: 'RUN',
     RESULTS: 'RESULTS',
+    SHOP: 'SHOP',
 });

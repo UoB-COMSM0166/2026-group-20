@@ -10,7 +10,6 @@ import { GameConfig } from '../config/GameConfig.js';
 export class MapMenu {
     /**
      * @description creates splash screen
-     *
      * @param {p5} p - The p5 instance
      * @param {string} stage - Current game stage
      */
@@ -41,7 +40,6 @@ export class MapMenu {
     }
     /**
      * @description renders menu page
-     *
      * @param {p5} p - The p5 instance
      * @param {number} mx - Mouse X position
      * @param {number} my - Mouse Y position

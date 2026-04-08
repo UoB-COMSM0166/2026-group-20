@@ -2,6 +2,8 @@ import { State } from './State.js';
 import { RespawnManager } from '../systems/RespawnManager.js';
 import { TimeManager } from '../systems/TimeManager.js';
 import { PlayerGameState } from '../config/PlayerGameState.js';
+import { PlayerState } from '../config/PlayerState.js';
+import { DeathReason } from '../config/DeathReason.js';
 import { GameStage } from '../config/GameStage.js';
 import { GameConfig } from '../config/GameConfig.js';
 import { TileType } from '../config/TileType.js';
@@ -31,7 +33,14 @@ export class RunState extends State {
     }
 
     update(deltaTime) {
-        const { players, scoreManager, placedObstacles, tiledMap } = this.ctx;
+        const {
+            players,
+            scoreManager,
+            placedObstacles,
+            gameWidth,
+            gameHeight,
+            tiledMap,
+        } = this.ctx;
 
         this.respawnManager.update(deltaTime);
         this.timeManager.update(deltaTime);
@@ -41,17 +50,58 @@ export class RunState extends State {
             return;
         }
 
+        // Update obstacles first so moving platforms have their new position
+        for (const obs of this.ctx.placedObstacles) {
+            obs.update(deltaTime, gameWidth, gameHeight);
+        }
+
+        // Carry players on moving platforms BEFORE physics resolves this frame
+        for (const obs of this.ctx.placedObstacles) {
+            obs.carryPlayers(players);
+        }
+
+        // Pre-physics effects (IceBlock, WindZone) — must run before player.update()
+        // so that slideMode and velocity changes are visible to horizontalMovement()
+        for (const obs of placedObstacles) {
+            for (const player of players) {
+                if (player.gameState !== PlayerGameState.PLAYING) continue;
+                obs.preEffect(player);
+            }
+        }
+
         for (const player of players) {
             if (player.gameState === PlayerGameState.SUCCESS) continue;
 
             // Pass placed obstacles into physics
-            player.update(players, this.respawnManager, placedObstacles, tiledMap.MAP);
+            player.update(
+                players,
+                this.respawnManager,
+                placedObstacles,
+                tiledMap.MAP,
+            );
 
             const { p } = this.ctx;
             const tx = p.floor((player.x + player.w / 2) / GameConfig.TILE);
             const ty = p.floor((player.y + player.h / 2) / GameConfig.TILE);
-            if (tiledMap.MAP[ty] && tiledMap.MAP[ty][tx] === TileType.ENDPOINT) {
+            if (
+                tiledMap.MAP[ty] &&
+                tiledMap.MAP[ty][tx] === TileType.ENDPOINT
+            ) {
                 this.timeManager.onPlayerReachFinish(player);
+                player.lifeState = PlayerState.DEAD;
+            }
+        }
+
+        // Post-physics effects (FallingPlatform, BouncePad, SpikePlatform, Teleporter, Flame)
+        for (const obs of placedObstacles) {
+            for (const player of players) {
+                if (player.gameState !== PlayerGameState.PLAYING) continue;
+                obs.applyEffect(
+                    player,
+                    players,
+                    this.respawnManager,
+                    placedObstacles,
+                );
             }
         }
 
@@ -59,9 +109,15 @@ export class RunState extends State {
             coin.update(players, scoreManager);
         }
 
-        // Update any animated obstacles
+        // Projectile collision — cannons manage their own projectiles internally
         for (const obs of this.ctx.placedObstacles) {
-            obs.update(deltaTime);
+            if (!obs.checkProjectileHit) continue;
+            for (const player of players) {
+                if (player.gameState !== PlayerGameState.PLAYING) continue;
+                if (obs.checkProjectileHit(player)) {
+                    this.respawnManager.triggerDeath(player, DeathReason.TRAP);
+                }
+            }
         }
     }
 

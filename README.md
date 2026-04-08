@@ -1,140 +1,206 @@
-# 2026-group-20
+<h1 align="center">The Ultimate Chicken Horse (provisional name) </h1>
 
-2026 COMSM0166 group 20
+<h3 align="center">
+  COMSM0166 (2026) · Group 20 
+</h3>
 
-# COMSM0166 Project Template
+<p align="center">
+An exciting multiplayer platformer where players design obstacles and race to reach the goal.
+</p>
 
-A project template for the Software Engineering Discipline and Practice module (COMSM0166).
+<h3 align="center"> Click <a href="https://uob-comsm0166.github.io/2026-group-20/main-game/"> HERE</a> to play the game (v0.1.0)</h3>
 
-## Info
+<hr style="border: none; height: 0.5px; background-color:#ddd;">
 
-This is the template for your group project repo/report. We'll be setting up your repo and assigning you to it after the group forming activity. You can delete this info section, but please keep the rest of the repo structure intact.
+<h3>VIDEO DEMO</h3>
+Add a video demo for v0.1.0 here...
 
-You will be developing your game using [P5.js](https://p5js.org) a javascript library that provides you will all the tools you need to make your game. However, we won't be teaching you javascript, this is a chance for you and your team to learn a (friendly) new language and framework quickly, something you will almost certainly have to do with your summer project and in future. There is a lot of documentation online, you can start with:
+<h3>PAPER DEMO</h3>
 
-- [P5.js tutorials](https://p5js.org/tutorials/)
-- [Coding Train P5.js](https://thecodingtrain.com/tracks/code-programming-with-p5-js) course - go here for enthusiastic video tutorials from Dan Shiffman (recommended!)
+https://github.com/user-attachments/assets/4d740826-4f04-4a33-90aa-97b0868dfc5b
 
-## The Ultimate Chicken Horse (provisional name)
-
-STRAPLINE. Add an exciting one sentence description of your game here.
-
-IMAGE. Add an image of your game here, keep this updated with a snapshot of your latest development.
-
-LINK. Add a link here to your deployed game, you can also make the image above link to your game if you wish. Your game lives in the [/docs](/docs) folder, and is published using Github pages.
-
-VIDEO. Include a demo video of your game here (you don't have to wait until the end, you can insert a work in progress video)
-
-## Your Group
+<h3>Group Members</h3>
 
 GROUP PHOTO. Add a group photo here.
 
-- Megi, jd25841@bristol.ac.uk, role
-- Maran, ilamaran.magesh.2025@bristol.ac.uk, role
-- Jacqueline, oz25232@bristol.ac.uk, role
-- Jinwang, ut25234@bristol.ac.uk, role
-- Mengxiao, dh25275@bristol.ac.uk, role
-- Eira, xz25553@bristol.ac.uk, role
+| Name       | Email                              |
+| ---------- | ---------------------------------- |
+| Megi       | jd25841@bristol.ac.uk              |
+| Maran      | ilamaran.magesh.2025@bristol.ac.uk |
+| Jacqueline | oz25232@bristol.ac.uk              |
+| Jinwang    | ut25234@bristol.ac.uk              |
+| Mengxiao   | dh25275@bristol.ac.uk              |
+| Eira       | xz25553@bristol.ac.uk              |
 
-## Project Report
+<h3>Project Management</h3>
+<p> Our project management is organised in <a href="link"> Lucidspark</a>:</p>
 
-### Introduction
+- Brainstorming board - used for idea generation, planning and taking meeting notes
+- Kanban board - used for tracking tasks and development progress
+
+<h2 align="center">Project Report</h2>
+
+### 1. Introduction
 
 - 5% ~250 words
 - Describe your game, what is based on, what makes it novel? (what's the "twist"?)
 
-### Requirements
+### 2. Requirements
 
-- 15% ~750 words
-- Early stages design. Ideation process. How did you decide as a team what to develop? Use case diagrams, user stories.
+-> outlines the requirements engineering process (15% ~750 words)
 
-#### Our Stakeholders:
+Our team began by brainstorming various game ideas and collectively selected the concept to develop. After the game was selected, we identified the stakeholders to understand who would be affected by the system and whose needs should be considered during the design process. Based on this understanding, we outlined epics for the game's key features, followed by user stories describing the detailed functional requirements. The overall game flow was then designed to show how players interact with the system.
 
-- Platformer game players
-- Casual game players
-- Software Engineering module lecturers
-- Classmates
-- Other academic staff/Bristol students
+#### 2.1 Ideation and Game Selection
 
-To begin our game design process, we identified all possible individuals that needed to be taken into account when making our game. Building on the Onion Model we learned about in the lecture, we then split our list into three big categories (gamers, lecturers and other students), to better identify what qualities each one would look for in a game.
-Coming up with the epics (high level requirements) and subsequently, the user stories, was a very similar process to the Running app exercise we did during the workshop. Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users, which we had direct access to. This allowed us to come up with feedback-based requirements.
+-> how the idea started
 
-#### Epics:
+Each member of the team brainstormed 5-9 games of their faviourite games and brought their ideas to the meeting. During the meeting, everyone presented the core game mechanics of their proposed games.
 
--<i>Gamer Group</i>
+![Ideathon](docs/assets/gif/ideation.gif)
 
-- Retro/Nostalgic Visuals
-- Twists/added features
-- Visually stimulating
-- Audio background/effects
-- Game lore
-- Core features (wallet system, scoreboard, intro tutorial)
-- Good UX
-- Multi device compatibility
+As numerous ideas were proposed, our team decided to first identify the two key challenges: **concurrency** and **AI**. Based on these challenges, each member selected a game that either aligned with or could be adapted to fit the challenges. This process narrowed the selection down to six games.
 
--<i>Lecturer Group</i>
+The team then evaluated which of these games would best support the implementation of chosen challenges. As a result, two games were reduced to two games: **The Ultimate Chicken Horse** and **Among US**.
 
-- Learning concepts integration and application
-- Clear challenge(s) demonstration
-- Achievable within the project timeline
-- Collaborative work
-- Continuous progress updates
-- Unique
+Both games were analysed to identify the most suitable base for the project. To account for time constraints, our selection involved a trade-off: a feature-rich base game would require fewer technical challenges, whereas a simpler base game would demand more complex implementations to maintain the project's level of difficulty.
 
--<i>Student Group</i>
+|                 | <div align="center">Ultimate Chicken Horse<div>                                                                                                                                      | <div align="center">Among Us<div>                                                               |
+| :-------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------- |
+|  **Features**   | • Obstacle placement <br> • Characters with different traits <br> • Different obstacles <br> • Scoreboard <br> • Coin collection / wallet system <br> • Timer <br> • Custom graphics | • Task-based mini-games <br> • Visually Distinct characters <br> • Timer <br> • Custom graphics |
+| **Concurrency** | • Concurrent player movement <br> • Obstacle placement                                                                                                                               | • Concurrent player movement <br> • Task execution                                              |
+| **AI Concept**  | AI solver that can be purchased with coins recommends obstacle placement                                                                                                             | AI imposter that decides whom, where and how to attack                                          |
 
-- Social features
-- Easy to pick up
-- Short game runs
+Based on this comparison, **The Ultimate Chicken Horse** was selected as the base game due to its feature-rich design. This ensures that even if time constraints limit the implementation of the planned technical challenges, the project will still remain functional and cohesive as a playable game.
 
-#### User Stories
+-> Add Appendix A: selection process
 
--<i>Students</i>
+#### 2.2 Stakeholders
+
+-> who is involved
+
+To begin our game design process, we identified all relevant stakeholders including individuals and entities that needed to be taken into account when developing our game. These stakeholders were visualised using an onion model diagram.
+
+![onion model](docs/assets/images/onion-model.png)
+
+Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users to whom we had direct access. We categorised the most relevant stakeholders into three groups: gamers, lecturers, and other students, to better identify the qualities each group would expect in a game.
+
+- **Gamers**: As primary users, they interact directly with the system. They expect an engaging and enjoyable gameplay experience.
+
+- **Lecturers**: As primary assessors, they evaluate the design process, technical implementation and whether the project meets academic requirements.
+
+- **Other students**: As peer testers, they provide critical feedbacks on bugs and playability.
+
+#### 2.3 Epics
+
+-> high level requirements
+
+Building on our stakeholder analysis, we defined a set of epics (high-level requirements). These requirements were designed to satisfy the expectations of each stakeholder group, as the goal of the project was to develop a game aligns with user expectations.
+
+| <div align="center">Stakeholder Group<div> | <div align="center">High Level Requirements<div>                                                                                                                                                                                                                                     |
+| :----------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|                 **Gamers**                 | • Retro / Nostalgic visuals <br> • Twists or added gameplay features <br> • Visually stimulating design <br> • Background audio and sound effects <br> • Game lore <br> • Core features (wallet system, scoreboard, intro tutorial) <br> • Good UX <br> • Multi-device compatibility |
+|               **Lecturers**                | • Learning concept integration and application <br> • Clear demonstration of technical challenges <br> • Achievable within the project timeline <br> • Collaborative work <br> • Continuous progress updates <br> • Originality                                                      |
+|                **Students**                | • Social features <br> • Easy to pick up <br> • Short game sessions                                                                                                                                                                                                                  |
+
+#### 2.4 User Stories
+
+-> detailed requirements
+After defining the epics, we deconstructed them into a set of user stories to describe the specific features and functionalities of the game from the perspective of the identified stakeholders.
+
+#### Students
 
 - As a student, I want the game to have a multiplayer mode, so that I can play with my friends.
 - As a student, I want the game to have intuitive controls/mechanics, so that I can start playing right away.
 - As a student, I want a game run/level to be short enough so that I can play between class breaks.
 
-TBC
+#### Lecturers
 
-### Design
+- As a lecturer, I want the game to clearly demonstrate applied programming concepts (e.g., OOP, game logic, UI handling), so that learning outcomes are achieved.
+- As a lecturer, I want the game to include defined challenges with measurable outcomes, so that student understanding can be evaluated.
+- As a lecturer, I want clear evidence of teamwork (shared commits, divided responsibilities, group meeting notes etc.), so that collaboration skills are demonstrated.
 
-- 15% ~750 words
+#### Gamers
+
+- As a gamer, I want a scoreboard, so that I can track my performance and try to beat my high score.
+- As a gamer, I want a short interactive tutorial, so that I can quickly understand how to play.
+- As a gamer, I want intuitive menus and clear navigation, so that I can easily access and play the game without confusion.
+- As a gamer, I want responsive sound effects and visual feedback for my actions, so that the game feels immersive and satisfying.
+
+#### 2.5 Use Case Diagram
+
+(~100 words) -> visual overview
+add a paragraph here
+
+### 3. Design
+
+(15% ~750 words)
+
 - System architecture. Class diagrams, behavioural diagrams.
 
-### Implementation
+#### 3.3 Behaviourial Diagram
 
-- 15% ~750 words
+```mermaid
+stateDiagram-v2
+
+[*] --> StartMenu
+StartMenu --> Lobby
+Lobby --> PreGameSetup
+
+state "Pre-Game Setup" as PreGameSetup {
+    direction LR
+    Character --> Map
+    Map --> Obstacle
+    Obstacle --> Placement
+}
+
+PreGameSetup --> GameStart
+GameStart --> Gameplay
+Gameplay --> ReachGoal
+
+ReachGoal --> GameEnd : goal reached
+Gameplay --> GameEnd : time limit reached
+
+GameEnd --> [*]
+```
+
+### 4. Implementation
+
+(15% ~750 words)
 
 - Describe implementation of your game, in particular highlighting the TWO areas of _technical challenge_ in developing your game.
 
-### Evaluation
+### 5. Evaluation
 
-- 15% ~750 words
+(15% ~750 words)
 
 - One qualitative evaluation (of your choice)
-
 - One quantitative evaluation (of your choice)
-
 - Description of how code was tested.
 
-### Process
+#### 5.1
 
-- 15% ~750 words
+Add think aloud and heuristic evaluation for v0.1.0
+
+will need to do the evaluation again when the game is almost ready
+
+### 6. Process
+
+(15% ~750 words)
 
 - Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project.
 
-### Conclusion
+### 7. Conclusion
 
-- 10% ~500 words
+(10% ~500 words)
 
 - Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
 
-### Contribution Statement
+### 8. Contribution Statement
 
 - Provide a table of everyone's contribution, which _may_ be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
 
-### Additional Marks
+### 9. Appendix
 
 You can delete this section in your own repo, it's just here for information. in addition to the marks above, we will be marking you on the following two points:
 
