@@ -20,10 +20,11 @@ export function DrawPlayer(player) {
     if (player.framesArr.length > 0) {
         // Use the character's own animConfig (set by setSprite / CharSelectState).
         // Fall back to playerNo-based default so the game works before char select runs.
-        const cfg = player.animConfig
-            ?? (player.playerNo === 0 ? AnimationConfig : AnimationConfig2);
+        const cfg =
+            player.animConfig ??
+            (player.playerNo === 0 ? AnimationConfig : AnimationConfig2);
 
-        const state     = player.movementState;
+        const state = player.movementState;
         const lifeState = player.lifeState;
 
         // Respawning overrides movement state
@@ -43,73 +44,89 @@ export function DrawPlayer(player) {
         // ── Fallback rectangle ────────────────────────────────────────────
         p.noStroke();
         let alpha;
-        if(PlayerState.RESPAWNING===player.lifeState){
-            alpha=120;
-        }
-        else{
-            alpha=255;
+        if (PlayerState.RESPAWNING === player.lifeState) {
+            alpha = 120;
+        } else {
+            alpha = 255;
         }
 
-      
-         if (player.movementState === PlayerMovementState.IDLE){
+        if (player.movementState === PlayerMovementState.IDLE) {
             const frames = player.animationconfig.IDLE;
-            player.p.image( player.framesArr[frames[player.frameIndexIdle]], player.x, player.y);
+            player.p.image(
+                player.framesArr[frames[player.frameIndexIdle]],
+                player.x,
+                player.y,
+            );
             player.frameIndexIdle = (player.frameIndexIdle + 1) % frames.length;
-         }
-      
-         if(player.movementState===PlayerMovementState.RUN){
+        }
+
+        if (player.movementState === PlayerMovementState.RUN) {
             const frames = player.animationconfig.RUN;
             const img = player.framesArr[frames[player.frameIndexRun]];
             player.p.push();
-            if(player.facingRight){
-               player.p.image( player.framesArr[frames[player.frameIndexRun]], player.x, player.y);
-            }
-            else{
-               player.p.translate(player.x + player.w, player.y);
-               player.p.scale(-1, 1);
-               player.p.image(img, 0, 0);
+            if (player.facingRight) {
+                player.p.image(
+                    player.framesArr[frames[player.frameIndexRun]],
+                    player.x,
+                    player.y,
+                );
+            } else {
+                player.p.translate(player.x + player.w, player.y);
+                player.p.scale(-1, 1);
+                player.p.image(img, 0, 0);
             }
             player.p.pop();
             player.frameIndexRun = (player.frameIndexRun + 1) % frames.length;
-         }
+        }
 
-         if(player.movementState===PlayerMovementState.JUMP){
+        if (player.movementState === PlayerMovementState.JUMP) {
             const frames = player.animationconfig.JUMP;
             const img = player.framesArr[frames[player.frameIndexJump]];
             player.p.push();
-            if(player.facingRight){
-               player.p.image( player.framesArr[frames[player.frameIndexJump]], player.x, player.y);
-            }
-            else{
-               player.p.translate(player.x + player.w, player.y);
-               player.p.scale(-1, 1);
-               player.p.image(img, 0, 0);
+            if (player.facingRight) {
+                player.p.image(
+                    player.framesArr[frames[player.frameIndexJump]],
+                    player.x,
+                    player.y,
+                );
+            } else {
+                player.p.translate(player.x + player.w, player.y);
+                player.p.scale(-1, 1);
+                player.p.image(img, 0, 0);
             }
             player.p.pop();
             player.frameIndexJump = (player.frameIndexJump + 1) % frames.length;
-         }
+        }
 
-         if(player.movementState===PlayerMovementState.FALL){
+        if (player.movementState === PlayerMovementState.FALL) {
             const frames = player.animationconfig.FALL;
             const img = player.framesArr[frames[player.frameIndexFall]];
             player.p.push();
-            if(player.facingRight){
-               player.p.image( player.framesArr[frames[player.frameIndexFall]], player.x, player.y);
-            }
-            else{
-               player.p.translate(player.x + player.w, player.y);
-               player.p.scale(-1, 1);
-               player.p.image(img, 0, 0);
+            if (player.facingRight) {
+                player.p.image(
+                    player.framesArr[frames[player.frameIndexFall]],
+                    player.x,
+                    player.y,
+                );
+            } else {
+                player.p.translate(player.x + player.w, player.y);
+                player.p.scale(-1, 1);
+                player.p.image(img, 0, 0);
             }
             player.p.pop();
             player.frameIndexFall = (player.frameIndexFall + 1) % frames.length;
-         }
+        }
 
-         if(player.lifeState===PlayerState.RESPAWNING){
+        if (player.lifeState === PlayerState.RESPAWNING) {
             const frames = player.animationconfig.RESPAWNING;
-            player.p.image(player.framesArr[frames[player.frameIndexRespawning]], player.x, player.y);
-            player.frameIndexRespawning = (player.frameIndexRespawning + 1) % frames.length;
-         }
+            player.p.image(
+                player.framesArr[frames[player.frameIndexRespawning]],
+                player.x,
+                player.y,
+            );
+            player.frameIndexRespawning =
+                (player.frameIndexRespawning + 1) % frames.length;
+        }
 
         p.fill(255);
         p.textAlign(p.CENTER, p.BOTTOM);
@@ -118,9 +135,12 @@ export function DrawPlayer(player) {
 
         if (player.lifeState === PlayerState.RESPAWNING) {
             p.fill(255, 100, 100);
-            p.text(Math.ceil(player.respawnCountdown) + "s", player.x + player.w / 2, player.y - 5);
-        } 
-        else {
+            p.text(
+                Math.ceil(player.respawnCountdown) + 's',
+                player.x + player.w / 2,
+                player.y - 5,
+            );
+        } else {
             p.text(player.movementState, player.x + player.w / 2, player.y - 5);
         }
     }
@@ -134,8 +154,11 @@ export function DrawPlayer(player) {
 
     if (player.lifeState === PlayerState.RESPAWNING) {
         p.fill(255, 100, 100);
-        p.text(Math.ceil(player.respawnCountdown) + 's',
-               player.x + player.w / 2, player.y - 5);
+        p.text(
+            Math.ceil(player.respawnCountdown) + 's',
+            player.x + player.w / 2,
+            player.y - 5,
+        );
     } else {
         p.text(player.movementState, player.x + player.w / 2, player.y - 5);
     }

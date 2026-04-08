@@ -7,8 +7,7 @@ import { GameStage } from '../config/GameStage.js';
  *
  * Transitions:
  *   Return button → MenuState
- *   Map 1 button  → PlayState  (triggers a round reset before entering)
- *   Map 2 button  → Map2State
+ *   Map button    → BuildState (after map switch)
  */
 export class MapMenuState extends State {
     enter() {
@@ -28,9 +27,11 @@ export class MapMenuState extends State {
         if (mapMenu.buttonReturn.isHovered(mx, my)) {
             this.goTo(GameStage.MENU);
         } else if (mapMenu.buttonMap1.isHovered(mx, my)) {
+            this.ctx.selectMap('map1');
             this.goTo(GameStage.BUILD);
         } else if (mapMenu.buttonMap2.isHovered(mx, my)) {
-            this.goTo(GameStage.MAP2);
+            this.ctx.selectMap('map2');
+            this.goTo(GameStage.BUILD);
         }
     }
 }

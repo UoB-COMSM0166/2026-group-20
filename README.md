@@ -15,7 +15,6 @@ An exciting multiplayer platformer where players design obstacles and race to re
 <h3>VIDEO DEMO</h3>
 Add a video demo for v0.1.0 here...
 
-
 <h3>PAPER DEMO</h3>
 
 https://github.com/user-attachments/assets/4d740826-4f04-4a33-90aa-97b0868dfc5b
@@ -33,14 +32,11 @@ GROUP PHOTO. Add a group photo here.
 | Mengxiao   | dh25275@bristol.ac.uk              |
 | Eira       | xz25553@bristol.ac.uk              |
 
-
 <h3>Project Management</h3>
 <p> Our project management is organised in <a href="link"> Lucidspark</a>:</p>
 
 - Brainstorming board - used for idea generation, planning and taking meeting notes
 - Kanban board - used for tracking tasks and development progress
-
-
 
 <h2 align="center">Project Report</h2>
 
@@ -48,8 +44,6 @@ GROUP PHOTO. Add a group photo here.
 
 - 5% ~250 words
 - Describe your game, what is based on, what makes it novel? (what's the "twist"?)
-
-
 
 ### 2. Requirements
 
@@ -103,11 +97,10 @@ Given the academic context of our game, we did not need to account for legal or 
 
 Building on our stakeholder analysis, we defined a set of epics (high-level requirements). These requirements were designed to satisfy the expectations of each stakeholder group, as the goal of the project was to develop a game aligns with user expectations.
 
-
 | <div align="center">Stakeholder Group<div> | <div align="center">High Level Requirements<div>                                                                                                                                                                                                                                     |
 | :----------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 |                 **Gamers**                 | • Retro / Nostalgic visuals <br> • Twists or added gameplay features <br> • Visually stimulating design <br> • Background audio and sound effects <br> • Game lore <br> • Core features (wallet system, scoreboard, intro tutorial) <br> • Good UX <br> • Multi-device compatibility |
-|               **Lecturers**               | • Learning concept integration and application <br> • Clear demonstration of technical challenges <br> • Achievable within the project timeline <br> • Collaborative work <br> • Continuous progress updates <br> • Originality                                                      |
+|               **Lecturers**                | • Learning concept integration and application <br> • Clear demonstration of technical challenges <br> • Achievable within the project timeline <br> • Collaborative work <br> • Continuous progress updates <br> • Originality                                                      |
 |                **Students**                | • Social features <br> • Easy to pick up <br> • Short game sessions                                                                                                                                                                                                                  |
 
 #### 2.4 User Stories
@@ -177,8 +170,6 @@ GameEnd --> [*]
 
 - Describe implementation of your game, in particular highlighting the TWO areas of _technical challenge_ in developing your game.
 
-
-
 ### 5. Evaluation
 
 (15% ~750 words)
@@ -193,13 +184,11 @@ Add think aloud and heuristic evaluation for v0.1.0
 
 will need to do the evaluation again when the game is almost ready
 
-
 ### 6. Process
 
 (15% ~750 words)
 
 - Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project.
-
 
 ### 7. Conclusion
 
@@ -207,12 +196,9 @@ will need to do the evaluation again when the game is almost ready
 
 - Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
 
-
 ### 8. Contribution Statement
 
 - Provide a table of everyone's contribution, which _may_ be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
-
-
 
 ### 9. Appendix
 

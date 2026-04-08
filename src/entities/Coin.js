@@ -45,10 +45,19 @@ export class Coin {
         this._age += 0.05;
 
         for (const player of players) {
-            if (!aabbIntersects(
-                player.x, player.y, player.w, player.h,
-                this.x, this.y, this.w, this.h,
-            )) continue;
+            if (
+                !aabbIntersects(
+                    player.x,
+                    player.y,
+                    player.w,
+                    player.h,
+                    this.x,
+                    this.y,
+                    this.w,
+                    this.h,
+                )
+            )
+                continue;
 
             this.collected = true;
             scoreManager.collectCoin(player, this);

@@ -20,7 +20,6 @@ import { GameConfig } from '../../config/GameConfig.js';
  *   saw.draw();
  */
 export class Saw extends Obstacle {
-
     /**
      * @param {p5}    p
      * @param {number} x - World x (top-left, tile-snapped)
@@ -30,19 +29,23 @@ export class Saw extends Obstacle {
         super(p, x, y, obstacleSheet);
         this._angle = 0;
         this.obstacleSheet = obstacleSheet;
-        this.frameIndex=0;
-        this.sawWidth=38;
-        this.sawHeight=38;
-        this.splitAnimation(this.sawWidth, this.sawHeight); 
+        this.frameIndex = 0;
+        this.sawWidth = 38;
+        this.sawHeight = 38;
+        this.splitAnimation(this.sawWidth, this.sawHeight);
     }
 
     // ── Obstacle interface ────────────────────────────────────────────────
 
     /** The blade does not block movement — you pass through and die. */
-    get isSolid()  { return false; }
+    get isSolid() {
+        return false;
+    }
 
     /** Any contact with the spinning blade kills the player. */
-    get isHazard() { return true; }
+    get isHazard() {
+        return true;
+    }
 
     // ── Per-frame ─────────────────────────────────────────────────────────
 
@@ -60,23 +63,23 @@ export class Saw extends Obstacle {
      * Draw the spinning saw blade centred on the tile.
      */
     draw() {
-        const p  = this.p;
-        const T  = GameConfig.TILE;
+        const p = this.p;
+        const T = GameConfig.TILE;
         const cx = this.x + T / 2;
         const cy = this.y + T / 2;
         const frame = this.framesArr[this.frameIndex];
 
         p.push();
         p.translate(cx, cy);
-         if (frame) {
-            p.image(frame, -frame.width / 2, -frame.height / 2);  // centred at origin
-         }
-         this.frameIndex = (this.frameIndex + 1) % this.framesArr.length;
+        if (frame) {
+            p.image(frame, -frame.width / 2, -frame.height / 2); // centred at origin
+        }
+        this.frameIndex = (this.frameIndex + 1) % this.framesArr.length;
 
         p.pop();
     }
 
-    // ── Build-phase ghost 
+    // ── Build-phase ghost
 
     /**
      * Draw a semi-transparent placement preview (no rotation).
@@ -85,7 +88,7 @@ export class Saw extends Obstacle {
      * @param {number} y
      */
     static drawGhost(p, x, y, sheet) {
-        const T  = GameConfig.TILE;
+        const T = GameConfig.TILE;
         const frameW = 38;
         const frameH = 38;
         p.push();
@@ -104,10 +107,10 @@ export class Saw extends Obstacle {
      * @private
      */
     _drawBlade(p, T) {
-        const outerR     = T * 0.42;
-        const innerR     = T * 0.28;
-        const toothR     = T * 0.16;
-        const hubR       = T * 0.12;
+        const outerR = T * 0.42;
+        const innerR = T * 0.28;
+        const toothR = T * 0.16;
+        const hubR = T * 0.12;
         const toothCount = GameConfig.SAW_TOOTH_COUNT;
 
         // Base disc
@@ -118,7 +121,7 @@ export class Saw extends Obstacle {
         p.fill(220, 60, 60);
         const step = (Math.PI * 2) / toothCount;
         for (let i = 0; i < toothCount; i++) {
-            const a  = i * step;
+            const a = i * step;
             const tx = Math.cos(a) * outerR;
             const ty = Math.sin(a) * outerR;
             p.circle(tx, ty, toothR * 2);
@@ -132,7 +135,7 @@ export class Saw extends Obstacle {
         p.stroke(150, 150, 160);
         p.strokeWeight(1);
         const lineCount = toothCount / 2;
-        const lineStep  = (Math.PI * 2) / lineCount;
+        const lineStep = (Math.PI * 2) / lineCount;
         for (let i = 0; i < lineCount; i++) {
             const a = i * lineStep;
             p.line(

@@ -12,9 +12,12 @@ import { aabbIntersects } from '../../systems/PhysicsSystem.js';
  * @extends Obstacle
  */
 export class IcePlatform extends Obstacle {
-
-    get isSolid()  { return true; }
-    get isHazard() { return false; }
+    get isSolid() {
+        return true;
+    }
+    get isHazard() {
+        return false;
+    }
 
     applyEffect(player) {
         // Check player is standing on the top surface.
@@ -22,10 +25,12 @@ export class IcePlatform extends Obstacle {
         // feet to obs.y - skin (0.01px above), so there is no actual AABB overlap.
         // Instead check feet-Y within a small tolerance and horizontal overlap.
         const feetY = player.y + player.h;
-        const onTop = player.onGround &&
-                      feetY >= this.y - 2 && feetY <= this.y + 4 &&
-                      player.x + player.w > this.x + 2 &&
-                      player.x < this.x + this.w - 2;
+        const onTop =
+            player.onGround &&
+            feetY >= this.y - 2 &&
+            feetY <= this.y + 4 &&
+            player.x + player.w > this.x + 2 &&
+            player.x < this.x + this.w - 2;
         if (onTop) player.slideMode = true;
     }
 

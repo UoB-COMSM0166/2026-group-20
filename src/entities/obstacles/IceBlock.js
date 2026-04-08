@@ -12,9 +12,12 @@ import { aabbIntersects } from '../../systems/PhysicsSystem.js';
  * @extends Obstacle
  */
 export class IceBlock extends Obstacle {
-
-    get isSolid()  { return false; }
-    get isHazard() { return false; }
+    get isSolid() {
+        return false;
+    }
+    get isHazard() {
+        return false;
+    }
 
     /**
      * preEffect runs BEFORE player.update(), so speedMultiplier and slideMode
@@ -24,10 +27,21 @@ export class IceBlock extends Obstacle {
      * momentum) when they release input while overlapping it.
      */
     preEffect(player) {
-        if (!aabbIntersects(player.x, player.y, player.w, player.h,
-                             this.x, this.y, this.w, this.h)) return;
+        if (
+            !aabbIntersects(
+                player.x,
+                player.y,
+                player.w,
+                player.h,
+                this.x,
+                this.y,
+                this.w,
+                this.h,
+            )
+        )
+            return;
         player.speedMultiplier = 1.6;
-        player.slideMode       = true;
+        player.slideMode = true;
     }
 
     draw() {
@@ -49,7 +63,7 @@ export class IceBlock extends Obstacle {
         p.strokeWeight(1.5);
         const cx = this.x + T / 2;
         const cy = this.y + T / 2;
-        const r  = T * 0.26;
+        const r = T * 0.26;
         p.line(cx - r, cy, cx + r, cy);
         p.line(cx, cy - r, cx, cy + r);
         p.line(cx - r * 0.7, cy - r * 0.7, cx + r * 0.7, cy + r * 0.7);

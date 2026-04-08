@@ -6,7 +6,9 @@ import { GameConfig } from '../../config/GameConfig.js';
  * Blocks player movement on all sides (treated like a '#' map tile).
  */
 export class Platform extends Obstacle {
-    get isSolid() { return true; }
+    get isSolid() {
+        return true;
+    }
 
     draw() {
         const p = this.p;

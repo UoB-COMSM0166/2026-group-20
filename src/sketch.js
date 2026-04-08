@@ -1,20 +1,21 @@
 import { Player } from './entities/Player.js';
 import { ScoreManager } from './systems/ScoreManager.js';
 import { GameStage } from './config/GameStage.js';
-import { GameConfig } from './config/GameConfig.js';
-import { MAP } from './maps/MapLoader.js';
-import { BootState }    from './states/BootState.js';
-import { MenuState }    from './states/MenuState.js';
+import { MapManager } from './systems/MapManager.js';
+
+import { BootState } from './states/BootState.js';
+import { MenuState } from './states/MenuState.js';
 import { CharSelectState } from './states/CharSelectState.js';
+
 import { MapMenuState } from './states/MapMenuState.js';
-import { BuildState }   from './states/BuildState.js';
-import { RunState }     from './states/RunState.js';
+import { BuildState } from './states/BuildState.js';
+import { RunState } from './states/RunState.js';
 import { ResultsState } from './states/ResultsState.js';
-import { ShopState }    from './states/ShopState.js';
-import { Map2State }    from './states/Map2State.js';
-import { AnimationConfigChick } from "./config/AnimationConfigChick.js";
-import { AnimationConfigBunny } from "./config/AnimationConfigBunny.js";
-// import images 
+import { ShopState } from './states/ShopState.js';
+import { Map2State } from './states/Map2State.js';
+import { AnimationConfigChick } from './config/AnimationConfigChick.js';
+import { AnimationConfigBunny } from './config/AnimationConfigBunny.js';
+// import images
 import chickenSprite from './assets/sprites/chicken_all_frames2.png';
 import bunnySprite from './assets/sprites/bunny_all_frames.png';
 import duckSprite from './assets/sprites/duck_all_frames_flipped.png';
@@ -25,8 +26,7 @@ import fire from './assets/obstacles/Fire/On (16x32).png';
 import trampoline from './assets/obstacles/Trampoline/Jump (28x28).png';
 import spikedBall from './assets/obstacles/Spiked Ball/Spiked Ball.png';
 import cannon from './assets/obstacles/Cannon/cannon (30x18).png';
-import fallingPlatform from './assets/obstacles/Falling Platforms/On (32x10).png'; 
-
+import fallingPlatform from './assets/obstacles/Falling Platforms/On (32x10).png';
 
 /**
  * Root p5 sketch.
@@ -40,20 +40,21 @@ import fallingPlatform from './assets/obstacles/Falling Platforms/On (32x10).png
  *                                                  MAPMENU
  */
 export const sketch = (p) => {
-    const gameWidth  = MAP[0].length * GameConfig.TILE;
-    const gameHeight = MAP.length    * GameConfig.TILE;
-
     let activeState;
     let states;
 
     let scaleFactor = 1;
-    let offsetX     = 0;
-    let offsetY     = 0;
+    let offsetX = 0;
+    let offsetY = 0;
+    let gameWidth;
+    let gameHeight;
+
+    const mapManager = new MapManager(p);
 
     let sawFrames;
     let fireFrames;
     let trampolineBouncing;
-    let spikedBallImg; 
+    let spikedBallImg;
     let cannonImg;
     let fallingPlatformFrames;
 
@@ -62,31 +63,24 @@ export const sketch = (p) => {
     let duckSheet;
     let polarSheet;
 
-    p.preload = function(){
-      chickenSheet= p.loadImage(chickenSprite);
-      bunnySheet = p.loadImage(bunnySprite); 
-      duckSheet = p.loadImage(duckSprite); 
-      polarSheet = p.loadImage(polarSprite); 
-      sawFrames= p.loadImage(saw); 
-      fireFrames = p.loadImage(fire);
-      trampolineBouncing = p.loadImage(trampoline); 
-      spikedBallImg = p.loadImage(spikedBall);
-      cannonImg= p.loadImage(cannon);
-      fallingPlatformFrames = p.loadImage(fallingPlatform);
+    p.preload = function () {
+        chickenSheet = p.loadImage(chickenSprite);
+        bunnySheet = p.loadImage(bunnySprite);
+        duckSheet = p.loadImage(duckSprite);
+        polarSheet = p.loadImage(polarSprite);
+        sawFrames = p.loadImage(saw);
+        fireFrames = p.loadImage(fire);
+        trampolineBouncing = p.loadImage(trampoline);
+        spikedBallImg = p.loadImage(spikedBall);
+        cannonImg = p.loadImage(cannon);
+        fallingPlatformFrames = p.loadImage(fallingPlatform);
+        mapManager.preloadAll();
     };
 
     // ── Setup ──
 
     p.setup = function () {
         p.createCanvas(p.windowWidth, p.windowHeight);
-
-        const players      = [
-            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 0, 
-                chickenSheet, AnimationConfigChick),
-            new Player(p, 12 * GameConfig.TILE, 8 * GameConfig.TILE - GameConfig.TILE, 1, 
-                bunnySheet, AnimationConfigBunny),
-        ];
-        const scoreManager = new ScoreManager(players);
 
         /**
          * Shared session context.
@@ -98,17 +92,24 @@ export const sketch = (p) => {
             p,
             gameWidth,
             gameHeight,
-            players,
-            scoreManager,
+            players: [],
+            tiledMap: null,
+            scoreManager: null,
+            mapKey: 'map1',
+            selectMap: (mapKey) => mapManager.selectMap(mapKey, ctx),
             sprites: {
                 chicken: chickenSheet,
-                bunny:   bunnySheet,
-                duck:    duckSheet,
-                polar:   polarSheet,
+                bunny: bunnySheet,
+                duck: duckSheet,
+                polar: polarSheet,
             },
             placedObstacles: [],
             shopHasRun: false,
         };
+
+        mapManager.initialize(ctx);
+        gameWidth = ctx.gameWidth;
+        gameHeight = ctx.gameHeight;
 
         const goTo = (stage) => {
             activeState?.exit();
@@ -117,16 +118,24 @@ export const sketch = (p) => {
         };
 
         states = {
-            [GameStage.BOOT]:    new BootState(ctx, goTo),
-            [GameStage.MENU]:    new MenuState(ctx, goTo),
+            [GameStage.BOOT]: new BootState(ctx, goTo),
+            [GameStage.MENU]: new MenuState(ctx, goTo),
             [GameStage.CHAR_SELECT]: new CharSelectState(ctx, goTo),
             [GameStage.MAPMENU]: new MapMenuState(ctx, goTo),
-            [GameStage.BUILD]:   new BuildState(ctx, goTo, sawFrames, fireFrames, 
-               trampolineBouncing, spikedBallImg, cannonImg, fallingPlatformFrames),
-            [GameStage.RUN]:     new RunState(ctx, goTo),
+            [GameStage.BUILD]: new BuildState(
+                ctx,
+                goTo,
+                sawFrames,
+                fireFrames,
+                trampolineBouncing,
+                spikedBallImg,
+                cannonImg,
+                fallingPlatformFrames,
+            ),
+            [GameStage.RUN]: new RunState(ctx, goTo),
             [GameStage.RESULTS]: new ResultsState(ctx, goTo),
-            [GameStage.SHOP]:    new ShopState(ctx, goTo),
-            [GameStage.MAP2]:    new Map2State(ctx, goTo),
+            [GameStage.SHOP]: new ShopState(ctx, goTo),
+            [GameStage.MAP2]: new Map2State(ctx, goTo),
         };
 
         goTo(GameStage.BOOT);
@@ -135,11 +144,16 @@ export const sketch = (p) => {
     // ── Draw ──
 
     p.draw = function () {
+        if (ctx) {
+            gameWidth = ctx.gameWidth;
+            gameHeight = ctx.gameHeight;
+        }
+
         p.background(0);
 
         scaleFactor = p.min(p.width / gameWidth, p.height / gameHeight);
-        offsetX     = (p.width  - gameWidth  * scaleFactor) / 2;
-        offsetY     = (p.height - gameHeight * scaleFactor) / 2;
+        offsetX = (p.width - gameWidth * scaleFactor) / 2;
+        offsetY = (p.height - gameHeight * scaleFactor) / 2;
 
         const mx = (p.mouseX - offsetX) / scaleFactor;
         const my = (p.mouseY - offsetY) / scaleFactor;
@@ -154,7 +168,6 @@ export const sketch = (p) => {
 
         p.pop();
     };
-
 
     // ── Input ──
 

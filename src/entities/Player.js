@@ -3,16 +3,19 @@
  * Handles movement, animation frames and life state.
  */
 
-import { GameConfig } from "../config/GameConfig.js";
-import { HandleInput } from "../systems/HandleInput.js";
-import { PlayerMovementState } from "../config/PlayerMovementState.js";
-import { PlayerState } from "../config/PlayerState.js";
+import { GameConfig } from '../config/GameConfig.js';
+import { HandleInput } from '../systems/HandleInput.js';
+import { PlayerMovementState } from '../config/PlayerMovementState.js';
+import { PlayerState } from '../config/PlayerState.js';
 import { PlayerGameState } from '../config/PlayerGameState.js';
-import { DeathReason } from "../config/DeathReason.js";
+import { DeathReason } from '../config/DeathReason.js';
 
-
-import { moveAndCollideX, moveAndCollideY, checkSpikeCollision } from "../systems/PhysicsSystem.js";
-
+import {
+    moveAndCollideX,
+    moveAndCollideY,
+    checkSpikeCollision,
+    checkFallDeath,
+} from '../systems/PhysicsSystem.js';
 
 export class Player {
     constructor(p, x, y, playerNo, spriteSheet, animationconfig) {
@@ -20,12 +23,12 @@ export class Player {
         this.playerNo = playerNo;
         this.spawnX = x;
         this.spawnY = y;
-        this.x = x; 
+        this.x = x;
         this.y = y;
-        this.w = 28; 
+        this.w = 28;
         this.h = 34;
 
-        this.vx = 0; 
+        this.vx = 0;
         this.vy = 0;
         this.onGround = false;
 
@@ -36,13 +39,13 @@ export class Player {
         this.skin = GameConfig.SKIN_WIDTH;
 
         // Double jump
-        this.maxJumps  = 2;
+        this.maxJumps = 2;
         this.jumpsLeft = this.maxJumps;
         this.secondJump = false;
 
-        this.lifeState     = PlayerState.ALIVE;
+        this.lifeState = PlayerState.ALIVE;
         this.movementState = PlayerMovementState.IDLE;
-        this.gameState     = PlayerGameState.PLAYING;
+        this.gameState = PlayerGameState.PLAYING;
         this.lastDeathReason = null;
 
         /**
@@ -86,20 +89,20 @@ export class Player {
          */
         this.inventory = new Map();
 
-        this.input        = new HandleInput(p, playerNo);
-        this.facingRight  = true;
+        this.input = new HandleInput(p, playerNo);
+        this.facingRight = true;
         this.respawnCountdown = 0;
 
         // ── Sprite animation ─
-        this.spriteSheet     = spriteSheet ?? null;
-        this.framesArr       = [];
-        this.frameIndexIdle       = 0;
-        this.frameIndexRun        = 0;
-        this.frameIndexJump       = 0;
-        this.frameIndexFall       = 0;
+        this.spriteSheet = spriteSheet ?? null;
+        this.framesArr = [];
+        this.frameIndexIdle = 0;
+        this.frameIndexRun = 0;
+        this.frameIndexJump = 0;
+        this.frameIndexFall = 0;
         this.frameIndexRespawning = 0;
         /** Animation frame-index map set by setSprite() or DrawPlayer. */
-        this.animConfig      = null;
+        this.animConfig = null;
 
         if (this.spriteSheet) {
             this._splitAnimation();
@@ -113,13 +116,13 @@ export class Player {
      * @param {object}   animConfig
      */
     setSprite(sheet, animConfig) {
-        this.spriteSheet          = sheet;
-        this.animConfig           = animConfig;
-        this.framesArr            = [];
-        this.frameIndexIdle       = 0;
-        this.frameIndexRun        = 0;
-        this.frameIndexJump       = 0;
-        this.frameIndexFall       = 0;
+        this.spriteSheet = sheet;
+        this.animConfig = animConfig;
+        this.framesArr = [];
+        this.frameIndexIdle = 0;
+        this.frameIndexRun = 0;
+        this.frameIndexJump = 0;
+        this.frameIndexFall = 0;
         this.frameIndexRespawning = 0;
         this._splitAnimation();
     }
@@ -140,10 +143,10 @@ export class Player {
      * Handles horizontal player movement based on input.
      */
     horizontalMovement() {
-        const prevSlide      = this.slideMode;
-        const speedMult      = this.speedMultiplier;
-        this.slideMode       = false; // reset; ice obstacles re-set before this call
-        this.speedMultiplier = 1.0;   // reset; IceBlock re-sets before this call
+        const prevSlide = this.slideMode;
+        const speedMult = this.speedMultiplier;
+        this.slideMode = false; // reset; ice obstacles re-set before this call
+        this.speedMultiplier = 1.0; // reset; IceBlock re-sets before this call
 
         const noInput = !this.input.left && !this.input.right;
         if (noInput && prevSlide) {
@@ -151,36 +154,35 @@ export class Player {
             this.vx *= 0.97;
         } else {
             this.vx = 0;
-            if (this.input.left)  this.vx -= this.speed * speedMult;
+            if (this.input.left) this.vx -= this.speed * speedMult;
             if (this.input.right) this.vx += this.speed * speedMult;
         }
     }
     /**
      * Handles vertical player movement based on input.
      */
-    jumpUp(){
-         if(this.onGround){
-            this.jumpsLeft=this.maxJumps;
-         }
-         if (this.input.jump  && !this.secondJump
-             && this.jumpsLeft>0) {
+    jumpUp() {
+        if (this.onGround) {
+            this.jumpsLeft = this.maxJumps;
+        }
+        if (this.input.jump && !this.secondJump && this.jumpsLeft > 0) {
             this.vy = -this.jumpVel;
             this.jumpsLeft--;
             this.onGround = false;
         }
-        this.secondJump=this.input.jump;
+        this.secondJump = this.input.jump;
     }
 
     /**
      *
      *
      * @param {Player[]} allPlayers - List of players
-     * @param {*} respawnManager 
+     * @param {*} respawnManager
      * @param {Array} obstacles - List of obstacles
      */
 
     //move
-    update(allPlayers, respawnManager, obstacles=[]) {
+    update(allPlayers, respawnManager, obstacles = [], MAP) {
         if (this.lifeState !== PlayerState.ALIVE) {
             return;
         }
@@ -188,10 +190,16 @@ export class Player {
         this.horizontalMovement();
         this.jumpUp();
         this.comeDown();
-        this.moveAndCollide(allPlayers, obstacles);
-        
-        if (checkSpikeCollision(this, this.p, obstacles)) {
+        this.moveAndCollide(allPlayers, obstacles, MAP);
+
+        if (checkSpikeCollision(this, this.p, obstacles, MAP)) {
             respawnManager.triggerDeath(this, DeathReason.TRAP);
+            return;
+        }
+
+        if (checkFallDeath(this, GameConfig.GAME_HEIGHT)) {
+            respawnManager.triggerDeath(this, DeathReason.FALL);
+            return;
         }
 
         this.updateMovementState();
@@ -199,13 +207,12 @@ export class Player {
     /**
      * Applies gravity to the player.
      */
-     comeDown(){
+    comeDown() {
         this.vy += this.gravity;
         if (this.vy > this.maxFall) {
             this.vy = this.maxFall;
         }
-     }
-
+    }
 
     /**
      * Moves the player and resolves collisions.
@@ -213,36 +220,42 @@ export class Player {
      * @param {Array} obstacles - List of obstacles
      */
 
-     //change name this is horrible 
-     //move to sparate file; handle collisions and the world
-     //move
-     moveAndCollide(allPlayers, obstacles = []) {
-        moveAndCollideX(this, this.vx, allPlayers, this.p, obstacles);
-        moveAndCollideY(this, this.vy, allPlayers, this.p, obstacles);
-     }
+    //change name this is horrible
+    //move to sparate file; handle collisions and the world
+    //move
+    moveAndCollide(allPlayers, obstacles = [], MAP) {
+        moveAndCollideX(this, this.vx, allPlayers, this.p, obstacles, MAP);
+        moveAndCollideY(this, this.vy, allPlayers, this.p, obstacles, MAP);
+    }
 
     /**
      * Updates the movement state (idle, run, jump, fall).
      */
     updateMovementState() {
         if (this.vx > 0) {
-         this.facingRight = true;
+            this.facingRight = true;
         }
         if (this.vx < 0) {
-         this.facingRight = false;
+            this.facingRight = false;
         }
 
         if (!this.onGround) {
-            this.movementState = this.vy < 0 ? PlayerMovementState.JUMP : PlayerMovementState.FALL;
+            this.movementState =
+                this.vy < 0
+                    ? PlayerMovementState.JUMP
+                    : PlayerMovementState.FALL;
         } else {
-            this.movementState = this.vx === 0 ? PlayerMovementState.IDLE : PlayerMovementState.RUN;
+            this.movementState =
+                this.vx === 0
+                    ? PlayerMovementState.IDLE
+                    : PlayerMovementState.RUN;
         }
     }
 
-   /**
-    * Kills the player and output the reason.
-    * @param {DeathReason} reason - the reason a player dies 
-    */
+    /**
+     * Kills the player and output the reason.
+     * @param {DeathReason} reason - the reason a player dies
+     */
     die(reason) {
         if (this.lifeState === PlayerState.DEAD) {
             return;
@@ -256,9 +269,9 @@ export class Player {
         console.log(`Player ${this.playerNo} died due to: ${reason}`);
     }
 
-     /**
-      * Moves the player to spawn position and prepares respawn animation.
-      */
+    /**
+     * Moves the player to spawn position and prepares respawn animation.
+     */
     prepareRespawn() {
         this.lifeState = PlayerState.RESPAWNING;
         this.x = this.spawnX;
@@ -269,13 +282,12 @@ export class Player {
     /**
      * Finishes the respawn process and returns the player to gameplay.
      */
-    //Needs to be moved to a separate class 
-     finishRespawn() {
+    //Needs to be moved to a separate class
+    finishRespawn() {
         this.lifeState = PlayerState.ALIVE;
         this.movementState = PlayerMovementState.IDLE;
         console.log(`Player ${this.playerNo} has respawned completely`);
     }
-    
 
     /**
      * Returns whether the player should currently be visible or not.
@@ -283,7 +295,10 @@ export class Player {
      */
 
     get isVisible() {
-        return this.lifeState === PlayerState.ALIVE || this.lifeState === PlayerState.RESPAWNING;
+        return (
+            this.lifeState === PlayerState.ALIVE ||
+            this.lifeState === PlayerState.RESPAWNING
+        );
     }
 
     /**
@@ -293,5 +308,4 @@ export class Player {
     setGameState(newState) {
         this.gameState = newState;
     }
-    
 }

@@ -14,31 +14,31 @@ import { AnimationConfigPolar } from './AnimationConfigPolar.js';
 
 export const CHARACTERS = [
     {
-        id:          'chicken',
+        id: 'chicken',
         displayName: 'Chicken',
-        spriteKey:   'chicken',
-        animConfig:  AnimationConfigChick,
-        colour:      [255, 210, 80],  // yellow
+        spriteKey: 'chicken',
+        animConfig: AnimationConfigChick,
+        colour: [255, 210, 80], // yellow
     },
     {
-        id:          'bunny',
+        id: 'bunny',
         displayName: 'Bunny',
-        spriteKey:   'bunny',
-        animConfig:  AnimationConfigBunny,
-        colour:      [255, 160, 200], // pink
+        spriteKey: 'bunny',
+        animConfig: AnimationConfigBunny,
+        colour: [255, 160, 200], // pink
     },
     {
-        id:          'duck',
+        id: 'duck',
         displayName: 'Duck',
-        spriteKey:   'duck',
-        animConfig:  AnimationConfigDuck,
-        colour:      [100, 200, 255], // light blue
+        spriteKey: 'duck',
+        animConfig: AnimationConfigDuck,
+        colour: [100, 200, 255], // light blue
     },
     {
-        id:          'polar',
+        id: 'polar',
         displayName: 'Polar Bear',
-        spriteKey:   'polar',
-        animConfig:  AnimationConfigPolar,
-        colour:      [200, 230, 255], // ice white
+        spriteKey: 'polar',
+        animConfig: AnimationConfigPolar,
+        colour: [200, 230, 255], // ice white
     },
 ];

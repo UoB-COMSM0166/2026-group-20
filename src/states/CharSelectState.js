@@ -4,14 +4,14 @@ import { CHARACTERS } from '../config/CharacterConfig.js';
 
 // Player accent colours used in UI
 const PLAYER_COLOURS = [
-    [90,  170, 255], // P1 blue
-    [255, 200, 80],  // P2 orange
+    [90, 170, 255], // P1 blue
+    [255, 200, 80], // P2 orange
 ];
 
 // Card layout (fits 4 cards in 960px canvas)
-const CARD_W     = 175;
-const CARD_H     = 200;
-const CARD_GAP   = 20;
+const CARD_W = 175;
+const CARD_H = 200;
+const CARD_GAP = 20;
 const SPRITE_SCALE = 3; // draw the 28×34 sprite at 4× for the preview
 
 /**
@@ -28,13 +28,12 @@ const SPRITE_SCALE = 3; // draw the 28×34 sprite at 4× for the preview
  *   ENTER                     — confirm current selection (if one is highlighted)
  */
 export class CharSelectState extends State {
-
     enter() {
-        this._currentTurn  = 0;          // 0 = P1 choosing, 1 = P2 choosing
-        this._hovered      = null;       // character id under cursor this frame
-        this._highlighted  = null;       // character id keyboard-highlighted
-        this._chosen       = [null, null]; // chosen character id per player
-        this._animTick     = 0;          // increments each frame for card previews
+        this._currentTurn = 0; // 0 = P1 choosing, 1 = P2 choosing
+        this._hovered = null; // character id under cursor this frame
+        this._highlighted = null; // character id keyboard-highlighted
+        this._chosen = [null, null]; // chosen character id per player
+        this._animTick = 0; // increments each frame for card previews
     }
 
     update(deltaTime) {
@@ -52,26 +51,38 @@ export class CharSelectState extends State {
         p.fill(...col);
         p.textAlign(p.CENTER, p.TOP);
         p.textSize(22);
-        p.text(`P${this._currentTurn + 1} — CHOOSE YOUR CHARACTER`, gameWidth / 2, 12);
+        p.text(
+            `P${this._currentTurn + 1} — CHOOSE YOUR CHARACTER`,
+            gameWidth / 2,
+            12,
+        );
 
         p.fill(160, 160, 190);
         p.textSize(12);
-        p.text('Click a card to select  •  ENTER to confirm', gameWidth / 2, 40);
+        p.text(
+            'Click a card to select  •  ENTER to confirm',
+            gameWidth / 2,
+            40,
+        );
 
         // ── Character cards ─
-        const totalW  = CHARACTERS.length * CARD_W + (CHARACTERS.length - 1) * CARD_GAP;
-        const startX  = (gameWidth - totalW) / 2;
-        const cardY   = (gameHeight - CARD_H) / 2 - 10;
+        const totalW =
+            CHARACTERS.length * CARD_W + (CHARACTERS.length - 1) * CARD_GAP;
+        const startX = (gameWidth - totalW) / 2;
+        const cardY = (gameHeight - CARD_H) / 2 - 10;
 
         this._hovered = null;
 
         CHARACTERS.forEach((char, i) => {
             const cx = startX + i * (CARD_W + CARD_GAP);
-            const isHovered   = mx >= cx && mx <= cx + CARD_W &&
-                                my >= cardY && my <= cardY + CARD_H;
-            const takenBy     = this._takenBy(char.id);
-            const isTaken     = takenBy !== null;
-            const isChosen    = this._chosen[this._currentTurn] === char.id;
+            const isHovered =
+                mx >= cx &&
+                mx <= cx + CARD_W &&
+                my >= cardY &&
+                my <= cardY + CARD_H;
+            const takenBy = this._takenBy(char.id);
+            const isTaken = takenBy !== null;
+            const isChosen = this._chosen[this._currentTurn] === char.id;
 
             if (isHovered && !isTaken) this._hovered = char.id;
 
@@ -129,7 +140,11 @@ export class CharSelectState extends State {
                 p.fill(...takenCol);
                 p.textSize(12);
                 p.textAlign(p.CENTER, p.CENTER);
-                p.text(`P${takenBy + 1}'s pick`, cx + CARD_W / 2, cardY + CARD_H - 22);
+                p.text(
+                    `P${takenBy + 1}'s pick`,
+                    cx + CARD_W / 2,
+                    cardY + CARD_H - 22,
+                );
             } else {
                 // Colour accent dot at bottom
                 p.fill(...char.colour);
@@ -139,19 +154,25 @@ export class CharSelectState extends State {
 
         // ── Player turn indicators ─────
         const dotsY = cardY + CARD_H + 22;
-        [0, 1].forEach(i => {
-            const dotX  = gameWidth / 2 + (i === 0 ? -16 : 16);
+        [0, 1].forEach((i) => {
+            const dotX = gameWidth / 2 + (i === 0 ? -16 : 16);
             const active = i === this._currentTurn;
             p.fill(active ? PLAYER_COLOURS[i] : [40, 40, 55]);
             p.noStroke();
             p.circle(dotX, dotsY, active ? 13 : 9);
 
             if (this._chosen[i]) {
-                const charName = CHARACTERS.find(c => c.id === this._chosen[i])?.displayName ?? '';
+                const charName =
+                    CHARACTERS.find((c) => c.id === this._chosen[i])
+                        ?.displayName ?? '';
                 p.fill(PLAYER_COLOURS[i]);
                 p.textAlign(i === 0 ? p.RIGHT : p.LEFT, p.CENTER);
                 p.textSize(11);
-                p.text(`P${i + 1}: ${charName}`, gameWidth / 2 + (i === 0 ? -26 : 26), dotsY);
+                p.text(
+                    `P${i + 1}: ${charName}`,
+                    gameWidth / 2 + (i === 0 ? -26 : 26),
+                    dotsY,
+                );
             }
         });
 
@@ -159,19 +180,28 @@ export class CharSelectState extends State {
         p.fill(70, 70, 90);
         p.textAlign(p.CENTER, p.BOTTOM);
         p.textSize(10);
-        p.text('Click a character to select  •  ENTER to confirm selection', gameWidth / 2, gameHeight - 4);
+        p.text(
+            'Click a character to select  •  ENTER to confirm selection',
+            gameWidth / 2,
+            gameHeight - 4,
+        );
     }
 
     mousePressed(mx, my) {
         const { gameWidth, gameHeight } = this.ctx;
-        const totalW = CHARACTERS.length * CARD_W + (CHARACTERS.length - 1) * CARD_GAP;
+        const totalW =
+            CHARACTERS.length * CARD_W + (CHARACTERS.length - 1) * CARD_GAP;
         const startX = (gameWidth - totalW) / 2;
-        const cardY  = (gameHeight - CARD_H) / 2 - 10;
+        const cardY = (gameHeight - CARD_H) / 2 - 10;
 
         CHARACTERS.forEach((char, i) => {
             const cx = startX + i * (CARD_W + CARD_GAP);
-            if (mx >= cx && mx <= cx + CARD_W &&
-                my >= cardY && my <= cardY + CARD_H) {
+            if (
+                mx >= cx &&
+                mx <= cx + CARD_W &&
+                my >= cardY &&
+                my <= cardY + CARD_H
+            ) {
                 if (this._takenBy(char.id) !== null) return; // already taken
                 this._selectChar(char);
             }
@@ -196,7 +226,7 @@ export class CharSelectState extends State {
      */
     _selectChar(char) {
         const playerIdx = this._currentTurn;
-        const player    = this.ctx.players[playerIdx];
+        const player = this.ctx.players[playerIdx];
 
         this._chosen[playerIdx] = char.id;
 
@@ -244,7 +274,8 @@ export class CharSelectState extends State {
 
         // Pick an idle frame to cycle (roughly 4fps)
         const idleFrames = char.animConfig.IDLE;
-        const frameIdx   = idleFrames[Math.floor(this._animTick / 250) % idleFrames.length];
+        const frameIdx =
+            idleFrames[Math.floor(this._animTick / 250) % idleFrames.length];
 
         const srcX = frameIdx * fw;
 

@@ -42,12 +42,12 @@ jobs:
             - name: Download build artifact
               uses: actions/download-artifact@v5
               with:
-                name: 'pages-artifact'
-                path: './dist'
+                  name: 'pages-artifact'
+                  path: './dist'
             - name: Deploy app
               uses: peaceiris/actions-gh-pages@v4.0.0
               with:
-                github_token: ${{ secrets.GITHUB_TOKEN }}
-                publish_dir: './dist'
-                destination_dir: ${{ env.TARGET_DIR }}
-                keep_files: 'true'
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: './dist'
+                  destination_dir: ${{ env.TARGET_DIR }}
+                  keep_files: 'true'
