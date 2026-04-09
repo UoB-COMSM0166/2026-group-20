@@ -12,7 +12,7 @@ import { BuildState } from './states/BuildState.js';
 import { RunState } from './states/RunState.js';
 import { ResultsState } from './states/ResultsState.js';
 import { ShopState } from './states/ShopState.js';
-import { Map2State } from './states/Map2State.js';
+// import { Map2State } from './states/Map2State.js';
 import { AnimationConfigChick } from './config/AnimationConfigChick.js';
 import { AnimationConfigBunny } from './config/AnimationConfigBunny.js';
 // import images
@@ -63,6 +63,8 @@ export const sketch = (p) => {
     let duckSheet;
     let polarSheet;
 
+    let ctx;
+
     p.preload = function () {
         chickenSheet = p.loadImage(chickenSprite);
         bunnySheet = p.loadImage(bunnySprite);
@@ -88,7 +90,7 @@ export const sketch = (p) => {
          *                   Lives here so it survives the BUILD → RUN transition.
          * Obstacle tokens are now stored per-player in player.inventory (Map).
          */
-        const ctx = {
+        ctx = {
             p,
             gameWidth,
             gameHeight,
@@ -135,7 +137,7 @@ export const sketch = (p) => {
             [GameStage.RUN]: new RunState(ctx, goTo),
             [GameStage.RESULTS]: new ResultsState(ctx, goTo),
             [GameStage.SHOP]: new ShopState(ctx, goTo),
-            [GameStage.MAP2]: new Map2State(ctx, goTo),
+            //            [GameStage.MAP2]: new Map2State(ctx, goTo),
         };
 
         goTo(GameStage.BOOT);

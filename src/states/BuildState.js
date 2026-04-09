@@ -16,7 +16,7 @@ import { SpikedBall } from '../entities/obstacles/SpikedBall.js';
 import { IceBlock } from '../entities/obstacles/IceBlock.js';
 import { WindZone, WindDir } from '../entities/obstacles/WindZone.js';
 import { Teleporter } from '../entities/obstacles/Teleporter.js';
-import { drawMap, MAP } from '../maps/MapLoader.js';
+// import { drawMap, MAP } from '../maps/MapLoader.js';
 
 // Map tile characters that cannot be overwritten when placing obstacles
 const BLOCKED_TILES = new Set([
