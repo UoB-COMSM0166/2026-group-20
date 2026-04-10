@@ -15,6 +15,8 @@ import { ShopState } from './states/ShopState.js';
 // import { Map2State } from './states/Map2State.js';
 import { AnimationConfigChick } from './config/AnimationConfigChick.js';
 import { AnimationConfigBunny } from './config/AnimationConfigBunny.js';
+//import { AnimationConfigDuck } from './config/AnimationConfigDuck.js';
+//import { AnimationConfigPolar } from './config/AnimationConfigPolar.js';
 // import images
 import chickenSprite from './assets/sprites/chicken_all_frames2.png';
 import bunnySprite from './assets/sprites/bunny_all_frames.png';

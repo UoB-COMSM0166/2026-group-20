@@ -1,11 +1,14 @@
 import { PlayerState } from '../config/PlayerState.js';
 import { PlayerMovementState } from '../config/PlayerMovementState.js';
+import { AnimationConfigChick } from '../config/AnimationConfigChick.js';
+import { AnimationConfigBunny } from '../config/AnimationConfigBunny.js';
+
 /**
  * DrawPlayer — renders a player each frame.
  *
  * If the player has a loaded sprite sheet (framesArr.length > 0), draws
  * the appropriate animation frame for the current movement/life state.
- * Otherwise falls back to a coloured rectangle (useful in tests / dev).
+ * Otherwise falls back to a simple label (useful in tests / dev).
  *
  * Frame advance rate: every call advances the frame index by 1. At ~60 fps
  * the animation plays at the p5 frame rate. The sprite branch animates on
@@ -22,7 +25,9 @@ export function DrawPlayer(player) {
         // Fall back to playerNo-based default so the game works before char select runs.
         const cfg =
             player.animConfig ??
-            (player.playerNo === 0 ? AnimationConfig : AnimationConfig2);
+            (player.playerNo === 0
+                ? AnimationConfigChick
+                : AnimationConfigBunny);
 
         const state = player.movementState;
         const lifeState = player.lifeState;
@@ -39,109 +44,6 @@ export function DrawPlayer(player) {
         } else {
             // IDLE (and any unrecognised state)
             _drawFrame(player, p, cfg.IDLE, 'frameIndexIdle', false);
-        }
-    } else {
-        // ── Fallback rectangle ────────────────────────────────────────────
-        p.noStroke();
-        let alpha;
-        if (PlayerState.RESPAWNING === player.lifeState) {
-            alpha = 120;
-        } else {
-            alpha = 255;
-        }
-
-        if (player.movementState === PlayerMovementState.IDLE) {
-            const frames = player.animationconfig.IDLE;
-            player.p.image(
-                player.framesArr[frames[player.frameIndexIdle]],
-                player.x,
-                player.y,
-            );
-            player.frameIndexIdle = (player.frameIndexIdle + 1) % frames.length;
-        }
-
-        if (player.movementState === PlayerMovementState.RUN) {
-            const frames = player.animationconfig.RUN;
-            const img = player.framesArr[frames[player.frameIndexRun]];
-            player.p.push();
-            if (player.facingRight) {
-                player.p.image(
-                    player.framesArr[frames[player.frameIndexRun]],
-                    player.x,
-                    player.y,
-                );
-            } else {
-                player.p.translate(player.x + player.w, player.y);
-                player.p.scale(-1, 1);
-                player.p.image(img, 0, 0);
-            }
-            player.p.pop();
-            player.frameIndexRun = (player.frameIndexRun + 1) % frames.length;
-        }
-
-        if (player.movementState === PlayerMovementState.JUMP) {
-            const frames = player.animationconfig.JUMP;
-            const img = player.framesArr[frames[player.frameIndexJump]];
-            player.p.push();
-            if (player.facingRight) {
-                player.p.image(
-                    player.framesArr[frames[player.frameIndexJump]],
-                    player.x,
-                    player.y,
-                );
-            } else {
-                player.p.translate(player.x + player.w, player.y);
-                player.p.scale(-1, 1);
-                player.p.image(img, 0, 0);
-            }
-            player.p.pop();
-            player.frameIndexJump = (player.frameIndexJump + 1) % frames.length;
-        }
-
-        if (player.movementState === PlayerMovementState.FALL) {
-            const frames = player.animationconfig.FALL;
-            const img = player.framesArr[frames[player.frameIndexFall]];
-            player.p.push();
-            if (player.facingRight) {
-                player.p.image(
-                    player.framesArr[frames[player.frameIndexFall]],
-                    player.x,
-                    player.y,
-                );
-            } else {
-                player.p.translate(player.x + player.w, player.y);
-                player.p.scale(-1, 1);
-                player.p.image(img, 0, 0);
-            }
-            player.p.pop();
-            player.frameIndexFall = (player.frameIndexFall + 1) % frames.length;
-        }
-
-        if (player.lifeState === PlayerState.RESPAWNING) {
-            const frames = player.animationconfig.RESPAWNING;
-            player.p.image(
-                player.framesArr[frames[player.frameIndexRespawning]],
-                player.x,
-                player.y,
-            );
-            player.frameIndexRespawning =
-                (player.frameIndexRespawning + 1) % frames.length;
-        }
-
-        p.fill(255);
-        p.textAlign(p.CENTER, p.BOTTOM);
-        p.textSize(16);
-        p.textFont('Arial');
-
-        if (player.lifeState === PlayerState.RESPAWNING) {
-            p.fill(255, 100, 100);
-            p.text(
-                Math.ceil(player.respawnCountdown) + 's',
-                player.x + player.w / 2,
-                player.y - 5,
-            );
-        } else {
-            p.text(player.movementState, player.x + player.w / 2, player.y - 5);
         }
     }
 

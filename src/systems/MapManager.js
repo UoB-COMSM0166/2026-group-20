@@ -2,6 +2,9 @@ import { Player } from '../entities/Player.js';
 import { ScoreManager } from './ScoreManager.js';
 import { TiledMapLoader } from '../maps/TiledMapLoader.js';
 
+import { AnimationConfigChick } from '../config/AnimationConfigChick.js';
+import { AnimationConfigBunny } from '../config/AnimationConfigBunny.js';
+
 /**
  * MapManager centralizes map loading/switching and keeps shared ctx in sync.
  */
@@ -51,8 +54,22 @@ export class MapManager {
         const gameWidth = this.current.gameWidth;
         const gameHeight = this.current.gameHeight;
         const players = [
-            new Player(this.p, this.current.startX, this.current.startY, 0),
-            new Player(this.p, this.current.startX, this.current.startY, 1),
+            new Player(
+                this.p,
+                this.current.startX,
+                this.current.startY,
+                0,
+                ctx.sprites.chicken,
+                AnimationConfigChick,
+            ),
+            new Player(
+                this.p,
+                this.current.startX,
+                this.current.startY,
+                1,
+                ctx.sprites.bunny,
+                AnimationConfigBunny,
+            ),
         ];
 
         ctx.gameWidth = gameWidth;
