@@ -40,6 +40,43 @@ GROUP PHOTO. Add a group photo here.
 - Brainstorming board - used for idea generation, planning and taking meeting notes
 - Kanban board - used for tracking tasks and development progress
 
+<h3>Repository Structure</h3>
+
+```
+2026-GROUP-20/
+├─ .github/
+│  └─ workflows/
+│     ├─ pre-build.yml        # CI workflow for checks before build
+│     └─ release.yml          # CI/CD workflow for build and deployment
+│
+├─ .husky/                    # Pre-commit hook configuration
+├─ docs/                      # Project documentation
+│
+├─ src/                       # source code
+│  ├─ assets/                 
+│  ├─ config/                
+│  ├─ entities/               
+│  ├─ maps/                 
+│  ├─ state/                  
+│  ├─ systems/                
+│  ├─ utils/                  
+│  ├─ ui/                    
+│  ├─ main.js                 
+│  ├─ sketch.js              
+│  └─ style.css              
+│
+├─ tests/                     # Unit tests
+│
+├─ .gitignore                 # Git ignore rules
+├─ .nvmrc                     # Node.js version configuration
+├─ .prettierignore            # Prettier ignore rules
+├─ .prettierrc                # Prettier formatting rules
+├─ eslint.config.js           # ESLint configuration
+├─ index.html                 
+├─ package.json               # Project dependencies 
+├─ README.md               
+└─ vite.config.js             # Vite development and build configuration
+```
 
 
 <h2 align="center">Project Report</h2>
@@ -364,15 +401,19 @@ The game utilises various asset types. Each asset type is managed by a correspon
 - Describe implementation of your game, in particular highlighting the TWO areas of _technical challenge_ in developing your game.
 
 ## 4.1 Implementaion Overall
-The game was implemented using a modular architecture that follows the hybrid Entity–Component–System (ECS) and object-oriented design described in Section 3. To ensure a clean execution environment, the project utilises **p5.js instance mode** (add ref), which encapsulates the sketch within a dedicated object and prevents conflicts in the global namespace. The codebase is organised into several modules: `entities`, `systems`, `state`, `config` and `UI`, each responsible for a specific part of the game logic.
+The game implementation follows the modular architecture described in Section 3. A key technical decision in the implementation was the use of **p5.js instance mode** (add ref). In standard mode (or <em>global mode</em>), core functions such as `setup()` and `draw()` are placed in the global namespace by default, meaning they are accessible from any script in the program. While this approach is simple and quick to set up, variables and functions are shared across multiple files, which increases the risk of name collisions. 
 
-Within this structure, `sketch.js` acts as the main entry point and controller of the game. In `sketch.js`, the `setup()` function initialises the game environment and loading required resources, while the `draw()` function runs continuously as the main game loop. During each frame, the game first processes player input and updates the state of game entities. It then executes gameplay systems responsible for core mechanics such as collision detection, respawning and timing control.
 
-Player entities respond to keyboard input to perform actions such as movement and jumping. Systems such as `Physics System`, `Respawn Manager` and `Time Manager` operate on these entities to handle interactions with obstacles, player resets and gameplay timing. Finally, the updated game state is rendered to the screen. 
+To avoid these issues, we adopted **instance mode**. In this mode, the entire sketch is encapsulated within an object, which isolates p5.js functions from the global scope. This prevents conflicts between variables and functions defined in different modules. As a result, instance mode supports better code organisation and maintainability, particularly when working with a modular architecture. 
+ 
+The codebase is organised into modules including `entities`, `systems`, `state`, `config`, and `UI`, each responsible for a specific part of the game logic. In this implementation, `main.js` creates a `new p5()` instance that serves as the main entry point of the program. This instance loads `sketch.js`,  which defines the `setup()` and `draw()` functions. The `setup()` function initialises the game environment and loading required resources, and the `draw()` function runs continuously as the main game loop. During each frame, the game first processes player input, updates entity states, executes gameplay systems such as collision detection, respawing, and finally renders the updated game state to the screen. 
 
 ## 4.2 Technical Challenge 1: CI/CD Pipeline 
+(250-300 words)
+
 
 ## 4.3 Technical Challenge 2: AI 
+(250-300 words)
 
 
 ## 5. Evaluation
@@ -649,6 +690,8 @@ main
 
 [7]J. Brooke , “SUS: A ‘Quick and Dirty’ Usability Scale,” in Usability Evaluation In Industry, CRC Press, 1996, pp. 207–212. Accessed: Apr. 06, 2026. [Online]. Available: https://doi.org/10.1201/9781498710411-35
   
+
+[8] “p5,” p5.js. Accessed: Apr. 12, 2026. [Online]. Available: https://p5js.org/reference/p5/p5/ (instance mode)
 
 ### Appendix
 
