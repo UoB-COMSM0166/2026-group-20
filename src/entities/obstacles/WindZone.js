@@ -4,17 +4,17 @@ import { aabbIntersects } from '../../systems/PhysicsSystem.js';
 
 // Wind directions and their velocity vectors
 export const WindDir = Object.freeze({
-    LEFT:  'LEFT',
+    LEFT: 'LEFT',
     RIGHT: 'RIGHT',
-    UP:    'UP',
-    DOWN:  'DOWN',
+    UP: 'UP',
+    DOWN: 'DOWN',
 });
 
 const DIR_VECTORS = {
-    LEFT:  { vx: -1, vy:  0 },
-    RIGHT: { vx:  1, vy:  0 },
-    UP:    { vx:  0, vy: -1 },
-    DOWN:  { vx:  0, vy:  1 },
+    LEFT: { vx: -1, vy: 0 },
+    RIGHT: { vx: 1, vy: 0 },
+    UP: { vx: 0, vy: -1 },
+    DOWN: { vx: 0, vy: 1 },
 };
 
 /**
@@ -27,7 +27,6 @@ const DIR_VECTORS = {
  * @extends Obstacle
  */
 export class WindZone extends Obstacle {
-
     /**
      * @param {p5}     p
      * @param {number} x
@@ -37,11 +36,15 @@ export class WindZone extends Obstacle {
     constructor(p, x, y, direction = WindDir.RIGHT) {
         super(p, x, y);
         this.direction = direction;
-        this._age      = 0;
+        this._age = 0;
     }
 
-    get isSolid()  { return false; }
-    get isHazard() { return false; }
+    get isSolid() {
+        return false;
+    }
+    get isHazard() {
+        return false;
+    }
 
     update(deltaTime) {
         this._age += deltaTime;
@@ -53,21 +56,32 @@ export class WindZone extends Obstacle {
      * does not zero vx before wind can take effect.
      */
     preEffect(player) {
-        if (!aabbIntersects(player.x, player.y, player.w, player.h,
-                             this.x, this.y, this.w, this.h)) return;
+        if (
+            !aabbIntersects(
+                player.x,
+                player.y,
+                player.w,
+                player.h,
+                this.x,
+                this.y,
+                this.w,
+                this.h,
+            )
+        )
+            return;
 
         // Prevent horizontalMovement from zeroing vx this frame
         player.slideMode = true;
 
-        const vec   = DIR_VECTORS[this.direction];
+        const vec = DIR_VECTORS[this.direction];
         const force = GameConfig.WIND_FORCE;
-        player.vx  += vec.vx * force;
-        player.vy  += vec.vy * force;
+        player.vx += vec.vx * force;
+        player.vy += vec.vy * force;
     }
 
     draw() {
-        const p  = this.p;
-        const T  = GameConfig.TILE;
+        const p = this.p;
+        const T = GameConfig.TILE;
         const cx = this.x + T / 2;
         const cy = this.y + T / 2;
 
@@ -78,27 +92,37 @@ export class WindZone extends Obstacle {
         p.rect(this.x, this.y, this.w, this.h, 4);
 
         // Animated wind lines — offset by time and direction
-        const vec    = DIR_VECTORS[this.direction];
+        const vec = DIR_VECTORS[this.direction];
         const period = 800; // ms per full travel
-        const phase  = (this._age % period) / period; // 0..1
+        const phase = (this._age % period) / period; // 0..1
 
         p.stroke(120, 230, 230, 180);
         p.strokeWeight(1.5);
 
         const lineCount = 4;
         for (let i = 0; i < lineCount; i++) {
-            const t   = (phase + i / lineCount) % 1;
+            const t = (phase + i / lineCount) % 1;
             const len = T * 0.35;
             let lx, ly;
 
             if (vec.vx !== 0) {
                 lx = this.x + (vec.vx > 0 ? t * T : (1 - t) * T);
                 ly = this.y + T * (0.2 + i * 0.2);
-                p.line(lx - vec.vx * len / 2, ly, lx + vec.vx * len / 2, ly);
+                p.line(
+                    lx - (vec.vx * len) / 2,
+                    ly,
+                    lx + (vec.vx * len) / 2,
+                    ly,
+                );
             } else {
                 lx = this.x + T * (0.2 + i * 0.2);
                 ly = this.y + (vec.vy > 0 ? t * T : (1 - t) * T);
-                p.line(lx, ly - vec.vy * len / 2, lx, ly + vec.vy * len / 2);
+                p.line(
+                    lx,
+                    ly - (vec.vy * len) / 2,
+                    lx,
+                    ly + (vec.vy * len) / 2,
+                );
             }
         }
         p.noStroke();
@@ -107,9 +131,14 @@ export class WindZone extends Obstacle {
         p.fill(120, 230, 230, 200);
         p.push();
         p.translate(cx, cy);
-        const angle = vec.vx !== 0
-            ? (vec.vx > 0 ? 0 : Math.PI)
-            : (vec.vy > 0 ? Math.PI / 2 : -Math.PI / 2);
+        const angle =
+            vec.vx !== 0
+                ? vec.vx > 0
+                    ? 0
+                    : Math.PI
+                : vec.vy > 0
+                  ? Math.PI / 2
+                  : -Math.PI / 2;
         p.rotate(angle);
         p.triangle(8, 0, -5, -5, -5, 5);
         p.pop();

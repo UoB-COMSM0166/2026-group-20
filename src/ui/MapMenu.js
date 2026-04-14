@@ -10,12 +10,10 @@ import { GameConfig } from '../config/GameConfig.js';
 export class MapMenu {
     /**
      * @description creates splash screen
-     *
      * @param {p5} p - The p5 instance
      * @param {string} stage - Current game stage
      */
     constructor(p) {
-        //this.stage=stage;
         this.buttonMap1 = new RectButton(
             p,
             GameConfig.MAP_BUTTON1_X,
@@ -42,7 +40,6 @@ export class MapMenu {
     }
     /**
      * @description renders menu page
-     *
      * @param {p5} p - The p5 instance
      * @param {number} mx - Mouse X position
      * @param {number} my - Mouse Y position
@@ -56,11 +53,10 @@ export class MapMenu {
             GameConfig.MAP_TITLE_COLOUR.g,
             GameConfig.MAP_TITLE_COLOUR.b,
         );
-        p.text('Maps', GameConfig.MAP_TITLE_X, GameConfig.MAP_TITLE_Y);
+        p.text('Map Select', GameConfig.MAP_TITLE_X, GameConfig.MAP_TITLE_Y);
 
         p.cursor(p.ARROW); // default cursor
 
-        // placeholder buttons
         this.buttonMap1.drawButton(p, mx, my);
         this.buttonMap2.drawButton(p, mx, my);
         this.buttonReturn.drawButton(p, mx, my);

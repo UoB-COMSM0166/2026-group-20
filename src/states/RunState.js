@@ -1,14 +1,14 @@
 import { State } from './State.js';
 import { RespawnManager } from '../systems/RespawnManager.js';
 import { TimeManager } from '../systems/TimeManager.js';
-import { PauseManager } from '../systems/PauseManager.js';
 import { PlayerGameState } from '../config/PlayerGameState.js';
 import { PlayerState } from '../config/PlayerState.js';
 import { DeathReason } from '../config/DeathReason.js';
 import { GameStage } from '../config/GameStage.js';
 import { GameConfig } from '../config/GameConfig.js';
-import { drawMap, MAP, getCoins } from '../maps/MapLoader.js';
+import { TileType } from '../config/TileType.js';
 import { DrawPlayer } from '../utils/DrawPlayer.js';
+import { PauseManager } from '../systems/PauseManager.js';
 
 /**
  * RunState — the active gameplay phase.
@@ -24,21 +24,27 @@ import { DrawPlayer } from '../utils/DrawPlayer.js';
  */
 export class RunState extends State {
     enter() {
-        const { p, gameWidth, gameHeight, players, scoreManager } = this.ctx;
+        const { p, gameWidth, gameHeight, players, scoreManager, tiledMap } = this.ctx;
 
-        this.coins          = getCoins(p, this.ctx.placedObstacles);
+        this.coins        = tiledMap.getCoins(this.ctx.placedObstacles);
         this.respawnManager = new RespawnManager(scoreManager);
-        this.timeManager    = new TimeManager(players, scoreManager);
-        this.pauseManager   = new PauseManager(p, gameWidth, gameHeight);
+        this.timeManager  = new TimeManager(players, scoreManager);
+        this.pauseManager = new PauseManager(p, gameWidth, gameHeight);
 
         this._resetRound();
     }
 
     update(deltaTime) {
-        // All game logic is frozen while paused
+        if (!this.pauseManager) return; // guard: enter() may have crashed
         if (this.pauseManager.isPaused) return;
-
-        const { players, scoreManager, placedObstacles, gameWidth, gameHeight } = this.ctx;
+        const {
+            players,
+            scoreManager,
+            placedObstacles,
+            gameWidth,
+            gameHeight,
+            tiledMap,
+        } = this.ctx;
 
         this.respawnManager.update(deltaTime);
         this.timeManager.update(deltaTime);
@@ -71,12 +77,20 @@ export class RunState extends State {
             if (player.gameState === PlayerGameState.SUCCESS) continue;
 
             // Pass placed obstacles into physics
-            player.update(players, this.respawnManager, placedObstacles);
+            player.update(
+                players,
+                this.respawnManager,
+                placedObstacles,
+                tiledMap.MAP,
+            );
 
             const { p } = this.ctx;
             const tx = p.floor((player.x + player.w / 2) / GameConfig.TILE);
             const ty = p.floor((player.y + player.h / 2) / GameConfig.TILE);
-            if (MAP[ty] && MAP[ty][tx] === 'F') {
+            if (
+                tiledMap.MAP[ty] &&
+                tiledMap.MAP[ty][tx] === TileType.ENDPOINT
+            ) {
                 this.timeManager.onPlayerReachFinish(player);
                 player.lifeState = PlayerState.DEAD;
             }
@@ -86,7 +100,12 @@ export class RunState extends State {
         for (const obs of placedObstacles) {
             for (const player of players) {
                 if (player.gameState !== PlayerGameState.PLAYING) continue;
-                obs.applyEffect(player, players, this.respawnManager, placedObstacles);
+                obs.applyEffect(
+                    player,
+                    players,
+                    this.respawnManager,
+                    placedObstacles,
+                );
             }
         }
 
@@ -107,10 +126,19 @@ export class RunState extends State {
     }
 
     render(mx, my) {
-        const { p, players, scoreManager, gameWidth, gameHeight, placedObstacles } = this.ctx;
+        try {
+        const {
+            p,
+            players,
+            scoreManager,
+            gameWidth,
+            gameHeight,
+            placedObstacles,
+            tiledMap,
+        } = this.ctx;
 
         p.background(25);
-        drawMap(p);
+        tiledMap.render();
 
         // Draw placed obstacles
         for (const obs of placedObstacles) {
@@ -138,18 +166,27 @@ export class RunState extends State {
         p.fill(255);
         p.textSize(22);
         p.textAlign(p.CENTER, p.TOP);
-        p.text(`Time: ${Math.ceil(this.timeManager.timeLeft)}s`, gameWidth / 2, 26);
+        p.text(
+            `Time: ${Math.ceil(this.timeManager.timeLeft)}s`,
+            gameWidth / 2,
+            26,
+        );
 
         // HUD — per-player coins + wallet
         p.textSize(15);
         for (const player of players) {
             const side = player.playerNo === 0 ? p.LEFT : p.RIGHT;
-            const hx   = player.playerNo === 0 ? 10 : gameWidth - 10;
+            const hx = player.playerNo === 0 ? 10 : gameWidth - 10;
             p.textAlign(side, p.TOP);
-            p.fill(player.playerNo === 0 ? p.color(90, 170, 255) : p.color(255, 200, 80));
+            p.fill(
+                player.playerNo === 0
+                    ? p.color(90, 170, 255)
+                    : p.color(255, 200, 80),
+            );
             p.text(
                 `P${player.playerNo + 1}  🪙 ${scoreManager.getRoundCoins(player)}  💰 ${scoreManager.getWallet(player)}`,
-                hx, 10,
+                hx,
+                10,
             );
         }
 
@@ -172,22 +209,28 @@ export class RunState extends State {
         p.textSize(11);
         p.text('⏸  Pause', qX + qW / 2, qY + qH / 2);
 
-        // Pause overlay — drawn last so it sits on top of everything
+        // Pause overlay — drawn last so it sits on top
         this.pauseManager.render(mx, my);
+        } catch(e) { console.error('[RunState.render] CRASH:', e.stack || e); }
     }
 
     mousePressed(mx, my) {
-        // If paused, PauseManager handles all clicks
         if (this.pauseManager.isPaused) {
             this.pauseManager.mousePressed(mx, my,
                 () => this.pauseManager.resume(),
                 () => { this._resetRound(); this.pauseManager.resume(); },
+                () => {
+                    // Store where to return so TutorialState knows to come back
+                    this.ctx.tutorialReturnStage = GameStage.RUN;
+                    this.pauseManager.resume();
+                    this.goTo(GameStage.TUTORIAL);
+                },
                 () => this.goTo(GameStage.MENU)
             );
             return;
         }
 
-        // Pause button (bottom-right)
+        // Pause button
         const { gameWidth, gameHeight } = this.ctx;
         const qW = 100, qH = 24;
         const qX = gameWidth - qW - 8;
@@ -213,6 +256,7 @@ export class RunState extends State {
         this.timeManager.reset();
         scoreManager.resetRound();
 
+        this.coins = this.ctx.tiledMap.getCoins(this.ctx.placedObstacles);
         for (const coin of this.coins) coin.reset();
 
         for (const player of players) {

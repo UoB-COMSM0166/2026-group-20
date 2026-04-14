@@ -1,14 +1,14 @@
 import { PlayerState } from '../config/PlayerState.js';
 import { PlayerMovementState } from '../config/PlayerMovementState.js';
-import { AnimationConfig } from '../config/AnimationConfig.js';
-import { AnimationConfig2 } from '../config/AnimationConfig2.js';
+import { AnimationConfigChick } from '../config/AnimationConfigChick.js';
+import { AnimationConfigBunny } from '../config/AnimationConfigBunny.js';
 
 /**
  * DrawPlayer — renders a player each frame.
  *
  * If the player has a loaded sprite sheet (framesArr.length > 0), draws
  * the appropriate animation frame for the current movement/life state.
- * Otherwise falls back to a coloured rectangle (useful in tests / dev).
+ * Otherwise falls back to a simple label (useful in tests / dev).
  *
  * Frame advance rate: every call advances the frame index by 1. At ~60 fps
  * the animation plays at the p5 frame rate. The sprite branch animates on
@@ -23,10 +23,13 @@ export function DrawPlayer(player) {
     if (player.framesArr.length > 0) {
         // Use the character's own animConfig (set by setSprite / CharSelectState).
         // Fall back to playerNo-based default so the game works before char select runs.
-        const cfg = player.animConfig
-            ?? (player.playerNo === 0 ? AnimationConfig : AnimationConfig2);
+        const cfg =
+            player.animConfig ??
+            (player.playerNo === 0
+                ? AnimationConfigChick
+                : AnimationConfigBunny);
 
-        const state     = player.movementState;
+        const state = player.movementState;
         const lifeState = player.lifeState;
 
         // Respawning overrides movement state
@@ -42,17 +45,9 @@ export function DrawPlayer(player) {
             // IDLE (and any unrecognised state)
             _drawFrame(player, p, cfg.IDLE, 'frameIndexIdle', false);
         }
-    } else {
-        // ── Fallback rectangle ────────────────────────────────────────────
-        p.noStroke();
-        const alpha = player.lifeState === PlayerState.RESPAWNING ? 120 : 255;
-        p.fill(player.playerNo === 0
-            ? p.color(90, 170, 255, alpha)
-            : p.color(255, 200, 80,  alpha));
-        p.rect(player.x, player.y, player.w, player.h, 6);
     }
 
-    // ── HUD label above player ────────────────────────────────────────────
+    // ── HUD label above player ─
     p.noStroke();
     p.fill(255);
     p.textAlign(p.CENTER, p.BOTTOM);
@@ -61,8 +56,11 @@ export function DrawPlayer(player) {
 
     if (player.lifeState === PlayerState.RESPAWNING) {
         p.fill(255, 100, 100);
-        p.text(Math.ceil(player.respawnCountdown) + 's',
-               player.x + player.w / 2, player.y - 5);
+        p.text(
+            Math.ceil(player.respawnCountdown) + 's',
+            player.x + player.w / 2,
+            player.y - 5,
+        );
     } else {
         p.text(player.movementState, player.x + player.w / 2, player.y - 5);
     }

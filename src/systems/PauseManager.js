@@ -1,62 +1,41 @@
 /**
  * PauseManager — manages the pause state during an active game round.
  *
- * Responsibilities:
- *   - Tracks whether the game is currently paused.
- *   - Renders the semi-transparent pause overlay with three buttons:
- *       ▶ Resume, ↺ Restart Round, ✕ Quit to Menu.
- *   - Forwards mouse clicks to caller-supplied callbacks.
+ * Buttons: ▶ Resume  ↺ Restart Round  ? How to Play  ✕ Quit to Menu
  *
  * Usage (inside RunState):
  *   this.pauseManager = new PauseManager(p, gameWidth, gameHeight);
  *
- *   // In RunState.update():
- *   if (this.pauseManager.isPaused) return;
- *
- *   // In RunState.render():
- *   this.pauseManager.render(mx, my);
- *
- *   // In RunState.keyPressed() — ESC:
- *   this.pauseManager.toggle();
- *
- *   // In RunState.mousePressed():
  *   if (this.pauseManager.isPaused) {
  *       this.pauseManager.mousePressed(mx, my,
  *           () => this.pauseManager.resume(),
  *           () => { this._resetRound(); this.pauseManager.resume(); },
+ *           () => this.goTo(GameStage.TUTORIAL_PAUSE),   // or handle inline
  *           () => this.goTo(GameStage.MENU)
  *       );
- *       return;
  *   }
- *
- * PauseManager has NO dependency on game logic, states, or GameStage.
  */
 export class PauseManager {
 
-    /**
-     * @param {p5}    p
-     * @param {number} gameWidth
-     * @param {number} gameHeight
-     */
     constructor(p, gameWidth, gameHeight) {
         this.p          = p;
         this.gameWidth  = gameWidth;
         this.gameHeight = gameHeight;
         this._paused    = false;
 
-        // Three buttons stacked, centred horizontally
+        // Four buttons stacked, centred horizontally
         const bW  = 200;
         const bH  = 44;
         const gap = 10;
         const cx  = gameWidth / 2;
 
-        // Stack starts slightly below the panel centre to leave room for title
-        const stackH = bH * 3 + gap * 2;
-        const topY   = gameHeight / 2 - stackH / 2 + 20;
+        const stackH = bH * 4 + gap * 3;
+        const topY   = gameHeight / 2 - stackH / 2 + 24;
 
-        this._btnResume  = { x: cx - bW / 2, y: topY,                 w: bW, h: bH };
-        this._btnRestart = { x: cx - bW / 2, y: topY + bH + gap,       w: bW, h: bH };
-        this._btnQuit    = { x: cx - bW / 2, y: topY + (bH + gap) * 2, w: bW, h: bH };
+        this._btnResume   = { x: cx - bW / 2, y: topY,                   w: bW, h: bH };
+        this._btnRestart  = { x: cx - bW / 2, y: topY + (bH + gap),       w: bW, h: bH };
+        this._btnTutorial = { x: cx - bW / 2, y: topY + (bH + gap) * 2,   w: bW, h: bH };
+        this._btnQuit     = { x: cx - bW / 2, y: topY + (bH + gap) * 3,   w: bW, h: bH };
     }
 
     // ── Public API ────────────────────────────────────────────────────────
@@ -69,8 +48,6 @@ export class PauseManager {
 
     /**
      * Draw the pause overlay. Call at the end of RunState.render().
-     * @param {number} mx
-     * @param {number} my
      */
     render(mx, my) {
         if (!this._paused) return;
@@ -84,9 +61,9 @@ export class PauseManager {
         p.fill(0, 0, 0, 160);
         p.rect(0, 0, gW, gH);
 
-        // Panel
+        // Panel — taller to fit 4 buttons
         const panW = 300;
-        const panH = 270;
+        const panH = 330;
         const panX = gW / 2 - panW / 2;
         const panY = gH / 2 - panH / 2;
 
@@ -119,31 +96,35 @@ export class PauseManager {
         // Buttons
         this._drawButton(p, mx, my, this._btnResume,
             '▶  Resume',
-            [50, 130, 60],  [70, 160, 80],  [210, 245, 215]);
+            [50, 130, 60],   [70, 160, 80],   [210, 245, 215]);
 
         this._drawButton(p, mx, my, this._btnRestart,
             '↺  Restart Round',
-            [40, 90, 150],  [55, 115, 185], [190, 220, 255]);
+            [40, 90, 150],   [55, 115, 185],  [190, 220, 255]);
+
+        this._drawButton(p, mx, my, this._btnTutorial,
+            '?  How to Play',
+            [80, 65, 130],   [105, 85, 165],  [215, 200, 255]);
 
         this._drawButton(p, mx, my, this._btnQuit,
             '✕  Quit to Menu',
-            [110, 32, 32],  [145, 45, 45],  [250, 180, 180]);
+            [110, 32, 32],   [145, 45, 45],   [250, 180, 180]);
     }
 
     /**
      * Route a click to the correct callback while paused.
-     * @param {number}   mx
-     * @param {number}   my
-     * @param {Function} onResume   - Resume button
-     * @param {Function} onRestart  - Restart Round button
-     * @param {Function} onQuit     - Quit to Menu button
+     * @param {Function} onResume
+     * @param {Function} onRestart
+     * @param {Function} onTutorial
+     * @param {Function} onQuit
      */
-    mousePressed(mx, my, onResume, onRestart, onQuit) {
+    mousePressed(mx, my, onResume, onRestart, onTutorial, onQuit) {
         if (!this._paused) return;
 
-        if      (this._hits(mx, my, this._btnResume))  onResume();
-        else if (this._hits(mx, my, this._btnRestart)) onRestart();
-        else if (this._hits(mx, my, this._btnQuit))    onQuit();
+        if      (this._hits(mx, my, this._btnResume))   onResume();
+        else if (this._hits(mx, my, this._btnRestart))  onRestart();
+        else if (this._hits(mx, my, this._btnTutorial)) onTutorial();
+        else if (this._hits(mx, my, this._btnQuit))     onQuit();
     }
 
     // ── Private ───────────────────────────────────────────────────────────
@@ -153,9 +134,8 @@ export class PauseManager {
         p.noStroke();
         p.fill(hov ? hoverCol : baseCol);
         p.rect(btn.x, btn.y, btn.w, btn.h, 8);
-        // Top-edge sheen
         p.fill(255, 255, 255, hov ? 22 : 14);
-        p.rect(btn.x, btn.y,              btn.w, btn.h * 0.45, 8);
+        p.rect(btn.x, btn.y,               btn.w, btn.h * 0.45, 8);
         p.rect(btn.x, btn.y + btn.h * 0.45, btn.w, btn.h * 0.55);
         p.fill(...textCol);
         p.textAlign(p.CENTER, p.CENTER);

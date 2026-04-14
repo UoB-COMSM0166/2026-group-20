@@ -54,7 +54,7 @@ export const GameConfig = {
     MAP_RETURN_R: 30,
 
     // tile
-    TILE: 40,
+    TILE: 32,
 
     // Reward algorithm: index 0 = 1st place, 1 = 2nd, etc. Fail = 0.
     FINISH_REWARDS: [20, 10, 5, 2],
@@ -69,42 +69,42 @@ export const GameConfig = {
 
     // Saw
     SAW_ROTATION_SPEED: 0.005, // radians per millisecond (~0.8 rotations/second)
-    SAW_TOOTH_COUNT: 10,       // number of teeth around the blade circumference
+    SAW_TOOTH_COUNT: 10, // number of teeth around the blade circumference
 
     // Shop — wallet cost to purchase one placement token per item type
     SHOP_PRICES: {
-        PLATFORM:        3,
-        SPIKE:           5,
-        SAW:             7,
-        CANNON:          8,
+        PLATFORM: 3,
+        SPIKE: 5,
+        SAW: 7,
+        CANNON: 8,
         MOVING_PLATFORM: 6,
-        FALLING_PLATFORM:5,
-        ICE_PLATFORM:    4,
-        BOUNCE_PAD:      5,
-        FLAME:           6,
-        SPIKE_PLATFORM:  7,
-        ICE_BLOCK:       4,
-        WIND_ZONE:       6,
-        TELEPORTER:      10,
+        FALLING_PLATFORM: 5,
+        ICE_PLATFORM: 4,
+        BOUNCE_PAD: 5,
+        FLAME: 6,
+        SPIKED_BALL: 7,
+        ICE_BLOCK: 4,
+        WIND_ZONE: 6,
+        TELEPORTER: 10,
     },
 
     // MovingPlatform
-    MOVING_PLATFORM_SPEED: 1.5,  // px per frame at 60 fps
-    MOVING_PLATFORM_RANGE: 3,    // tiles of travel from start position
+    MOVING_PLATFORM_SPEED: 1.5, // px per frame at 60 fps
+    MOVING_PLATFORM_RANGE: 3, // tiles of travel from start position
 
     // FallingPlatform
     FALLING_PLATFORM_TRIGGER_MS: 500, // ms standing before drop starts
-    FALLING_PLATFORM_GRAVITY:    0.4, // px/frame² acceleration while falling
+    FALLING_PLATFORM_GRAVITY: 0.4, // px/frame² acceleration while falling
 
     // BouncePad
-    BOUNCE_PAD_FORCE: -18,       // vy applied on landing (negative = up)
+    BOUNCE_PAD_FORCE: -18, // vy applied on landing (negative = up)
 
     // Flame
-    FLAME_ON_MS:  1000,          // ms active (hazard)
-    FLAME_OFF_MS:  700,          // ms inactive (safe)
+    FLAME_ON_MS: 1000, // ms active (hazard)
+    FLAME_OFF_MS: 700, // ms inactive (safe)
 
     // WindZone
-    WIND_FORCE: 0.35,            // px/frame² push applied per frame inside zone
+    WIND_FORCE: 0.35, // px/frame² push applied per frame inside zone
 
     // Teleporter
     TELEPORTER_COOLDOWN_MS: 1200, // ms before same player can teleport again

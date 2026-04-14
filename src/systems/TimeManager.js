@@ -7,11 +7,11 @@ export class TimeManager {
      * @param {ScoreManager} scoreManager
      */
     constructor(players, scoreManager) {
-        this.timeLimit    = GameConfig.TIME_LIMIT;
-        this.timeLeft     = GameConfig.TIME_LIMIT;
-        this.isGameOver   = false;
-        this.rankings     = [];
-        this.players      = players;
+        this.timeLimit = GameConfig.TIME_LIMIT;
+        this.timeLeft = GameConfig.TIME_LIMIT;
+        this.isGameOver = false;
+        this.rankings = [];
+        this.players = players;
         this.scoreManager = scoreManager;
     }
 
@@ -36,13 +36,16 @@ export class TimeManager {
      * @param {Player} player
      */
     onPlayerReachFinish(player) {
-        if (this.isGameOver || player.gameState !== PlayerGameState.PLAYING) return;
+        if (this.isGameOver || player.gameState !== PlayerGameState.PLAYING)
+            return;
 
         player.setGameState(PlayerGameState.SUCCESS);
         this.rankings.push(player);
 
-        const rank        = this.rankings.length;
-        const elapsedSecs = parseFloat((this.timeLimit - this.timeLeft).toFixed(2));
+        const rank = this.rankings.length;
+        const elapsedSecs = parseFloat(
+            (this.timeLimit - this.timeLeft).toFixed(2),
+        );
 
         this.scoreManager.onPlayerFinish(player, rank, elapsedSecs);
 
@@ -82,8 +85,8 @@ export class TimeManager {
      * Does NOT reset wallet — call scoreManager.resetRound() separately.
      */
     reset() {
-        this.timeLeft   = this.timeLimit;
+        this.timeLeft = this.timeLimit;
         this.isGameOver = false;
-        this.rankings   = [];
+        this.rankings = [];
     }
 }

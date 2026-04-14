@@ -1,19 +1,23 @@
 import { GameConfig } from '../config/GameConfig.js';
 import { PlayerState } from '../config/PlayerState.js';
+import { DeathReason } from '../config/DeathReason.js';
 
 export class RespawnManager {
     /**
      * @param {ScoreManager|null} scoreManager — optional; if provided, deaths are recorded
      */
     constructor(scoreManager = null) {
-        this.queue        = [];
+        this.queue = [];
         this.scoreManager = scoreManager;
     }
 
     /**
      * Kills a player and queues them for respawn.
      * Also increments their death count in ScoreManager if one is set.
+<<<<<<< HEAD
+=======
      *
+>>>>>>> feature/charSelect
      * @param {Player} player
      * @param {string} reason - DeathReason value
      */
@@ -25,8 +29,8 @@ export class RespawnManager {
 
         this.queue.push({
             player: player,
-            timer:  GameConfig.RESPAWN_TIME,
-            phase:  'dead',
+            timer: GameConfig.RESPAWN_TIME,
+            phase: 'dead',
         });
     }
 
@@ -47,7 +51,8 @@ export class RespawnManager {
                 }
             } else {
                 let totalRemainingMs = record.timer;
-                if (record.phase === 'dead') totalRemainingMs += GameConfig.RESPAWN_TIME / 2;
+                if (record.phase === 'dead')
+                    totalRemainingMs += GameConfig.RESPAWN_TIME / 2;
                 record.player.respawnCountdown = totalRemainingMs / 1000;
             }
         }

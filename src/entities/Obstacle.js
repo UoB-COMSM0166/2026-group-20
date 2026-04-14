@@ -15,21 +15,31 @@ export class Obstacle {
      * @param {p5}    p
      * @param {number} x - World x position in pixels (top-left, snapped to tile grid)
      * @param {number} y - World y position in pixels (top-left, snapped to tile grid)
+     * @param obstacleSheet
      */
-    constructor(p, x, y) {
-        this.p      = p;
-        this.x      = x;
-        this.y      = y;
-        this.w      = GameConfig.TILE;
-        this.h      = GameConfig.TILE;
+    constructor(p, x, y, obstacleSheet) {
+        this.p = p;
+        this.x = x;
+        this.y = y;
+        this.w = GameConfig.TILE;
+        this.h = GameConfig.TILE;
         this.active = true;
+
+        this.obstacleSheet = obstacleSheet;
+        this.framesArr = [];
+        //this.splitAnimation(frameWidth, frameHeight);
+        //this.animationconfig= animationconfig;
     }
 
     /** @returns {boolean} true if this obstacle should block player movement */
-    get isSolid()  { return false; }
+    get isSolid() {
+        return false;
+    }
 
     /** @returns {boolean} true if touching this obstacle kills the player */
-    get isHazard() { return false; }
+    get isHazard() {
+        return false;
+    }
 
     /**
      * Per-frame logic. Override for moving/animated obstacles.
@@ -51,7 +61,6 @@ export class Obstacle {
      * Apply special physics/effects to a player each frame.
      * Called after all player movement is resolved.
      * Override in: IcePlatform, BouncePad, SpikePlatform, Teleporter, Flame.
-     *
      * @param {object}     _player
      * @param {object[]}   _allPlayers
      * @param {object}     _respawnManager
@@ -65,6 +74,13 @@ export class Obstacle {
      * @param {object[]} _players
      */
     carryPlayers(_players) {}
+
+    splitAnimation(frameWidth, frameHeight) {
+        for (let j = 0; j < this.obstacleSheet.width; j += frameWidth) {
+            let frame = this.obstacleSheet.get(j, 0, frameWidth, frameHeight);
+            this.framesArr.push(frame);
+        }
+    }
 
     /** Render the obstacle. Must be overridden. */
     draw() {}

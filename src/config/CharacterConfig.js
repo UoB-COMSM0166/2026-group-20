@@ -1,5 +1,7 @@
-import { AnimationConfig } from './AnimationConfig.js';
-import { AnimationConfig2 } from './AnimationConfig2.js';
+import { AnimationConfigChick } from './AnimationConfigChick.js';
+import { AnimationConfigBunny } from './AnimationConfigBunny.js';
+import { AnimationConfigDuck } from './AnimationConfigDuck.js';
+import { AnimationConfigPolar } from './AnimationConfigPolar.js';
 
 /**
  * All selectable characters.
@@ -9,33 +11,34 @@ import { AnimationConfig2 } from './AnimationConfig2.js';
  * displayName — shown on the selection card.
  * colour — accent colour used in the character select UI.
  */
+
 export const CHARACTERS = [
     {
-        id:          'chicken',
+        id: 'chicken',
         displayName: 'Chicken',
-        spriteKey:   'chicken',
-        animConfig:  AnimationConfig,
-        colour:      [255, 210, 80],  // yellow
+        spriteKey: 'chicken',
+        animConfig: AnimationConfigChick,
+        colour: [255, 210, 80], // yellow
     },
     {
-        id:          'bunny',
+        id: 'bunny',
         displayName: 'Bunny',
-        spriteKey:   'bunny',
-        animConfig:  AnimationConfig2,
-        colour:      [255, 160, 200], // pink
+        spriteKey: 'bunny',
+        animConfig: AnimationConfigBunny,
+        colour: [255, 160, 200], // pink
     },
     {
-        id:          'duck',
+        id: 'duck',
         displayName: 'Duck',
-        spriteKey:   'duck',
-        animConfig:  AnimationConfig2,
-        colour:      [100, 200, 255], // light blue
+        spriteKey: 'duck',
+        animConfig: AnimationConfigDuck,
+        colour: [100, 200, 255], // light blue
     },
     {
-        id:          'polar',
+        id: 'polar',
         displayName: 'Polar Bear',
-        spriteKey:   'polar',
-        animConfig:  AnimationConfig2,
-        colour:      [200, 230, 255], // ice white
+        spriteKey: 'polar',
+        animConfig: AnimationConfigPolar,
+        colour: [200, 230, 255], // ice white
     },
 ];

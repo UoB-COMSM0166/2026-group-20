@@ -10,7 +10,6 @@ import { GameConfig } from '../config/GameConfig.js';
 export class SplashScreen {
     /**
      * @description creates splash screen
-     *
      * @param {p5} p - The p5 instance
      * @param {string} stage - Current game stage
      */
@@ -34,7 +33,6 @@ export class SplashScreen {
     }
     /**
      * @description renders splash screen
-     *
      * @param {p5} p - The p5 instance
      * @param {number} mx - Mouse X position
      * @param {number} my - Mouse Y position

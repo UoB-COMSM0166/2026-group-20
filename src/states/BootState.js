@@ -29,7 +29,8 @@ export class BootState extends State {
         p.background(10);
 
         // Pulsing logo text
-        const alpha = 128 + 127 * Math.sin((this._elapsed / this._duration) * Math.PI);
+        const alpha =
+            128 + 127 * Math.sin((this._elapsed / this._duration) * Math.PI);
         p.fill(255, 255, 255, alpha);
         p.textAlign(p.CENTER, p.CENTER);
         p.textSize(28);

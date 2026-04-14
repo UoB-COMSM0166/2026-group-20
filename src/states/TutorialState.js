@@ -17,8 +17,11 @@ import { GameStage } from '../config/GameStage.js';
 export class TutorialState extends State {
 
     enter() {
-        this._alpha = 0;      // fade-in
-        this._page  = 0;      // 0 = controls, 1 = game flow
+        this._page = 0;
+        // When opened from the pause menu, ctx.tutorialReturnStage is set
+        // so closing the tutorial returns to the paused game.
+        this._returnStage = this.ctx.tutorialReturnStage ?? null;
+        this.ctx.tutorialReturnStage = null; // consume it
     }
 
     update(deltaTime) {
@@ -32,9 +35,6 @@ export class TutorialState extends State {
 
         // ── Dark overlay ───────────────────────────────────────────────────
         p.background(10, 14, 26);
-
-        p.push();
-        p.globalAlpha = this._alpha / 255; // fade-in
 
         // ── Panel ──────────────────────────────────────────────────────────
         const panW  = gameWidth  - 60;
@@ -57,7 +57,6 @@ export class TutorialState extends State {
             this._renderFlowPage(p, panX, panY, panW, panH, mx, my);
         }
 
-        p.pop();
     }
 
     mousePressed(mx, my) {
@@ -78,7 +77,12 @@ export class TutorialState extends State {
             const bx = gameWidth - 30 - btnW - 10;
             const by = gameHeight - 20 - btnH - 8;
             if (mx >= bx && mx <= bx + btnW && my >= by && my <= by + btnH) {
-                this.goTo(GameStage.BUILD);
+                // If opened from pause menu, return to the paused game
+                if (this._returnStage) {
+                    this.goTo(this._returnStage);
+                } else {
+                    this.goTo(this.ctx.shopHasRun ? GameStage.BUILD : GameStage.RUN);
+                }
                 return;
             }
             // "← Back" button
@@ -96,10 +100,15 @@ export class TutorialState extends State {
             if (this._page === 0) {
                 this._page = 1;
             } else {
-                this.goTo(GameStage.BUILD);
+                // If opened from pause menu, return to the paused game
+                if (this._returnStage) {
+                    this.goTo(this._returnStage);
+                } else {
+                    this.goTo(this.ctx.shopHasRun ? GameStage.BUILD : GameStage.RUN);
+                }
             }
         } else if (p.keyCode === p.ESCAPE) {
-            this.goTo(GameStage.MAPMENU);
+            this.goTo(this._returnStage ?? GameStage.MAPMENU);
         }
     }
 
@@ -298,7 +307,8 @@ export class TutorialState extends State {
 
         // Navigation buttons
         this._drawNavButton(p, gameWidth, gameHeight, panX, panW, '← Back', [60, 70, 110], mx, my, true);
-        this._drawNavButton(p, gameWidth, gameHeight, panX, panW, 'Play  →', [60, 130, 70], mx, my);
+        const playLabel = this._returnStage ? '← Back to Game' : 'Play  →';
+        this._drawNavButton(p, gameWidth, gameHeight, panX, panW, playLabel, [60, 130, 70], mx, my);
 
         p.fill(60, 70, 100);
         p.textAlign(p.LEFT, p.BOTTOM);

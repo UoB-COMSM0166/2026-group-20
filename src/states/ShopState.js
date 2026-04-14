@@ -4,21 +4,26 @@ import { GameConfig } from '../config/GameConfig.js';
 import { ObstacleType } from '../config/ObstacleType.js';
 
 // All purchasable items derived from GameConfig.SHOP_PRICES
-const SHOP_ITEMS = Object.entries(GameConfig.SHOP_PRICES).map(([type, price]) => ({
-    type,
-    price,
-    label: type.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' '),
-}));
+const SHOP_ITEMS = Object.entries(GameConfig.SHOP_PRICES).map(
+    ([type, price]) => ({
+        type,
+        price,
+        label: type
+            .split('_')
+            .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
+            .join(' '),
+    }),
+);
 
 // Player colours
 const PLAYER_COLOURS = [
-    [90,  170, 255], // P1 blue
-    [255, 200, 80],  // P2 orange
+    [90, 170, 255], // P1 blue
+    [255, 200, 80], // P2 orange
 ];
 
 // Table layout constants
-const COLS        = 2;
-const ROW_H       = 36;
+const COLS = 2;
+const ROW_H = 36;
 const TABLE_PAD_X = 20;
 const TABLE_PAD_Y = 10;
 
@@ -38,12 +43,11 @@ const TABLE_PAD_Y = 10;
  *   S                  — end turn (skip)
  */
 export class ShopState extends State {
-
     enter() {
         this.ctx.shopHasRun = true;
-        this._currentTurn   = 0;
-        this._message       = '';
-        this._msgTimer      = 0;
+        this._currentTurn = 0;
+        this._message = '';
+        this._msgTimer = 0;
     }
 
     update(deltaTime) {
@@ -57,7 +61,7 @@ export class ShopState extends State {
         const { p, gameWidth, gameHeight, players, scoreManager } = this.ctx;
         const player = players[this._currentTurn];
         const wallet = scoreManager.getWallet(player);
-        const col    = PLAYER_COLOURS[this._currentTurn];
+        const col = PLAYER_COLOURS[this._currentTurn];
 
         p.background(15, 15, 25);
 
@@ -75,12 +79,22 @@ export class ShopState extends State {
         p.text(`💰 ${wallet}`, gameWidth - 14, 10);
 
         // Inventory summary (top-left)
-        const invEntries = [...player.inventory.entries()].filter(([, c]) => c > 0);
+        const invEntries = [...player.inventory.entries()].filter(
+            ([, c]) => c > 0,
+        );
         p.fill(160, 160, 200);
         p.textSize(11);
         p.textAlign(p.LEFT, p.TOP);
         if (invEntries.length > 0) {
-            const inv = invEntries.map(([t, c]) => `${t.split('_').map(w => w[0] + w.slice(1).toLowerCase()).join(' ')} ×${c}`).join('  ');
+            const inv = invEntries
+                .map(
+                    ([t, c]) =>
+                        `${t
+                            .split('_')
+                            .map((w) => w[0] + w.slice(1).toLowerCase())
+                            .join(' ')} ×${c}`,
+                )
+                .join('  ');
             p.text(`Bag: ${inv}`, 14, 12);
         } else {
             p.fill(90, 90, 110);
@@ -91,12 +105,16 @@ export class ShopState extends State {
         p.fill(160, 160, 190);
         p.textSize(12);
         p.textAlign(p.CENTER, p.TOP);
-        p.text('Buy as many items as you can afford. Press ENTER or Done when finished.', gameWidth / 2, 34);
+        p.text(
+            'Buy as many items as you can afford. Press ENTER or Done when finished.',
+            gameWidth / 2,
+            34,
+        );
 
         // ── Table ────────────────────────────────────────────────────────
-        const tableTop  = 58;
-        const tableH    = gameHeight - tableTop - 52; // leave room for buttons at bottom
-        const colW      = (gameWidth - TABLE_PAD_X * 2) / COLS;
+        const tableTop = 58;
+        const tableH = gameHeight - tableTop - 52; // leave room for buttons at bottom
+        const colW = (gameWidth - TABLE_PAD_X * 2) / COLS;
         const itemsPerCol = Math.ceil(SHOP_ITEMS.length / COLS);
 
         // Table background
@@ -120,15 +138,24 @@ export class ShopState extends State {
 
         // Rows
         for (let i = 0; i < SHOP_ITEMS.length; i++) {
-            const col_i   = Math.floor(i / itemsPerCol);
-            const row_i   = i % itemsPerCol;
-            const rx      = TABLE_PAD_X + col_i * colW;
-            const ry      = tableTop + headerH + row_i * ROW_H;
-            const item    = SHOP_ITEMS[i];
+            const col_i = Math.floor(i / itemsPerCol);
+            const row_i = i % itemsPerCol;
+            const rx = TABLE_PAD_X + col_i * colW;
+            const ry = tableTop + headerH + row_i * ROW_H;
+            const item = SHOP_ITEMS[i];
             const canAfford = wallet >= item.price;
-            const btnRect = this._buyBtnRect(i, tableTop, colW, headerH, itemsPerCol);
-            const hovered = mx >= btnRect.x && mx <= btnRect.x + btnRect.w &&
-                            my >= btnRect.y && my <= btnRect.y + btnRect.h;
+            const btnRect = this._buyBtnRect(
+                i,
+                tableTop,
+                colW,
+                headerH,
+                itemsPerCol,
+            );
+            const hovered =
+                mx >= btnRect.x &&
+                mx <= btnRect.x + btnRect.w &&
+                my >= btnRect.y &&
+                my <= btnRect.y + btnRect.h;
 
             // Row background (alternating)
             p.noStroke();
@@ -172,20 +199,29 @@ export class ShopState extends State {
         for (let i = 0; i < SHOP_ITEMS.length; i++) {
             const col_i = Math.floor(i / itemsPerCol);
             const row_i = i % itemsPerCol;
-            const rx    = TABLE_PAD_X + col_i * colW;
-            const ry    = tableTop + headerH + row_i * ROW_H;
+            const rx = TABLE_PAD_X + col_i * colW;
+            const ry = tableTop + headerH + row_i * ROW_H;
             p.line(rx, ry, rx + colW, ry);
         }
         // Column divider
-        p.line(TABLE_PAD_X + colW, tableTop, TABLE_PAD_X + colW, tableTop + tableH);
+        p.line(
+            TABLE_PAD_X + colW,
+            tableTop,
+            TABLE_PAD_X + colW,
+            tableTop + tableH,
+        );
         p.noStroke();
 
-        // ── Done button ───────────────────────────────────────────────────
-        const doneY  = gameHeight - 44;
-        const doneW  = 160;
-        const doneH  = 34;
-        const doneX  = gameWidth / 2 - doneW / 2;
-        const doneHov = mx >= doneX && mx <= doneX + doneW && my >= doneY && my <= doneY + doneH;
+        // ── Done button ────────────────
+        const doneY = gameHeight - 44;
+        const doneW = 160;
+        const doneH = 34;
+        const doneX = gameWidth / 2 - doneW / 2;
+        const doneHov =
+            mx >= doneX &&
+            mx <= doneX + doneW &&
+            my >= doneY &&
+            my <= doneY + doneH;
 
         p.fill(doneHov ? [60, 120, 180] : [40, 85, 135]);
         p.noStroke();
@@ -197,7 +233,7 @@ export class ShopState extends State {
 
         // Turn dots
         const dotY = doneY + doneH + 8;
-        [0, 1].forEach(i => {
+        [0, 1].forEach((i) => {
             const dotX = gameWidth / 2 + (i === 0 ? -14 : 14);
             const active = i === this._currentTurn;
             p.fill(active ? PLAYER_COLOURS[i] : [45, 45, 60]);
@@ -217,7 +253,11 @@ export class ShopState extends State {
         p.fill(75, 75, 95);
         p.textAlign(p.LEFT, p.BOTTOM);
         p.textSize(10);
-        p.text('ENTER / Done → finish turn   S → skip turn', 14, gameHeight - 2);
+        p.text(
+            'ENTER / Done → finish turn   S → skip turn',
+            14,
+            gameHeight - 2,
+        );
     }
 
     mousePressed(mx, my) {
@@ -225,18 +265,28 @@ export class ShopState extends State {
         const player = players[this._currentTurn];
         const wallet = scoreManager.getWallet(player);
 
-        const tableTop    = 58;
-        const tableH      = gameHeight - tableTop - 52;
-        const colW        = (gameWidth - TABLE_PAD_X * 2) / COLS;
-        const headerH     = 24;
+        const tableTop = 58;
+        const tableH = gameHeight - tableTop - 52;
+        const colW = (gameWidth - TABLE_PAD_X * 2) / COLS;
+        const headerH = 24;
         const itemsPerCol = Math.ceil(SHOP_ITEMS.length / COLS);
 
         // Buy button clicks
         for (let i = 0; i < SHOP_ITEMS.length; i++) {
-            const item    = SHOP_ITEMS[i];
-            const btnRect = this._buyBtnRect(i, tableTop, colW, headerH, itemsPerCol);
-            if (mx >= btnRect.x && mx <= btnRect.x + btnRect.w &&
-                my >= btnRect.y && my <= btnRect.y + btnRect.h) {
+            const item = SHOP_ITEMS[i];
+            const btnRect = this._buyBtnRect(
+                i,
+                tableTop,
+                colW,
+                headerH,
+                itemsPerCol,
+            );
+            if (
+                mx >= btnRect.x &&
+                mx <= btnRect.x + btnRect.w &&
+                my >= btnRect.y &&
+                my <= btnRect.y + btnRect.h
+            ) {
                 this._buyItem(item, player, scoreManager);
                 return;
             }
@@ -247,7 +297,12 @@ export class ShopState extends State {
         const doneW = 160;
         const doneH = 34;
         const doneX = gameWidth / 2 - doneW / 2;
-        if (mx >= doneX && mx <= doneX + doneW && my >= doneY && my <= doneY + doneH) {
+        if (
+            mx >= doneX &&
+            mx <= doneX + doneW &&
+            my >= doneY &&
+            my <= doneY + doneH
+        ) {
             this._doneTurn();
         }
     }
@@ -265,6 +320,9 @@ export class ShopState extends State {
 
     /**
      * Attempt to buy one unit of an item. Does NOT end the turn.
+     * @param item
+     * @param player
+     * @param scoreManager
      * @private
      */
     _buyItem(item, player, scoreManager) {
@@ -276,7 +334,9 @@ export class ShopState extends State {
         const current = player.inventory.get(item.type) ?? 0;
         player.inventory.set(item.type, current + 1);
         const label = item.label;
-        this._showMessage(`Bought ${label}! (💰 ${scoreManager.getWallet(player)} remaining)`);
+        this._showMessage(
+            `Bought ${label}! (💰 ${scoreManager.getWallet(player)} remaining)`,
+        );
     }
 
     /**
@@ -284,7 +344,7 @@ export class ShopState extends State {
      * @private
      */
     _doneTurn() {
-        this._message     = '';
+        this._message = '';
         this._currentTurn++;
         if (this._currentTurn >= this.ctx.players.length) {
             this.goTo(GameStage.BUILD);
@@ -292,21 +352,26 @@ export class ShopState extends State {
     }
 
     _showMessage(text) {
-        this._message  = text;
+        this._message = text;
         this._msgTimer = 2200;
     }
 
     /**
      * Compute the Buy button rect for item index i.
+     * @param i
+     * @param tableTop
+     * @param colW
+     * @param headerH
+     * @param itemsPerCol
      * @private
      */
     _buyBtnRect(i, tableTop, colW, headerH, itemsPerCol) {
         const col_i = Math.floor(i / itemsPerCol);
         const row_i = i % itemsPerCol;
-        const rx    = TABLE_PAD_X + col_i * colW;
-        const ry    = tableTop + headerH + row_i * ROW_H;
-        const btnW  = 42;
-        const btnH  = ROW_H - 8;
+        const rx = TABLE_PAD_X + col_i * colW;
+        const ry = tableTop + headerH + row_i * ROW_H;
+        const btnW = 42;
+        const btnH = ROW_H - 8;
         return {
             x: rx + colW - btnW - 8,
             y: ry + 4,
@@ -317,23 +382,24 @@ export class ShopState extends State {
 
     /**
      * Return a display colour for an obstacle type.
+     * @param type
      * @private
      */
     _itemColor(type) {
         const map = {
-            PLATFORM:         [120, 90,  60],
-            MOVING_PLATFORM:  [80,  110, 160],
-            FALLING_PLATFORM: [90,  65,  40],
-            ICE_PLATFORM:     [160, 220, 245],
-            BOUNCE_PAD:       [80,  200, 100],
-            SPIKE:            [220, 60,  60],
-            CANNON:           [100, 100, 115],
-            SAW:              [200, 60,  60],
-            FLAME:            [240, 100, 20],
-            SPIKE_PLATFORM:   [170, 80,  40],
-            ICE_BLOCK:        [120, 190, 230],
-            WIND_ZONE:        [60,  185, 185],
-            TELEPORTER:       [160, 80,  240],
+            PLATFORM: [120, 90, 60],
+            MOVING_PLATFORM: [80, 110, 160],
+            FALLING_PLATFORM: [90, 65, 40],
+            ICE_PLATFORM: [160, 220, 245],
+            BOUNCE_PAD: [80, 200, 100],
+            SPIKE: [220, 60, 60],
+            CANNON: [100, 100, 115],
+            SAW: [200, 60, 60],
+            FLAME: [240, 100, 20],
+            SPIKED_BALL: [170, 80, 40],
+            ICE_BLOCK: [120, 190, 230],
+            WIND_ZONE: [60, 185, 185],
+            TELEPORTER: [160, 80, 240],
         };
         return map[type] ?? [150, 150, 150];
     }
