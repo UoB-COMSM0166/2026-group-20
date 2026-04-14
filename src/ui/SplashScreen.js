@@ -39,29 +39,31 @@ export class SplashScreen {
      */
     render(p, mx, my) {
         // placeholder title
-        p.textAlign(p.LEFT, p.BASELINE);
+        p.textAlign(p.CENTER, p.CENTER);
         p.textFont(GameConfig.FONT, GameConfig.TITLE_FONTSIZE);
         p.fill(
             GameConfig.TITLE_COLOUR.r,
             GameConfig.TITLE_COLOUR.g,
             GameConfig.TITLE_COLOUR.b,
         );
-        p.text(
-            'Ultimate Chicken Horse',
-            GameConfig.TITLE_X,
-            GameConfig.TITLE_Y,
-        );
+        // p.text(
+        //     'Ultimate Chicken Horse',
+        //     GameConfig.TITLE_X,
+        //     GameConfig.TITLE_Y,
+        // );
 
         // placeholder "press space to start"
         if (p.frameCount % 120 < 80) {
             p.textFont(GameConfig.FONT, GameConfig.PRESS_FONTSIZE);
+            p.stroke(0); 
+            p.strokeWeight(8);
             p.fill(
                 GameConfig.PRESS_COLOUR.r,
                 GameConfig.PRESS_COLOUR.g,
                 GameConfig.PRESS_COLOUR.b,
             );
             p.text(
-                'Press Space to Start',
+                'Press Space to Start', 
                 GameConfig.PRESS_X,
                 GameConfig.PRESS_Y,
             );
@@ -70,10 +72,10 @@ export class SplashScreen {
         p.cursor(p.ARROW); // default cursor
 
         // placeholder option buttons
-        this.button1.drawButton(p, mx, my);
-        this.button2.drawButton(p, mx, my);
+        //this.button1.drawButton(p, mx, my);
+        //this.button2.drawButton(p, mx, my);
 
-        this.button1.updateCursor(mx, my);
-        this.button2.updateCursor(mx, my);
+        //this.button1.updateCursor(mx, my);
+        //his.button2.updateCursor(mx, my);
     }
 }
