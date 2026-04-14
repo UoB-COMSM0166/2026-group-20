@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { ScoreManager } from '../src/systems/ScoreManager.js';
 
 //Reward algorithm:
-//1st → 20   2nd → 10   3rd → 5   4th → 2   Fail → 0
+//1st -> 20   2nd -> 10   3rd -> 5   4th -> 2   Fail -> 0
 
 // only test for two players 
 
