@@ -17,11 +17,14 @@
  */
 
 export const GameStage = Object.freeze({
-    MENU: 'MENU',
-    MAPMENU: 'MAP',
-    OPTION1: 'OPTION1', // change this
-    OPTION2: 'OPTION2',
-    MAP1: 'MAP1',
-    MAP2: 'MAP2',
-    // add more
+    BOOT:        'BOOT',
+    MENU:        'MENU',
+    TUTORIAL:    'TUTORIAL',
+    CHAR_SELECT: 'CHAR_SELECT',
+    MAPMENU:     'MAPMENU',
+    BUILD:       'BUILD',
+    RUN:         'RUN',
+    RESULTS:     'RESULTS',
+    SHOP:        'SHOP',
+    MAP2:        'MAP2',
 });
