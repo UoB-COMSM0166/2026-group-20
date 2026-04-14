@@ -1,6 +1,7 @@
 import { State } from './State.js';
 import { RespawnManager } from '../systems/RespawnManager.js';
 import { TimeManager } from '../systems/TimeManager.js';
+import { PauseManager } from '../systems/PauseManager.js';
 import { PlayerGameState } from '../config/PlayerGameState.js';
 import { PlayerState } from '../config/PlayerState.js';
 import { DeathReason } from '../config/DeathReason.js';
@@ -25,14 +26,18 @@ export class RunState extends State {
     enter() {
         const { p, gameWidth, gameHeight, players, scoreManager } = this.ctx;
 
-        this.coins          = getCoins(p);
+        this.coins          = getCoins(p, this.ctx.placedObstacles);
         this.respawnManager = new RespawnManager(scoreManager);
         this.timeManager    = new TimeManager(players, scoreManager);
+        this.pauseManager   = new PauseManager(p, gameWidth, gameHeight);
 
         this._resetRound();
     }
 
     update(deltaTime) {
+        // All game logic is frozen while paused
+        if (this.pauseManager.isPaused) return;
+
         const { players, scoreManager, placedObstacles, gameWidth, gameHeight } = this.ctx;
 
         this.respawnManager.update(deltaTime);
@@ -154,34 +159,48 @@ export class RunState extends State {
         p.textAlign(p.LEFT, p.BOTTOM);
         p.text('P1: A/D + W   P2: ←/→ + ↑', 10, gameHeight - 8);
 
-        // Quit button (bottom-right)
+        // Pause button (bottom-right)
         const qW = 100, qH = 24;
         const qX = gameWidth - qW - 8;
         const qY = gameHeight - qH - 6;
         const qHov = mx >= qX && mx <= qX + qW && my >= qY && my <= qY + qH;
         p.noStroke();
-        p.fill(qHov ? [130, 40, 40] : [85, 28, 28]);
+        p.fill(qHov ? [55, 65, 110] : [35, 42, 78]);
         p.rect(qX, qY, qW, qH, 5);
-        p.fill(225, 130, 130);
+        p.fill(180, 195, 255);
         p.textAlign(p.CENTER, p.CENTER);
         p.textSize(11);
-        p.text('✕  Quit', qX + qW / 2, qY + qH / 2);
+        p.text('⏸  Pause', qX + qW / 2, qY + qH / 2);
+
+        // Pause overlay — drawn last so it sits on top of everything
+        this.pauseManager.render(mx, my);
     }
 
     mousePressed(mx, my) {
+        // If paused, PauseManager handles all clicks
+        if (this.pauseManager.isPaused) {
+            this.pauseManager.mousePressed(mx, my,
+                () => this.pauseManager.resume(),
+                () => { this._resetRound(); this.pauseManager.resume(); },
+                () => this.goTo(GameStage.MENU)
+            );
+            return;
+        }
+
+        // Pause button (bottom-right)
         const { gameWidth, gameHeight } = this.ctx;
         const qW = 100, qH = 24;
         const qX = gameWidth - qW - 8;
         const qY = gameHeight - qH - 6;
         if (mx >= qX && mx <= qX + qW && my >= qY && my <= qY + qH) {
-            this.goTo(GameStage.MAPMENU);
+            this.pauseManager.pause();
         }
     }
 
     keyPressed() {
         const { p } = this.ctx;
         if (p.keyCode === p.ESCAPE) {
-            this.goTo(GameStage.MAPMENU);
+            this.pauseManager.toggle();
         }
     }
 

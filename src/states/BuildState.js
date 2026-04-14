@@ -18,7 +18,7 @@ import { Teleporter } from '../entities/obstacles/Teleporter.js';
 import { drawMap, MAP } from '../maps/MapLoader.js';
 
 // Map tile characters that cannot be overwritten when placing obstacles
-const BLOCKED_TILES = new Set(['#', 'S', 'F', 'C']);
+const BLOCKED_TILES = new Set(['#', 'S', 'F']);
 
 // Player colours — must match DrawPlayer / Scoreboard / ShopState
 const PLAYER_COLOURS = [
@@ -174,7 +174,7 @@ export class BuildState extends State {
         // Inventory summary
         if (this._isShopMode()) {
             const inv     = this._activePlayer().inventory;
-            const entries = [...inv.entries()].filter(([, c]) => c > 0);
+            const entries = [...inv.entries()].filter(([t, c]) => typeof t === 'string' && c > 0);
             p.textSize(11);
             if (entries.length > 0) {
                 p.fill(...col);
@@ -556,21 +556,25 @@ export class BuildState extends State {
 
     _createObstacle(type, x, y) {
         const { p } = this.ctx;
+        const s = this.ctx.obstacleSprites ?? {};
+        let obs = null;
         switch (type) {
-            case ObstacleType.PLATFORM:         return new Platform(p, x, y);
-            case ObstacleType.MOVING_PLATFORM:  return new MovingPlatform(p, x, y);
-            case ObstacleType.FALLING_PLATFORM: return new FallingPlatform(p, x, y);
-            case ObstacleType.ICE_PLATFORM:     return new IcePlatform(p, x, y);
-            case ObstacleType.BOUNCE_PAD:       return new BouncePad(p, x, y);
-            case ObstacleType.SPIKE:            return new SpikeObstacle(p, x, y);
-            case ObstacleType.CANNON:           return new Cannon(p, x, y, this._cannonDir);
-            case ObstacleType.SAW:              return new Saw(p, x, y);
-            case ObstacleType.FLAME:            return new Flame(p, x, y);
-            case ObstacleType.SPIKE_PLATFORM:   return new SpikePlatform(p, x, y);
-            case ObstacleType.ICE_BLOCK:        return new IceBlock(p, x, y);
-            case ObstacleType.WIND_ZONE:        return new WindZone(p, x, y, this._windDir);
-            case ObstacleType.TELEPORTER:       return new Teleporter(p, x, y);
+            case ObstacleType.PLATFORM:         obs = new Platform(p, x, y);                           break;
+            case ObstacleType.MOVING_PLATFORM:  obs = new MovingPlatform(p, x, y);                     break;
+            case ObstacleType.FALLING_PLATFORM: obs = new FallingPlatform(p, x, y);                    break;
+            case ObstacleType.ICE_PLATFORM:     obs = new IcePlatform(p, x, y);                        break;
+            case ObstacleType.BOUNCE_PAD:       obs = new BouncePad(p, x, y);                          break;
+            case ObstacleType.SPIKE:            obs = new SpikeObstacle(p, x, y);                      break;
+            case ObstacleType.CANNON:           obs = new Cannon(p, x, y, this._cannonDir);             break;
+            case ObstacleType.SAW:              obs = new Saw(p, x, y);                                break;
+            case ObstacleType.FLAME:            obs = new Flame(p, x, y);                              break;
+            case ObstacleType.SPIKE_PLATFORM:   obs = new SpikePlatform(p, x, y);                      break;
+            case ObstacleType.ICE_BLOCK:        obs = new IceBlock(p, x, y);                           break;
+            case ObstacleType.WIND_ZONE:        obs = new WindZone(p, x, y, this._windDir);             break;
+            case ObstacleType.TELEPORTER:       obs = new Teleporter(p, x, y);                         break;
             default:                            return null;
         }
+        if (obs) obs.type = type; // stamp type so undo/refund can read it back
+        return obs;
     }
 }

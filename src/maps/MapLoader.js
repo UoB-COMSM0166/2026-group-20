@@ -67,22 +67,73 @@ export function drawMap(p) {
 }
 
 /**
- * Parses the active map and returns a Coin instance for every 'C' tile.
- * Call once during setup; the returned array is the live coin list.
+ * Returns a Coin instance for every 'C' tile in the active map.
  *
- * @param {p5} p - The p5 instance
+ * If a placed obstacle occupies a coin's tile, that coin is relocated to a
+ * randomly chosen *grounded* free tile (a '.' tile that has a solid '#' tile
+ * directly below it) so the total coin count never changes and all coins
+ * remain reachable by the player.
+ *
+ * If no grounded free tile is available, the coin stays at its original
+ * position regardless — count is always preserved.
+ *
+ * @param {p5}       p
+ * @param {object[]} [placedObstacles=[]]
  * @returns {Coin[]}
  */
-export function getCoins(p) {
-    const coins = [];
-    for (let y = 0; y < MAP.length; y++) {
-        for (let x = 0; x < MAP[0].length; x++) {
-            if (MAP[y][x] === 'C') {
-                const px = x * GameConfig.TILE + GameConfig.TILE * 0.25;
-                const py = y * GameConfig.TILE + GameConfig.TILE * 0.25;
-                coins.push(new Coin(p, px, py, GameConfig.COIN_VALUE));
+export function getCoins(p, placedObstacles = []) {
+    const T    = GameConfig.TILE;
+    const cols = MAP[0].length; // canonical width — avoids off-screen tiles from longer rows
+
+    // Build a set of tile positions occupied by placed obstacles
+    const occupiedKeys = new Set(
+        placedObstacles.map(obs => `${Math.round(obs.x / T)},${Math.round(obs.y / T)}`)
+    );
+
+    // Candidate relocation tiles: empty ('.') tiles with solid '#' directly
+    // below them (i.e. grounded — the player can stand there and collect the coin).
+    // Strictly bounded to [0, cols) so we never pick an off-screen tile.
+    const candidates = [];
+    for (let ty = 0; ty < MAP.length - 1; ty++) {
+        for (let tx = 0; tx < cols; tx++) {
+            const c     = MAP[ty][tx];
+            const below = MAP[ty + 1]?.[tx];
+            if (c === '.' && below === '#' && !occupiedKeys.has(`${tx},${ty}`)) {
+                candidates.push({ tx, ty });
             }
         }
     }
+
+    // Fisher-Yates shuffle so picks are random each round
+    for (let i = candidates.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+
+    let relocIdx = 0;
+    const coins  = [];
+
+    for (let ty = 0; ty < MAP.length; ty++) {
+        for (let tx = 0; tx < cols; tx++) {
+            if (MAP[ty]?.[tx] !== 'C') continue;
+
+            let coinTx = tx, coinTy = ty;
+
+            if (occupiedKeys.has(`${tx},${ty}`)) {
+                if (relocIdx < candidates.length) {
+                    // Move coin to a grounded free tile
+                    ({ tx: coinTx, ty: coinTy } = candidates[relocIdx++]);
+                }
+                // else: no candidates left — coin stays at original position.
+                // Count is always preserved; coin may be behind an obstacle
+                // but it still exists and renders on top of it.
+            }
+
+            const px = coinTx * T + T * 0.25;
+            const py = coinTy * T + T * 0.25;
+            coins.push(new Coin(p, px, py, GameConfig.COIN_VALUE));
+        }
+    }
+
     return coins;
 }
