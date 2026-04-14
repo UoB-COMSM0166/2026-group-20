@@ -12,7 +12,13 @@ An exciting multiplayer platformer where players design obstacles and race to re
 
 <hr style="border: none; height: 0.5px; background-color:#ddd;">
 
-<h3>VIDEO DEMO (v0.1.0)</h3>
+<h3>VIDEO DEMO (v0.1.0)</h3> 
+2-3 mins long no more than 3 mins 
+intro of the game (optional) 
+explain concept of the game and twists
+explain challanges (in the game) 
+team formation 
+explain the process (sprints, kanban board...) 
 
 https://github.com/user-attachments/assets/00920bfc-84fc-4969-a731-ab39fba2d5a1
 
@@ -659,6 +665,9 @@ main
 
 ### 6.6. Reflection on Teamwork 
 
+## 7. Subtainability, Ethics and Accessibility
+(~250 words) 
+Environmental + 2 of the following: Social, Enconimic, Technical and Individual 
 
 
 ## 7. Conclusion
@@ -671,6 +680,12 @@ main
 ## 8. Contribution Statement
 
 - Provide a table of everyone's contribution, which _may_ be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
+
+## AI Statement 
+(~250 words) 
+summerise your team'suse of AI so we know where to give you credit for work done 
+charater animation 
+
 
 ### Reference
 [1]J. Joe, S. Chaudhuri, T. Le, H. Thompson, and G. Demiris, “The use of think-aloud and instant data analysis in evaluation research: Exemplar and lessons learned,” Journal of Biomedical Informatics, vol. 56, pp. 284–291, Aug. 2015, doi: 10.1016/j.jbi.2015.06.001. (add to why choose think aloud)
