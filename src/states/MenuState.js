@@ -9,14 +9,15 @@ import { GameStage } from '../config/GameStage.js';
  *   SPACE → MapMenuState
  */
 export class MenuState extends State {
-    constructor(ctx, goTo, bgImage) {
+    constructor(ctx, goTo, bgImage, font) {
         super(ctx, goTo);
         this.bgImage = bgImage; 
+        this.font= font;
     }
 
     enter() {
         const { p } = this.ctx;
-        this.splashScreen = new SplashScreen(p);
+        this.splashScreen = new SplashScreen(p, this.font);
         
     }
 

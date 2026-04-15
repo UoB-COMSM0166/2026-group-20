@@ -13,8 +13,8 @@ export class SplashScreen {
      * @param {p5} p - The p5 instance
      * @param {string} stage - Current game stage
      */
-    //constructor(p) {
-    
+    constructor(p, font) {
+         this.font=font;
         // this.button1 = new RectButton(
         //     p,
         //     GameConfig.BUTTON1_X,
@@ -31,7 +31,7 @@ export class SplashScreen {
         //     GameConfig.BUTTON2_H,
         //     'option2',
         // );
-    //}
+    }
     /**
      * @description renders splash screen
      * @param {p5} p - The p5 instance
@@ -39,21 +39,23 @@ export class SplashScreen {
     render(p) {
         // placeholder title
         p.textAlign(p.CENTER, p.CENTER);
-        p.textFont(GameConfig.FONT, GameConfig.TITLE_FONTSIZE);
+         p.stroke(0); 
+         p.strokeWeight(8);
+        p.textFont(this.font, GameConfig.TITLE_FONTSIZE);
         p.fill(
             GameConfig.TITLE_COLOUR.r,
             GameConfig.TITLE_COLOUR.g,
             GameConfig.TITLE_COLOUR.b,
         );
-        // p.text(
-        //     'Ultimate Chicken Horse',
-        //     GameConfig.TITLE_X,
-        //     GameConfig.TITLE_Y,
-        // );
+        p.text(
+            'The Incredible\n ChickenBunny',
+            GameConfig.TITLE_X,
+            GameConfig.TITLE_Y,
+        );
 
         // placeholder "press space to start"
         if (p.frameCount % 120 < 80) {
-            p.textFont(GameConfig.FONT, GameConfig.PRESS_FONTSIZE);
+            p.textFont(this.font, GameConfig.PRESS_FONTSIZE);
             p.stroke(0); 
             p.strokeWeight(8);
             p.fill(

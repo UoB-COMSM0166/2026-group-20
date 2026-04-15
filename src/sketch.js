@@ -31,6 +31,10 @@ import cannon from './assets/obstacles/Cannon/cannon (30x18).png';
 import fallingPlatform from './assets/obstacles/Falling Platforms/On (32x10).png';
 
 import startScreen from './assets/images/background/startscreen-bg.png';
+//import PixelCowboy from './assets/fonts/PixelCowboy.otf';
+import PixelCowboy from './assets/fonts/PanasChill.ttf';
+
+
 /**
  * Root p5 sketch.
  *
@@ -66,6 +70,7 @@ export const sketch = (p) => {
     let duckSheet;
     let polarSheet;
     let startScreenBackground; 
+    let startScreenFont;
 
     let ctx;
 
@@ -80,7 +85,8 @@ export const sketch = (p) => {
         spikedBallImg = p.loadImage(spikedBall);
         cannonImg = p.loadImage(cannon);
         fallingPlatformFrames = p.loadImage(fallingPlatform);
-        startScreenBackground = p.loadImage(startScreen); 
+        startScreenBackground = p.loadImage(startScreen);
+        startScreenFont= p.loadFont(PixelCowboy);
         mapManager.preloadAll();
     };
 
@@ -126,7 +132,7 @@ export const sketch = (p) => {
 
         states = {
             [GameStage.BOOT]: new BootState(ctx, goTo),
-            [GameStage.MENU]: new MenuState(ctx, goTo, startScreenBackground),
+            [GameStage.MENU]: new MenuState(ctx, goTo, startScreenBackground, startScreenFont),
             [GameStage.CHAR_SELECT]: new CharSelectState(ctx, goTo),
             [GameStage.MAPMENU]: new MapMenuState(ctx, goTo),
             [GameStage.BUILD]: new BuildState(
