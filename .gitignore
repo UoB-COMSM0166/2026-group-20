@@ -24,4 +24,5 @@ dist-ssr
 
 # Exclusions
 !.vscode/extensions.json
-!.husky
+!.huskynode_modules/
+**/.DS_Store
