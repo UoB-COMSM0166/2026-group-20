@@ -13,16 +13,16 @@ export const GameConfig = {
     SKIN_WIDTH: 0.01,
 
     // Start Screen
-    FONT: 'Monaco',
-    TITLE_FONTSIZE: 20,
-    TITLE_X: 310,
-    TITLE_Y: 200,
-    TITLE_COLOUR: { r: 143, g: 57, b: 133 }, // purple
+    //FONT: 'Apple Chancery', //or courier new?
+    TITLE_FONTSIZE: 140,
+    TITLE_X: 500,
+    TITLE_Y: 230,
+    TITLE_COLOUR: { r: 245, g: 140, b: 265 }, // purple
 
-    PRESS_FONTSIZE: 15,
-    PRESS_X: 350,
-    PRESS_Y: 300,
-    PRESS_COLOUR: { r: 0, g: 0, b: 225 }, // blue
+    PRESS_FONTSIZE: 57,
+    PRESS_X: 1050,
+    PRESS_Y: 650,
+    PRESS_COLOUR: { r: 255, g: 215, b: 0 }, // yellow
 
     BUTTON1_X: 330,
     BUTTON1_Y: 330,
