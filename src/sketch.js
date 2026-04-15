@@ -156,7 +156,10 @@ export const sketch = (p) => {
             gameHeight = ctx.gameHeight;
         }
 
-        p.background(0);
+        if (activeState === states[GameStage.MENU]) {
+            // fix aspect ratio in start screen
+            p.image(startScreenBackground, 0, 0, p.width, p.height);
+        } 
 
         scaleFactor = p.min(p.width / gameWidth, p.height / gameHeight);
         offsetX = (p.width - gameWidth * scaleFactor) / 2;
