@@ -13,16 +13,16 @@ export const GameConfig = {
     SKIN_WIDTH: 0.01,
 
     // Start Screen
-    FONT: 'Monaco',
-    TITLE_FONTSIZE: 20,
+    FONT: 'Apple Chancery',
+    TITLE_FONTSIZE: 50,
     TITLE_X: 310,
     TITLE_Y: 200,
     TITLE_COLOUR: { r: 143, g: 57, b: 133 }, // purple
 
-    PRESS_FONTSIZE: 15,
-    PRESS_X: 350,
-    PRESS_Y: 300,
-    PRESS_COLOUR: { r: 0, g: 0, b: 225 }, // blue
+    PRESS_FONTSIZE: 65,
+    PRESS_X: 1000,
+    PRESS_Y: 600,
+    PRESS_COLOUR: { r: 255, g: 215, b: 0 }, // blue
 
     BUTTON1_X: 330,
     BUTTON1_Y: 330,

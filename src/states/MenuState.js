@@ -9,15 +9,29 @@ import { GameStage } from '../config/GameStage.js';
  *   SPACE → MapMenuState
  */
 export class MenuState extends State {
-    enter() {
-        const { p, gameWidth, gameHeight } = this.ctx;
-        this.splashScreen = new SplashScreen(p, gameWidth, gameHeight);
+    constructor(ctx, goTo, bgImage) {
+        super(ctx, goTo);
+        this.bgImage = bgImage; 
     }
 
-    render(mx, my) {
+    enter() {
         const { p } = this.ctx;
-        p.background(30);
-        this.splashScreen.render(p, mx, my);
+        this.splashScreen = new SplashScreen(p);
+        
+    }
+
+    render() {
+        // Destructure gameWidth and gameHeight from this.ctx
+        // const { p, gameWidth, gameHeight } = this.ctx;
+        const { p } = this.ctx;
+        // if (this.bgImage) {
+        //     // Draw the image to fill the internal game resolution
+        //     p.image(this.bgImage, 0, 0, gameWidth, gameHeight);
+        // } else {
+        //     p.background(30); 
+        // }
+        
+        this.splashScreen.render(p);
     }
 
     keyPressed() {
