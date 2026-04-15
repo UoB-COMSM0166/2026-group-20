@@ -36,18 +36,18 @@ export const GameConfig = {
 
     // MAP MENU
     MAP_TITLE_COLOUR: { r: 143, g: 57, b: 133 }, // purple
-    MAP_TITLE_X: 330,
+    MAP_TITLE_X: 1920 / 2,
     MAP_TITLE_Y: 200,
 
     MAP_BUTTON1_X: 200,
     MAP_BUTTON1_Y: 330,
-    MAP_BUTTON1_W: 60,
-    MAP_BUTTON1_H: 25,
+    MAP_BUTTON1_W: 120,
+    MAP_BUTTON1_H: 50,
 
     MAP_BUTTON2_X: 400,
     MAP_BUTTON2_Y: 330,
-    MAP_BUTTON2_W: 60,
-    MAP_BUTTON2_H: 25,
+    MAP_BUTTON2_W: 120,
+    MAP_BUTTON2_H: 50,
 
     MAP_RETURN_X: 50,
     MAP_RETURN_Y: 50,

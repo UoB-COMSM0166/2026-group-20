@@ -35,7 +35,6 @@ import startScreen from './assets/images/background/startscreen-bg.png';
 //import PixelCowboy from './assets/fonts/PixelCowboy.otf';
 import PixelCowboy from './assets/fonts/PanasChill.ttf';
 
-
 /**
  * Root p5 sketch.
  *
@@ -70,7 +69,7 @@ export const sketch = (p) => {
     let bunnySheet;
     let duckSheet;
     let polarSheet;
-    let startScreenBackground; 
+    let startScreenBackground;
     let startScreenFont;
 
     let ctx;
@@ -87,7 +86,7 @@ export const sketch = (p) => {
         cannonImg = p.loadImage(cannon);
         fallingPlatformFrames = p.loadImage(fallingPlatform);
         startScreenBackground = p.loadImage(startScreen);
-        startScreenFont= p.loadFont(PixelCowboy);
+        startScreenFont = p.loadFont(PixelCowboy);
         mapManager.preloadAll();
     };
 
@@ -104,6 +103,7 @@ export const sketch = (p) => {
          */
         ctx = {
             p,
+            font: startScreenFont,
             gameWidth,
             gameHeight,
             players: [],
@@ -133,9 +133,14 @@ export const sketch = (p) => {
 
         states = {
             [GameStage.BOOT]: new BootState(ctx, goTo),
-            [GameStage.MENU]: new MenuState(ctx, goTo, startScreenBackground, startScreenFont),
+            [GameStage.MENU]: new MenuState(
+                ctx,
+                goTo,
+                startScreenBackground,
+                startScreenFont,
+            ),
             [GameStage.CHAR_SELECT]: new CharSelectState(ctx, goTo),
-            [GameStage.MAPMENU]: new MapMenuState(ctx, goTo),
+            [GameStage.MAPMENU]: new MapMenuState(ctx, goTo, startScreenFont),
             [GameStage.BUILD]: new BuildState(
                 ctx,
                 goTo,
@@ -167,7 +172,7 @@ export const sketch = (p) => {
         if (activeState === states[GameStage.MENU]) {
             // fix aspect ratio in start screen
             p.image(startScreenBackground, 0, 0, p.width, p.height);
-        } 
+        }
 
         scaleFactor = p.min(p.width / gameWidth, p.height / gameHeight);
         offsetX = (p.width - gameWidth * scaleFactor) / 2;

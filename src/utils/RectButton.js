@@ -7,8 +7,9 @@ export class RectButton extends Button {
         this.radius = 10;
         this.defaultColour = { r: 100, g: 100, b: 225 }; // blue background
         this.changedColour = { r: 0, g: 100, b: 225 }; // purple background
+        //need to change the font
         this.textFont = 'Monaco';
-        this.textSize = 10;
+        this.textSize = 20;
         this.textColour = 250;
     }
 
