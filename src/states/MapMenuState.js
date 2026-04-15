@@ -28,10 +28,10 @@ export class MapMenuState extends State {
             this.goTo(GameStage.MENU);
         } else if (mapMenu.buttonMap1.isHovered(mx, my)) {
             this.ctx.selectMap('map1');
-            this.goTo(GameStage.BUILD);
+            this.goTo(GameStage.TUTORIAL);
         } else if (mapMenu.buttonMap2.isHovered(mx, my)) {
             this.ctx.selectMap('map2');
-            this.goTo(GameStage.BUILD);
+            this.goTo(GameStage.TUTORIAL);
         }
     }
 }

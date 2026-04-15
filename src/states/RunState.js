@@ -8,6 +8,7 @@ import { GameStage } from '../config/GameStage.js';
 import { GameConfig } from '../config/GameConfig.js';
 import { TileType } from '../config/TileType.js';
 import { DrawPlayer } from '../utils/DrawPlayer.js';
+import { PauseManager } from '../systems/PauseManager.js';
 
 /**
  * RunState — the active gameplay phase.
@@ -23,16 +24,19 @@ import { DrawPlayer } from '../utils/DrawPlayer.js';
  */
 export class RunState extends State {
     enter() {
-        const { players, scoreManager, tiledMap } = this.ctx;
+        const { p, gameWidth, gameHeight, players, scoreManager, tiledMap } = this.ctx;
 
-        this.coins = tiledMap.getCoins();
+        this.coins        = tiledMap.getCoins(this.ctx.placedObstacles);
         this.respawnManager = new RespawnManager(scoreManager);
-        this.timeManager = new TimeManager(players, scoreManager);
+        this.timeManager  = new TimeManager(players, scoreManager);
+        this.pauseManager = new PauseManager(p, gameWidth, gameHeight);
 
         this._resetRound();
     }
 
     update(deltaTime) {
+        if (!this.pauseManager) return; // guard: enter() may have crashed
+        if (this.pauseManager.isPaused) return;
         const {
             players,
             scoreManager,
@@ -122,6 +126,7 @@ export class RunState extends State {
     }
 
     render(mx, my) {
+        try {
         const {
             p,
             players,
@@ -189,13 +194,56 @@ export class RunState extends State {
         p.fill(160, 160, 180);
         p.textSize(13);
         p.textAlign(p.LEFT, p.BOTTOM);
-        p.text('P1: A/D + W   P2: ←/→ + ↑   (ESC to exit)', 10, gameHeight - 8);
+        p.text('P1: A/D + W   P2: ←/→ + ↑', 10, gameHeight - 8);
+
+        // Pause button (bottom-right)
+        const qW = 100, qH = 24;
+        const qX = gameWidth - qW - 8;
+        const qY = gameHeight - qH - 6;
+        const qHov = mx >= qX && mx <= qX + qW && my >= qY && my <= qY + qH;
+        p.noStroke();
+        p.fill(qHov ? [55, 65, 110] : [35, 42, 78]);
+        p.rect(qX, qY, qW, qH, 5);
+        p.fill(180, 195, 255);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(11);
+        p.text('⏸  Pause', qX + qW / 2, qY + qH / 2);
+
+        // Pause overlay — drawn last so it sits on top
+        this.pauseManager.render(mx, my);
+        } catch(e) { console.error('[RunState.render] CRASH:', e.stack || e); }
+    }
+
+    mousePressed(mx, my) {
+        if (this.pauseManager.isPaused) {
+            this.pauseManager.mousePressed(mx, my,
+                () => this.pauseManager.resume(),
+                () => { this._resetRound(); this.pauseManager.resume(); },
+                () => {
+                    // Store where to return so TutorialState knows to come back
+                    this.ctx.tutorialReturnStage = GameStage.RUN;
+                    this.pauseManager.resume();
+                    this.goTo(GameStage.TUTORIAL);
+                },
+                () => this.goTo(GameStage.MENU)
+            );
+            return;
+        }
+
+        // Pause button
+        const { gameWidth, gameHeight } = this.ctx;
+        const qW = 100, qH = 24;
+        const qX = gameWidth - qW - 8;
+        const qY = gameHeight - qH - 6;
+        if (mx >= qX && mx <= qX + qW && my >= qY && my <= qY + qH) {
+            this.pauseManager.pause();
+        }
     }
 
     keyPressed() {
         const { p } = this.ctx;
         if (p.keyCode === p.ESCAPE) {
-            this.goTo(GameStage.MAPMENU);
+            this.pauseManager.toggle();
         }
     }
 
@@ -208,6 +256,7 @@ export class RunState extends State {
         this.timeManager.reset();
         scoreManager.resetRound();
 
+        this.coins = this.ctx.tiledMap.getCoins(this.ctx.placedObstacles);
         for (const coin of this.coins) coin.reset();
 
         for (const player of players) {

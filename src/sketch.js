@@ -12,6 +12,7 @@ import { BuildState } from './states/BuildState.js';
 import { RunState } from './states/RunState.js';
 import { ResultsState } from './states/ResultsState.js';
 import { ShopState } from './states/ShopState.js';
+import { TutorialState } from './states/TutorialState.js';
 // import { Map2State } from './states/Map2State.js';
 import { AnimationConfigChick } from './config/AnimationConfigChick.js';
 import { AnimationConfigBunny } from './config/AnimationConfigBunny.js';
@@ -139,6 +140,7 @@ export const sketch = (p) => {
             [GameStage.RUN]: new RunState(ctx, goTo),
             [GameStage.RESULTS]: new ResultsState(ctx, goTo),
             [GameStage.SHOP]: new ShopState(ctx, goTo),
+            [GameStage.TUTORIAL]: new TutorialState(ctx, goTo),
             //            [GameStage.MAP2]: new Map2State(ctx, goTo),
         };
 
