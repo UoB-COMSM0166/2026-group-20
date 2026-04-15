@@ -158,16 +158,18 @@ export const sketch = (p) => {
         p.background(0);
 
         scaleFactor = p.min(p.width / gameWidth, p.height / gameHeight);
-        offsetX = (p.width - gameWidth * scaleFactor) / 2;
-        offsetY = (p.height - gameHeight * scaleFactor) / 2;
+        const scaleX = p.width / gameWidth;
+        const scaleY = p.height / gameHeight;
+        // offsetX = (p.width - gameWidth * scaleFactor) / 2;
+        // offsetY = (p.height - gameHeight * scaleFactor) / 2;
 
-        const mx = (p.mouseX - offsetX) / scaleFactor;
-        const my = (p.mouseY - offsetY) / scaleFactor;
+        const mx = p.mouseX / scaleX;
+        const my = p.mouseY / scaleY;
 
         p.cursor(p.ARROW);
         p.push();
-        p.translate(offsetX, offsetY);
-        p.scale(scaleFactor);
+        // p.translate(offsetX, offsetY);
+        p.scale(scaleX, scaleY);
 
         activeState.update(p.deltaTime || 16.6);
         activeState.render(mx, my);
@@ -178,8 +180,10 @@ export const sketch = (p) => {
     // ── Input ──
 
     p.mousePressed = function () {
-        const mx = (p.mouseX - offsetX) / scaleFactor;
-        const my = (p.mouseY - offsetY) / scaleFactor;
+        const scaleX = p.width / gameWidth;
+        const scaleY = p.height / gameHeight;
+        const mx = p.mouseX / scaleX;
+        const my = p.mouseY / scaleY;
         activeState.mousePressed(mx, my);
     };
 
@@ -189,5 +193,10 @@ export const sketch = (p) => {
 
     p.windowResized = function () {
         p.resizeCanvas(p.windowWidth, p.windowHeight);
+    };
+
+    p.doubleClicked = function () {
+        let a = p.fullscreen();
+        p.fullscreen(!a);
     };
 };
