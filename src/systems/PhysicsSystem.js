@@ -13,8 +13,14 @@ export function aabbIntersects(ax, ay, aw, ah, bx, by, bw, bh) {
 
 function getMapTile(MAP, tx, ty) {
     if (!MAP?.length || !MAP[0]?.length) return TileType.SOLID;
-    if (ty < 0 || ty >= MAP.length || tx < 0 || tx >= MAP[0].length)
+    if (ty < 0 || tx < 0 || tx >= MAP[0].length) {
         return TileType.SOLID;
+    }
+    // Let players fall out of the bottom of the map instead of treating the
+    // void below the last row as an invisible solid floor.
+    if (ty >= MAP.length) {
+        return TileType.EMPTY;
+    }
     return MAP[ty][tx];
 }
 

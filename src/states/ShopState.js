@@ -3,17 +3,43 @@ import { GameStage } from '../config/GameStage.js';
 import { GameConfig } from '../config/GameConfig.js';
 import { ObstacleType } from '../config/ObstacleType.js';
 
+// Rich item descriptions for hover tooltips
+const ITEM_DESCRIPTIONS = {
+    PLATFORM:         'Solid block that players can stand on.',
+    MOVING_PLATFORM:  'Slides left and right on a fixed path.',
+    FALLING_PLATFORM: 'Drops after a player stands on it.',
+    ICE_PLATFORM:     'Solid but frictionless — players slide.',
+    BOUNCE_PAD:       'Launches players upward on contact.',
+    SPIKE:            'Instant kill on touch.',
+    CANNON:           'Fires projectiles periodically.',
+    SAW:              'Spinning blade — instant kill.',
+    FLAME:            'Pulses on/off. Kills when active.',
+    SPIKED_BALL:      'Static hazard ball — instant kill.',
+    ICE_BLOCK:        'Pass-through zone that increases speed.',
+    WIND_ZONE:        'Pushes players in a set direction.',
+    TELEPORTER:       '1 token = 2 portals. Warps players.',
+    BOMB:             'Destroys terrain tiles on explosion!',
+    SHADOW:           'Replays the last 5 seconds of a player as a ghost clone.',
+};
+
 // All purchasable items derived from GameConfig.SHOP_PRICES
-const SHOP_ITEMS = Object.entries(GameConfig.SHOP_PRICES).map(
+// Shuffled each round via shuffleItems()
+let ALL_SHOP_ITEMS = Object.entries(GameConfig.SHOP_PRICES).map(
     ([type, price]) => ({
         type,
         price,
-        label: type
-            .split('_')
-            .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
-            .join(' '),
+        label: type.split('_').map((w) => w.charAt(0) + w.slice(1).toLowerCase()).join(' '),
+        desc: ITEM_DESCRIPTIONS[type] || '',
     }),
 );
+
+// Active items shown this round (random subset of 8)
+let SHOP_ITEMS = ALL_SHOP_ITEMS;
+
+function shuffleShopItems() {
+    const shuffled = [...ALL_SHOP_ITEMS].sort(() => Math.random() - 0.5);
+    SHOP_ITEMS = shuffled.slice(0, Math.min(8, shuffled.length));
+}
 
 // Player colours
 const PLAYER_COLOURS = [
@@ -21,11 +47,11 @@ const PLAYER_COLOURS = [
     [255, 200, 80], // P2 orange
 ];
 
-// Table layout constants
-const COLS = 2;
-const ROW_H = 36;
-const TABLE_PAD_X = 20;
-const TABLE_PAD_Y = 10;
+const GRID_COLS = 4;
+const CARD_W = 212;
+const CARD_H = 132;
+const CARD_GAP_X = 14;
+const CARD_GAP_Y = 16;
 
 /**
  * ShopState — turn-based shop.
@@ -48,6 +74,8 @@ export class ShopState extends State {
         this._currentTurn = 0;
         this._message = '';
         this._msgTimer = 0;
+        this._hoveredItem = null;
+        shuffleShopItems(); // Feature 7: random shop each round
     }
 
     update(deltaTime) {
@@ -55,167 +83,167 @@ export class ShopState extends State {
             this._msgTimer -= deltaTime;
             if (this._msgTimer <= 0) this._message = '';
         }
+        this._hoveredItem = null; // reset each frame, set during render
     }
 
     render(mx, my) {
         const { p, gameWidth, gameHeight, players, scoreManager } = this.ctx;
         const player = players[this._currentTurn];
-        const wallet = scoreManager.getWallet(player);
         const col = PLAYER_COLOURS[this._currentTurn];
+        const panelX = 24;
+        const panelY = 56;
+        const panelW = gameWidth - 48;
+        const panelH = gameHeight - 122;
+        const gridX = panelX + 20;
+        const gridY = panelY + 38;
 
-        p.background(15, 15, 25);
+        p.background(11, 13, 22);
 
-        // ── Header ───────────────────────────────────────────────────────
+        // Header
         p.noStroke();
         p.fill(...col);
         p.textAlign(p.CENTER, p.TOP);
-        p.textSize(22);
-        p.text(`P${this._currentTurn + 1} — SHOP`, gameWidth / 2, 10);
+        p.textSize(9);
+        p.text(`P${this._currentTurn + 1} PIXEL SHOP`, gameWidth / 2, 10);
 
-        // Wallet (top-right)
-        p.fill(100, 220, 180);
-        p.textSize(16);
-        p.textAlign(p.RIGHT, p.TOP);
-        p.text(`💰 ${wallet}`, gameWidth - 14, 10);
-
-        // Inventory summary (top-left)
-        const invEntries = [...player.inventory.entries()].filter(
-            ([, c]) => c > 0,
-        );
-        p.fill(160, 160, 200);
-        p.textSize(11);
-        p.textAlign(p.LEFT, p.TOP);
-        if (invEntries.length > 0) {
-            const inv = invEntries
-                .map(
-                    ([t, c]) =>
-                        `${t
-                            .split('_')
-                            .map((w) => w[0] + w.slice(1).toLowerCase())
-                            .join(' ')} ×${c}`,
-                )
-                .join('  ');
-            p.text(`Bag: ${inv}`, 14, 12);
-        } else {
-            p.fill(90, 90, 110);
-            p.text('Bag: empty', 14, 12);
-        }
-
-        // Subtitle
         p.fill(160, 160, 190);
-        p.textSize(12);
+        p.textSize(5.5);
         p.textAlign(p.CENTER, p.TOP);
         p.text(
-            'Buy as many items as you can afford. Press ENTER or Done when finished.',
+            'Hover icon to inspect. Buy traps with wallet coins.',
             gameWidth / 2,
-            34,
+            28,
         );
 
-        // ── Table ────────────────────────────────────────────────────────
-        const tableTop = 58;
-        const tableH = gameHeight - tableTop - 52; // leave room for buttons at bottom
-        const colW = (gameWidth - TABLE_PAD_X * 2) / COLS;
-        const itemsPerCol = Math.ceil(SHOP_ITEMS.length / COLS);
+        this._hoveredItem = null;
 
-        // Table background
-        p.fill(20, 22, 36);
+        // Main shop panel
+        p.fill(16, 20, 34);
+        p.rect(panelX, panelY, panelW, panelH, 10);
+        p.stroke(...col);
+        p.strokeWeight(2);
+        p.noFill();
+        p.rect(panelX, panelY, panelW, panelH, 10);
         p.noStroke();
-        p.rect(TABLE_PAD_X, tableTop, gameWidth - TABLE_PAD_X * 2, tableH, 6);
 
-        // Column headers
-        const headerH = 24;
-        p.fill(35, 38, 58);
-        p.rect(TABLE_PAD_X, tableTop, gameWidth - TABLE_PAD_X * 2, headerH, 6);
-
-        p.fill(140, 140, 180);
-        p.textSize(11);
+        p.fill(32, 38, 60);
+        p.rect(panelX, panelY, panelW, 24, 10, 10, 0, 0);
+        p.fill(205, 218, 255);
         p.textAlign(p.LEFT, p.CENTER);
-        for (let c = 0; c < COLS; c++) {
-            const hx = TABLE_PAD_X + c * colW + TABLE_PAD_Y;
-            p.text('ITEM', hx, tableTop + headerH / 2);
-            p.text('COST', hx + colW * 0.52, tableTop + headerH / 2);
-        }
+        p.textSize(5.5);
+        p.text('ITEM SHOP', panelX + 12, panelY + 13);
 
-        // Rows
-        for (let i = 0; i < SHOP_ITEMS.length; i++) {
-            const col_i = Math.floor(i / itemsPerCol);
-            const row_i = i % itemsPerCol;
-            const rx = TABLE_PAD_X + col_i * colW;
-            const ry = tableTop + headerH + row_i * ROW_H;
-            const item = SHOP_ITEMS[i];
-            const canAfford = wallet >= item.price;
-            const btnRect = this._buyBtnRect(
-                i,
-                tableTop,
-                colW,
-                headerH,
-                itemsPerCol,
-            );
-            const hovered =
-                mx >= btnRect.x &&
-                mx <= btnRect.x + btnRect.w &&
-                my >= btnRect.y &&
-                my <= btnRect.y + btnRect.h;
+        const wallet = scoreManager.getWallet(player);
+        p.fill(100, 220, 180);
+        p.textAlign(p.RIGHT, p.CENTER);
+        p.text(`WALLET ${wallet}`, panelX + panelW - 12, panelY + 13);
 
-            // Row background (alternating)
-            p.noStroke();
-            p.fill(row_i % 2 === 0 ? [24, 26, 42] : [28, 30, 48]);
-            p.rect(rx, ry, colW, ROW_H);
-
-            // Item colour swatch
-            const swatchCol = this._itemColor(item.type);
-            p.fill(...swatchCol);
-            p.rect(rx + 8, ry + ROW_H / 2 - 7, 14, 14, 2);
-
-            // Item name
-            p.fill(canAfford ? [210, 210, 235] : [90, 90, 100]);
-            p.textSize(12);
-            p.textAlign(p.LEFT, p.CENTER);
-            p.text(item.label, rx + 28, ry + ROW_H / 2);
-
-            // Price
-            p.fill(canAfford ? [255, 215, 0] : [140, 80, 80]);
-            p.textSize(12);
-            p.textAlign(p.LEFT, p.CENTER);
-            p.text(`💰 ${item.price}`, rx + colW * 0.52, ry + ROW_H / 2);
-
-            // Buy button
-            if (canAfford) {
-                p.fill(hovered ? [60, 140, 75] : [38, 100, 52]);
-            } else {
-                p.fill(35, 35, 45);
-            }
-            p.noStroke();
-            p.rect(btnRect.x, btnRect.y, btnRect.w, btnRect.h, 4);
-            p.fill(canAfford ? (hovered ? 255 : 200) : 70);
-            p.textSize(11);
-            p.textAlign(p.CENTER, p.CENTER);
-            p.text('Buy', btnRect.x + btnRect.w / 2, btnRect.y + btnRect.h / 2);
-        }
-
-        // Divider lines between rows
-        p.stroke(35, 38, 55);
-        p.strokeWeight(1);
-        for (let i = 0; i < SHOP_ITEMS.length; i++) {
-            const col_i = Math.floor(i / itemsPerCol);
-            const row_i = i % itemsPerCol;
-            const rx = TABLE_PAD_X + col_i * colW;
-            const ry = tableTop + headerH + row_i * ROW_H;
-            p.line(rx, ry, rx + colW, ry);
-        }
-        // Column divider
-        p.line(
-            TABLE_PAD_X + colW,
-            tableTop,
-            TABLE_PAD_X + colW,
-            tableTop + tableH,
+        const invEntries = [...player.inventory.entries()].filter(([, c]) => c > 0);
+        p.fill(invEntries.length ? [150, 176, 220] : [95, 102, 130]);
+        p.textAlign(p.LEFT, p.TOP);
+        p.textSize(4.8);
+        p.text(
+            invEntries.length
+                ? `BAG ${invEntries.map(([t, c]) => `${this._labelFor(t)} x${c}`).join('   ')}`
+                : 'BAG EMPTY',
+            gridX,
+            gridY - 16,
         );
-        p.noStroke();
 
-        // ── Done button ────────────────
-        const doneY = gameHeight - 44;
+        // Item cards
+        for (let i = 0; i < SHOP_ITEMS.length; i++) {
+            const item = SHOP_ITEMS[i];
+            const col_i = i % GRID_COLS;
+            const row_i = Math.floor(i / GRID_COLS);
+            const rx = gridX + col_i * (CARD_W + CARD_GAP_X);
+            const ry = gridY + row_i * (CARD_H + CARD_GAP_Y);
+            const canAfford = wallet >= item.price;
+            const iconRect = { x: rx + 12, y: ry + 18, w: 56, h: 56 };
+            const buyRect = { x: rx + CARD_W - 70, y: ry + CARD_H - 28, w: 58, h: 18 };
+            const cardHovered = mx >= rx && mx <= rx + CARD_W && my >= ry && my <= ry + CARD_H;
+            const iconHovered = mx >= iconRect.x && mx <= iconRect.x + iconRect.w &&
+                my >= iconRect.y && my <= iconRect.y + iconRect.h;
+            const buyHovered = mx >= buyRect.x && mx <= buyRect.x + buyRect.w &&
+                my >= buyRect.y && my <= buyRect.y + buyRect.h;
+            if (iconHovered) this._hoveredItem = item;
+
+            p.noStroke();
+            p.fill(cardHovered ? [28, 34, 56] : [22, 26, 44]);
+            p.rect(rx, ry, CARD_W, CARD_H, 8);
+            p.stroke(...this._itemColor(item.type), cardHovered ? 255 : 170);
+            p.strokeWeight(1.5);
+            p.noFill();
+            p.rect(rx, ry, CARD_W, CARD_H, 8);
+            p.noStroke();
+
+            p.fill(34, 40, 66);
+            p.rect(rx, ry, CARD_W, 18, 8, 8, 0, 0);
+            p.fill(225, 232, 255);
+            p.textAlign(p.LEFT, p.CENTER);
+            p.textSize(5);
+            p.text(this._labelFor(item.type), rx + 10, ry + 10);
+
+            p.fill(18, 22, 36);
+            p.rect(iconRect.x, iconRect.y, iconRect.w, iconRect.h, 6);
+            p.stroke(66, 78, 120);
+            p.strokeWeight(1);
+            p.noFill();
+            p.rect(iconRect.x, iconRect.y, iconRect.w, iconRect.h, 6);
+            p.noStroke();
+            this._drawShopIcon(item.type, iconRect.x, iconRect.y, iconRect.w, iconRect.h);
+
+            p.fill(canAfford ? [255, 215, 0] : [170, 88, 88]);
+            p.textAlign(p.LEFT, p.TOP);
+            p.textSize(5.5);
+            p.text(`PRICE ${item.price}`, rx + 82, ry + 30);
+
+            const owned = player.inventory.get(item.type) ?? 0;
+            p.fill(124, 210, 170);
+            p.textSize(5);
+            p.text(`OWNED ${owned}`, rx + 82, ry + 50);
+
+            p.fill(120, 132, 170);
+            p.textSize(4.6);
+            p.text(this._shortDesc(item.type), rx + 12, ry + 86, 126);
+
+            p.fill(canAfford ? (buyHovered ? [72, 156, 90] : [46, 112, 62]) : [44, 44, 54]);
+            p.rect(buyRect.x, buyRect.y, buyRect.w, buyRect.h, 4);
+            p.fill(canAfford ? [238, 248, 238] : [110, 110, 118]);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.textSize(5);
+            p.text('BUY', buyRect.x + buyRect.w / 2, buyRect.y + buyRect.h / 2 + 0.5);
+        }
+
+        if (this._hoveredItem) {
+            const item = this._hoveredItem;
+            const tipW = 270;
+            const tipH = 74;
+            const tipX = Math.min(mx + 14, gameWidth - tipW - 8);
+            const tipY = Math.max(my - tipH - 8, 8);
+            p.noStroke();
+            p.fill(14, 18, 30, 242);
+            p.rect(tipX, tipY, tipW, tipH, 8);
+            p.stroke(...this._itemColor(item.type));
+            p.strokeWeight(1.5);
+            p.noFill();
+            p.rect(tipX, tipY, tipW, tipH, 8);
+            p.noStroke();
+            this._drawShopIcon(item.type, tipX + 10, tipY + 10, 42, 42);
+            p.fill(...this._itemColor(item.type));
+            p.textAlign(p.LEFT, p.TOP);
+            p.textSize(5.5);
+            p.text(this._labelFor(item.type), tipX + 62, tipY + 12);
+            p.fill(255, 215, 0);
+            p.text(`PRICE ${item.price}`, tipX + 62, tipY + 28);
+            p.fill(180, 185, 210);
+            p.textSize(5);
+            p.text(item.desc, tipX + 10, tipY + 56);
+        }
+
+        // Done button
+        const doneY = gameHeight - 48;
         const doneW = 160;
-        const doneH = 34;
+        const doneH = 28;
         const doneX = gameWidth / 2 - doneW / 2;
         const doneHov =
             mx >= doneX &&
@@ -228,8 +256,8 @@ export class ShopState extends State {
         p.rect(doneX, doneY, doneW, doneH, 6);
         p.fill(220, 235, 255);
         p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(14);
-        p.text('✓  Done shopping', doneX + doneW / 2, doneY + doneH / 2);
+        p.textSize(5);
+        p.text('DONE SHOPPING', doneX + doneW / 2, doneY + doneH / 2 + 0.5);
 
         // Turn dots
         const dotY = doneY + doneH + 8;
@@ -245,14 +273,14 @@ export class ShopState extends State {
         if (this._message) {
             p.fill(255, 220, 80);
             p.textAlign(p.CENTER, p.BOTTOM);
-            p.textSize(12);
+            p.textSize(5.5);
             p.text(this._message, gameWidth / 2, doneY - 4);
         }
 
         // Controls hint
         p.fill(75, 75, 95);
         p.textAlign(p.LEFT, p.BOTTOM);
-        p.textSize(10);
+        p.textSize(5);
         p.text(
             'ENTER / Done → finish turn   S → skip turn',
             14,
@@ -263,24 +291,19 @@ export class ShopState extends State {
     mousePressed(mx, my) {
         const { gameWidth, gameHeight, players, scoreManager } = this.ctx;
         const player = players[this._currentTurn];
-        const wallet = scoreManager.getWallet(player);
-
-        const tableTop = 58;
-        const tableH = gameHeight - tableTop - 52;
-        const colW = (gameWidth - TABLE_PAD_X * 2) / COLS;
-        const headerH = 24;
-        const itemsPerCol = Math.ceil(SHOP_ITEMS.length / COLS);
+        const panelX = 24;
+        const panelY = 56;
+        const gridX = panelX + 20;
+        const gridY = panelY + 38;
 
         // Buy button clicks
         for (let i = 0; i < SHOP_ITEMS.length; i++) {
             const item = SHOP_ITEMS[i];
-            const btnRect = this._buyBtnRect(
-                i,
-                tableTop,
-                colW,
-                headerH,
-                itemsPerCol,
-            );
+            const col_i = i % GRID_COLS;
+            const row_i = Math.floor(i / GRID_COLS);
+            const rx = gridX + col_i * (CARD_W + CARD_GAP_X);
+            const ry = gridY + row_i * (CARD_H + CARD_GAP_Y);
+            const btnRect = { x: rx + CARD_W - 70, y: ry + CARD_H - 28, w: 58, h: 18 };
             if (
                 mx >= btnRect.x &&
                 mx <= btnRect.x + btnRect.w &&
@@ -313,6 +336,8 @@ export class ShopState extends State {
             this._doneTurn();
         } else if (p.key === 's' || p.key === 'S') {
             this._doneTurn();
+        } else if (p.keyCode === p.ESCAPE) {
+            this.goTo(GameStage.RESULTS);
         }
     }
 
@@ -356,35 +381,6 @@ export class ShopState extends State {
         this._msgTimer = 2200;
     }
 
-    /**
-     * Compute the Buy button rect for item index i.
-     * @param i
-     * @param tableTop
-     * @param colW
-     * @param headerH
-     * @param itemsPerCol
-     * @private
-     */
-    _buyBtnRect(i, tableTop, colW, headerH, itemsPerCol) {
-        const col_i = Math.floor(i / itemsPerCol);
-        const row_i = i % itemsPerCol;
-        const rx = TABLE_PAD_X + col_i * colW;
-        const ry = tableTop + headerH + row_i * ROW_H;
-        const btnW = 42;
-        const btnH = ROW_H - 8;
-        return {
-            x: rx + colW - btnW - 8,
-            y: ry + 4,
-            w: btnW,
-            h: btnH,
-        };
-    }
-
-    /**
-     * Return a display colour for an obstacle type.
-     * @param type
-     * @private
-     */
     _itemColor(type) {
         const map = {
             PLATFORM: [120, 90, 60],
@@ -400,7 +396,80 @@ export class ShopState extends State {
             ICE_BLOCK: [120, 190, 230],
             WIND_ZONE: [60, 185, 185],
             TELEPORTER: [160, 80, 240],
+            BOMB: [220, 80, 40],
+            SHADOW: [140, 90, 220],
         };
         return map[type] ?? [150, 150, 150];
+    }
+
+    _labelFor(type) {
+        return type
+            .split('_')
+            .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
+            .join(' ');
+    }
+
+    _shortDesc(type) {
+        const desc = ITEM_DESCRIPTIONS[type] || '';
+        const words = desc.split(' ');
+        return words.slice(0, 5).join(' ') + (words.length > 5 ? '...' : '');
+    }
+
+    _drawShopIcon(type, x, y, w, h) {
+        const { p, shopIcons } = this.ctx;
+        const img = shopIcons?.[type] ?? null;
+        p.push();
+        p.noSmooth();
+        if (img) {
+            if (type === ObstacleType.MOVING_PLATFORM) {
+                p.image(img, x + 5, y + 18, w - 10, 14, 0, 0, 32, 8);
+            } else if (type === ObstacleType.WIND_ZONE) {
+                p.image(img, x + 8, y + 8, w - 16, h - 16, 0, 0, 32, 32);
+            } else if (type === ObstacleType.TELEPORTER) {
+                p.image(img, x + 6, y + 6, w - 12, h - 12, 0, 0, 40, 40);
+            } else if (type === ObstacleType.PLATFORM) {
+                p.image(img, x + 8, y + 8, w - 16, h - 16, 0, 0, 40, 40);
+            } else if (type === ObstacleType.ICE_PLATFORM) {
+                p.image(img, x + 8, y + 8, w - 16, h - 16, 0, 0, 40, 40);
+            } else if (type === ObstacleType.ICE_BLOCK) {
+                p.image(img, x + 8, y + 8, w - 16, h - 16, 0, 0, 40, 40);
+            } else {
+                const pad = 6;
+                p.image(img, x + pad, y + pad, w - pad * 2, h - pad * 2);
+            }
+        } else if (type === ObstacleType.BOMB) {
+            const cx = x + w / 2;
+            const cy = y + h / 2 + 3;
+            p.noStroke();
+            p.fill(38, 42, 50);
+            p.circle(cx, cy, Math.min(w, h) - 12);
+            p.stroke(210, 160, 60);
+            p.strokeWeight(3);
+            p.noFill();
+            p.arc(cx + 10, cy - 14, 18, 18, Math.PI, Math.PI * 1.7);
+            p.noStroke();
+            p.fill(255, 180, 80);
+            p.circle(cx + 16, cy - 20, 6);
+        } else if (type === ObstacleType.SHADOW) {
+            const cx = x + w / 2;
+            const cy = y + h / 2;
+            p.noStroke();
+            p.fill(70, 46, 122, 210);
+            p.circle(cx, cy, Math.min(w, h) - 12);
+            p.stroke(210, 180, 255);
+            p.strokeWeight(2);
+            p.noFill();
+            p.circle(cx, cy, Math.min(w, h) - 18);
+            p.noStroke();
+            p.fill(240, 230, 255);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.textSize(18);
+            p.text('◌', cx, cy + 1);
+        } else {
+            p.noStroke();
+            p.fill(...this._itemColor(type));
+            p.rect(x + 8, y + 8, w - 16, h - 16, 4);
+        }
+        p.pop();
     }
 }

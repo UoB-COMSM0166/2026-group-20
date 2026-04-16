@@ -31,4 +31,5 @@ export const GameStage = Object.freeze({
     RESULTS: 'RESULTS',
     SHOP: 'SHOP',
     TUTORIAL: 'TUTORIAL',
+    WALK_MAP: 'WALK_MAP',
 });

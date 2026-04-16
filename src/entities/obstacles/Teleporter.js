@@ -15,8 +15,8 @@ import { aabbIntersects } from '../../systems/PhysicsSystem.js';
  * @extends Obstacle
  */
 export class Teleporter extends Obstacle {
-    constructor(p, x, y) {
-        super(p, x, y);
+    constructor(p, x, y, sprite = null) {
+        super(p, x, y, sprite);
         /** @type {Teleporter|null} */
         this.partner = null;
         // Map<playerNo, remaining cooldown ms>
@@ -80,13 +80,17 @@ export class Teleporter extends Obstacle {
         const cy = this.y + T / 2;
         const paired = this.partner !== null;
 
+        if (this.obstacleSheet) {
+            p.image(this.obstacleSheet, this.x, this.y, this.w, this.h, 0, 0, 40, 40);
+        }
+
         // Spinning ring
         p.push();
         p.translate(cx, cy);
         p.rotate(this._age * 0.002);
 
         p.noFill();
-        p.stroke(paired ? 160 : 100, paired ? 80 : 80, paired ? 240 : 140, 200);
+        p.stroke(paired ? 160 : 100, paired ? 80 : 80, paired ? 240 : 140, this.obstacleSheet ? 110 : 200);
         p.strokeWeight(3);
         p.circle(0, 0, T * 0.78);
 
@@ -108,12 +112,14 @@ export class Teleporter extends Obstacle {
         // Inner fill — pulsing
         const pulse = 0.7 + 0.3 * Math.sin(this._age * 0.006);
         const alpha = paired ? 160 * pulse : 80;
-        p.noStroke();
-        p.fill(paired ? 120 : 60, paired ? 40 : 40, paired ? 200 : 120, alpha);
-        p.circle(cx, cy, T * 0.52);
+        if (!this.obstacleSheet) {
+            p.noStroke();
+            p.fill(paired ? 120 : 60, paired ? 40 : 40, paired ? 200 : 120, alpha);
+            p.circle(cx, cy, T * 0.52);
+        }
 
         // Centre symbol
-        p.fill(220, 200, 255, paired ? 230 : 120);
+        p.fill(220, 200, 255, paired ? 230 : 160);
         p.textAlign(p.CENTER, p.CENTER);
         p.textSize(16);
         p.text(paired ? '⇌' : '?', cx, cy + 1);
@@ -126,10 +132,16 @@ export class Teleporter extends Obstacle {
         p.noStroke();
     }
 
-    static drawGhost(p, x, y) {
+    static drawGhost(p, x, y, sprite = null) {
         const T = GameConfig.TILE;
         const cx = x + T / 2;
         const cy = y + T / 2;
+        if (sprite) {
+            p.push();
+            p.tint(255, 150);
+            p.image(sprite, x, y, T, T, 0, 0, 40, 40);
+            p.pop();
+        }
         p.noStroke();
         p.fill(120, 40, 200, 90);
         p.circle(cx, cy, T * 0.52);

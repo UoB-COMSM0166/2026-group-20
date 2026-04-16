@@ -33,8 +33,8 @@ export class WindZone extends Obstacle {
      * @param {number} y
      * @param {WindDir} direction
      */
-    constructor(p, x, y, direction = WindDir.RIGHT) {
-        super(p, x, y);
+    constructor(p, x, y, direction = WindDir.RIGHT, sprite = null) {
+        super(p, x, y, sprite);
         this.direction = direction;
         this._age = 0;
     }
@@ -85,11 +85,16 @@ export class WindZone extends Obstacle {
         const cx = this.x + T / 2;
         const cy = this.y + T / 2;
 
-        p.noStroke();
-
-        // Soft teal background
-        p.fill(60, 185, 185, 70);
-        p.rect(this.x, this.y, this.w, this.h, 4);
+        if (this.obstacleSheet) {
+            p.push();
+            p.tint(255, 185);
+            p.image(this.obstacleSheet, this.x, this.y, this.w, this.h, 0, 0, 32, 32);
+            p.pop();
+        } else {
+            p.noStroke();
+            p.fill(60, 185, 185, 70);
+            p.rect(this.x, this.y, this.w, this.h, 4);
+        }
 
         // Animated wind lines — offset by time and direction
         const vec = DIR_VECTORS[this.direction];
@@ -150,8 +155,14 @@ export class WindZone extends Obstacle {
         p.noStroke();
     }
 
-    static drawGhost(p, x, y, direction = WindDir.RIGHT) {
+    static drawGhost(p, x, y, direction = WindDir.RIGHT, sprite = null) {
         const T = GameConfig.TILE;
+        if (sprite) {
+            p.push();
+            p.tint(255, 140);
+            p.image(sprite, x, y, T, T, 0, 0, 32, 32);
+            p.pop();
+        }
         p.noStroke();
         p.fill(60, 185, 185, 80);
         p.rect(x, y, T, T, 4);

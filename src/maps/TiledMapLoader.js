@@ -26,6 +26,7 @@ export class TiledMapLoader {
         this.mapData = null;
         this.tilesetImage = null;
         this.imageLayerAssets = new Map();
+        this.visualBlockMap = [];
 
         /** @type {string[][]} Collision map: '#' solid, '.' empty, 'F' endpoint */
         this.MAP = [];
@@ -33,6 +34,10 @@ export class TiledMapLoader {
         /** Start position parsed from the object layer */
         this.startX = 0;
         this.startY = 0;
+        this.endX = 0;
+        this.endY = 0;
+        this.endW = 0;
+        this.endH = 0;
 
         this.gameWidth = 0;
         this.gameHeight = 0;
@@ -76,6 +81,7 @@ export class TiledMapLoader {
         );
 
         this._generateCollisionMap();
+        this._generateVisualBlockMap();
         this._parseObjectLayer();
     }
 
@@ -131,6 +137,31 @@ export class TiledMapLoader {
         }
     }
 
+    renderEndpoint(flagSprite) {
+        if (!flagSprite || !this.endW || !this.endH) return;
+
+        const p = this.p;
+        const frameCount = Math.max(1, Math.floor(flagSprite.width / 64));
+        const frameIndex = Math.floor((p.frameCount / 8) % frameCount);
+        const frameW = 64;
+        const frameH = 64;
+        const drawX = this.endX + this.endW / 2 - frameW / 2;
+        const drawY = this.endY + this.endH - frameH;
+        const srcX = frameIndex * frameW;
+
+        p.image(
+            flagSprite,
+            drawX,
+            drawY,
+            frameW,
+            frameH,
+            srcX,
+            0,
+            frameW,
+            frameH,
+        );
+    }
+
     /**
      * Returns the tile character at grid position (tx, ty).
      * Out-of-bounds tiles are treated as solid walls.
@@ -162,6 +193,27 @@ export class TiledMapLoader {
      */
     isSpike(tx, ty) {
         return this.getTile(tx, ty) === TileType.SPIKE;
+    }
+
+    /**
+     * Returns true when a visible map tile occupies this cell, even if the
+     * collision layer forgot to mark it solid. Used by BuildState so players
+     * cannot place obstacles inside the map's drawn terrain.
+     *
+     * @param {number} tx
+     * @param {number} ty
+     * @returns {boolean}
+     */
+    hasVisibleTerrain(tx, ty) {
+        if (
+            ty < 0 ||
+            ty >= this.visualBlockMap.length ||
+            tx < 0 ||
+            tx >= (this.visualBlockMap[0]?.length ?? 0)
+        ) {
+            return true;
+        }
+        return this.visualBlockMap[ty][tx];
     }
 
     /**
@@ -262,6 +314,35 @@ export class TiledMapLoader {
                     const y = p.floor(i / cols);
                     this.MAP[y][x] = tileType;
                 }
+            }
+        }
+    }
+
+    _generateVisualBlockMap() {
+        const { mapData } = this;
+        const cols = mapData.width;
+        const rows = mapData.height;
+        this.visualBlockMap = Array.from(
+            { length: rows },
+            () => Array(cols).fill(false),
+        );
+
+        for (const layer of mapData.layers) {
+            if (
+                layer.type !== 'tilelayer' ||
+                layer.name === 'Collision_Layer' ||
+                layer.visible === false
+            ) {
+                continue;
+            }
+
+            const data = layer.data ?? [];
+            for (let i = 0; i < data.length; i++) {
+                const gidInfo = this._parseGid(data[i]);
+                if (gidInfo.isEmpty) continue;
+                const x = i % cols;
+                const y = Math.floor(i / cols);
+                this.visualBlockMap[y][x] = true;
             }
         }
     }
@@ -417,6 +498,10 @@ export class TiledMapLoader {
                     this.startX = obj.x;
                     this.startY = obj.y;
                 } else if (obj.name === 'endPoint') {
+                    this.endX = obj.x;
+                    this.endY = obj.y;
+                    this.endW = obj.width;
+                    this.endH = obj.height;
                     const startCol = p.floor(obj.x / mapData.tilewidth);
                     const startRow = p.floor(obj.y / mapData.tileheight);
                     const endCol = p.floor((obj.x + obj.width) / mapData.tilewidth);

@@ -1,6 +1,7 @@
 import { Player } from '../entities/Player.js';
 import { ScoreManager } from './ScoreManager.js';
 import { TiledMapLoader } from '../maps/TiledMapLoader.js';
+import { GameConfig } from '../config/GameConfig.js';
 
 import { AnimationConfigChick } from '../config/AnimationConfigChick.js';
 import { AnimationConfigBunny } from '../config/AnimationConfigBunny.js';
@@ -51,8 +52,9 @@ export class MapManager {
     _applySelectedMap(ctx) {
         this.current.setup();
 
-        const gameWidth = this.current.gameWidth;
-        const gameHeight = this.current.gameHeight;
+        const mapPixelWidth = this.current.gameWidth;
+        const mapPixelHeight = this.current.gameHeight;
+        const previousPlayers = Array.isArray(ctx.players) ? ctx.players : [];
         const players = [
             new Player(
                 this.p,
@@ -72,8 +74,35 @@ export class MapManager {
             ),
         ];
 
-        ctx.gameWidth = gameWidth;
-        ctx.gameHeight = gameHeight;
+        players.forEach((player, index) => {
+            const prev = previousPlayers[index];
+            if (!prev) return;
+
+            player.nickname = prev.nickname ?? player.nickname;
+
+            if (prev.character) {
+                const char = prev.character;
+                player.character = char;
+
+                const sheet = ctx.sprites[char.spriteKey];
+                if (sheet) player.setSprite(sheet, char.animConfig);
+
+                if (char.speed !== undefined) player.speed = char.speed;
+                if (char.jumpVel !== undefined) player.jumpVel = char.jumpVel;
+                if (char.maxJumps !== undefined) {
+                    player.maxJumps = char.maxJumps;
+                    player.jumpsLeft = char.maxJumps;
+                }
+                if (char.gravity !== undefined) player.gravity = char.gravity;
+            }
+        });
+
+        // Keep a fixed logical viewport across every state so switching maps
+        // never changes the game's apparent resolution or zoom level.
+        ctx.gameWidth = GameConfig.GAME_WIDTH;
+        ctx.gameHeight = GameConfig.GAME_HEIGHT;
+        ctx.mapPixelWidth = mapPixelWidth;
+        ctx.mapPixelHeight = mapPixelHeight;
         ctx.players = players;
         ctx.tiledMap = this.current;
         ctx.mapKey = this.currentKey;

@@ -33,11 +33,11 @@ export class BootState extends State {
             128 + 127 * Math.sin((this._elapsed / this._duration) * Math.PI);
         p.fill(255, 255, 255, alpha);
         p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(28);
+        p.textSize(12);
         p.text('Loading...', gameWidth / 2, gameHeight / 2);
 
-        p.textSize(13);
+        p.textSize(5);
         p.fill(100, 100, 120, alpha);
-        p.text('COMSM0166 — Group 20', gameWidth / 2, gameHeight / 2 + 40);
+        p.text('COMSM0166 — Group 20', gameWidth / 2, gameHeight / 2 + 28);
     }
 }

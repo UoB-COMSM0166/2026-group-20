@@ -12,6 +12,10 @@ import { aabbIntersects } from '../../systems/PhysicsSystem.js';
  * @extends Obstacle
  */
 export class IcePlatform extends Obstacle {
+    constructor(p, x, y, sprite = null) {
+        super(p, x, y, sprite);
+    }
+
     get isSolid() {
         return true;
     }
@@ -36,6 +40,10 @@ export class IcePlatform extends Obstacle {
 
     draw() {
         const p = this.p;
+        if (this.obstacleSheet) {
+            p.image(this.obstacleSheet, this.x, this.y, this.w, this.h, 0, 0, 40, 40);
+            return;
+        }
         p.noStroke();
 
         // Icy body
@@ -58,8 +66,15 @@ export class IcePlatform extends Obstacle {
         p.noStroke();
     }
 
-    static drawGhost(p, x, y) {
+    static drawGhost(p, x, y, sprite = null) {
         const T = GameConfig.TILE;
+        if (sprite) {
+            p.push();
+            p.tint(255, 150);
+            p.image(sprite, x, y, T, T, 0, 0, 40, 40);
+            p.pop();
+            return;
+        }
         p.noStroke();
         p.fill(160, 220, 245, 130);
         p.rect(x, y, T, T, 3);

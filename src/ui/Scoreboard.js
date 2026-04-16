@@ -61,7 +61,7 @@ export class Scoreboard {
         // ── Title ────────────────────────────────────────────────────────────
         p.fill(255);
         p.textAlign(p.CENTER, p.TOP);
-        p.textSize(32);
+        p.textSize(16);
         p.textStyle(p.BOLD);
         p.text('ROUND OVER', gw / 2, panelY + 18);
         p.textStyle(p.NORMAL);
@@ -71,7 +71,7 @@ export class Scoreboard {
         const headerY = panelY + 68;
 
         p.fill(160, 160, 200);
-        p.textSize(13);
+        p.textSize(7.5);
         p.textAlign(p.CENTER, p.TOP);
 
         p.text('RANK', cols.rank, headerY);
@@ -108,15 +108,15 @@ export class Scoreboard {
                 p.rect(panelX + 10, rowY - 4, panelW - 20, rowH - 4, 6);
             }
 
-            p.textSize(15);
+            p.textSize(7.5);
             p.textAlign(p.CENTER, p.TOP);
 
             // Rank medal / number
             p.fill(255, 215, 0);
-            p.textSize(isTop ? 20 : 15);
+            p.textSize(isTop ? 10 : 7.5);
             const medal = ['🥇', '🥈', '🥉'][i] ?? `#${score.rank}`;
             p.text(medal, cols.rank, rowY);
-            p.textSize(15);
+            p.textSize(7.5);
 
             // Player name (coloured)
             p.fill(col.r, col.g, col.b);
@@ -167,7 +167,7 @@ export class Scoreboard {
 
         // ── Footer hint ──────────────────────────────────────────────────────
         p.fill(120, 120, 150);
-        p.textSize(13);
+        p.textSize(6.5);
         p.textAlign(p.CENTER, p.BOTTOM);
         p.text('ENTER → Shop  •  ESC → Map Menu', gw / 2, panelY + panelH - 12);
     }

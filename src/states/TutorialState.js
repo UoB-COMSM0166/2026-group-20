@@ -15,6 +15,12 @@ import { GameStage } from '../config/GameStage.js';
  *   ESC                   → MAPMENU
  */
 export class TutorialState extends State {
+    _returnToTarget() {
+        if (this._returnStage === GameStage.RUN) {
+            this.ctx.resumeRunState = true;
+        }
+        this.goTo(this._returnStage ?? GameStage.WALK_MAP);
+    }
 
     enter() {
         this._page = 0;
@@ -79,7 +85,7 @@ export class TutorialState extends State {
             if (mx >= bx && mx <= bx + btnW && my >= by && my <= by + btnH) {
                 // If opened from pause menu, return to the paused game
                 if (this._returnStage) {
-                    this.goTo(this._returnStage);
+                    this._returnToTarget();
                 } else {
                     this.goTo(this.ctx.shopHasRun ? GameStage.BUILD : GameStage.RUN);
                 }
@@ -102,13 +108,13 @@ export class TutorialState extends State {
             } else {
                 // If opened from pause menu, return to the paused game
                 if (this._returnStage) {
-                    this.goTo(this._returnStage);
+                    this._returnToTarget();
                 } else {
                     this.goTo(this.ctx.shopHasRun ? GameStage.BUILD : GameStage.RUN);
                 }
             }
         } else if (p.keyCode === p.ESCAPE) {
-            this.goTo(this._returnStage ?? GameStage.MAPMENU);
+            this._returnToTarget();
         }
     }
 
@@ -121,7 +127,7 @@ export class TutorialState extends State {
         // Title
         p.fill(180, 200, 255);
         p.textAlign(p.CENTER, p.TOP);
-        p.textSize(18);
+        p.textSize(9);
         p.text('HOW TO PLAY', cx, panY + 14);
 
         // Separator
@@ -132,7 +138,7 @@ export class TutorialState extends State {
 
         // Page indicator
         p.fill(80, 100, 150);
-        p.textSize(9);
+        p.textSize(5);
         p.textAlign(p.CENTER, p.TOP);
         p.text('1 / 2', cx, panY + 42);
 
@@ -163,30 +169,36 @@ export class TutorialState extends State {
         );
 
         // Double jump callout box
-        const boxY = startY + 170;
+        const boxY = startY + 204;
+        const boxX = panX + 30;
+        const boxW = panW - 60;
         p.noStroke();
         p.fill(40, 50, 80);
-        p.rect(panX + 20, boxY, panW - 40, 38, 6);
+        p.rect(boxX, boxY, boxW, 68, 6);
         p.stroke(80, 110, 180);
         p.strokeWeight(1);
         p.noFill();
-        p.rect(panX + 20, boxY, panW - 40, 38, 6);
+        p.rect(boxX, boxY, boxW, 68, 6);
         p.noStroke();
         p.fill(160, 200, 255);
-        p.textAlign(p.LEFT, p.CENTER);
-        p.textSize(11);
-        p.text('✦  Double Jump:', panX + 34, boxY + 19);
+        p.textAlign(p.LEFT, p.TOP);
+        p.textSize(5.4);
+        p.text('✦  Double Jump:', boxX + 16, boxY + 10);
         p.fill(210, 225, 255);
-        p.text('press jump once to jump, then press jump again mid-air for a second jump!', panX + 140, boxY + 19);
+        p.text(
+            'Press jump once to jump,\nthen press jump again mid-air for a second jump!',
+            boxX + 16,
+            boxY + 24,
+        );
 
         // Navigation button
         this._drawNavButton(p, gameWidth, gameHeight, panX, panW, 'Next  →', [80, 140, 80], mx, my);
 
         // Skip hint
         p.fill(60, 70, 100);
-        p.textAlign(p.LEFT, p.BOTTOM);
-        p.textSize(9);
-        p.text('ESC to go back to map menu  ·  SPACE or ENTER to advance', panX + 20, panY + panH - 8);
+        p.textAlign(p.CENTER, p.BOTTOM);
+        p.textSize(5.4);
+        p.text('ESC to go back to map menu  ·  SPACE or ENTER to advance', panX + panW / 2, panY + panH - 8);
     }
 
     _renderFlowPage(p, panX, panY, panW, panH, mx, my) {
@@ -196,7 +208,7 @@ export class TutorialState extends State {
         // Title
         p.fill(180, 200, 255);
         p.textAlign(p.CENTER, p.TOP);
-        p.textSize(18);
+        p.textSize(9);
         p.text('GAME FLOW', cx, panY + 14);
 
         p.stroke(50, 65, 110);
@@ -205,7 +217,7 @@ export class TutorialState extends State {
         p.noStroke();
 
         p.fill(80, 100, 150);
-        p.textSize(9);
+        p.textSize(5.4);
         p.textAlign(p.CENTER, p.TOP);
         p.text('2 / 2', cx, panY + 42);
 
@@ -285,7 +297,7 @@ export class TutorialState extends State {
             // Phase header
             p.fill(...ph.colour);
             p.textAlign(p.LEFT, p.TOP);
-            p.textSize(12);
+            p.textSize(6);
             p.text(`${ph.icon}  ${ph.label}`, cx2 + 12, cy2 + 9);
 
             // Divider under header
@@ -299,9 +311,9 @@ export class TutorialState extends State {
             ph.lines.forEach(line => {
                 p.fill(185, 198, 220);
                 p.textAlign(p.LEFT, p.TOP);
-                p.textSize(9.5);
+                p.textSize(5.2);
                 p.text(`• ${line}`, cx2 + 12, ly);
-                ly += 13;
+                ly += 18;
             });
         });
 
@@ -311,20 +323,20 @@ export class TutorialState extends State {
         this._drawNavButton(p, gameWidth, gameHeight, panX, panW, playLabel, [60, 130, 70], mx, my);
 
         p.fill(60, 70, 100);
-        p.textAlign(p.LEFT, p.BOTTOM);
-        p.textSize(9);
-        p.text('ESC to go back to map menu  ·  SPACE or ENTER to start', panX + 20, panY + panH - 8);
+        p.textAlign(p.CENTER, p.BOTTOM);
+        p.textSize(5.4);
+        p.text('ESC to go back to map menu  ·  SPACE or ENTER to start', panX + panW / 2, panY + panH - 8);
     }
 
     _drawPlayerColumn(p, x, y, w, playerNo, title, colour, bindings) {
         // Column background
         p.noStroke();
         p.fill(22, 28, 50);
-        p.rect(x, y, w, 155, 7);
+        p.rect(x, y, w, 182, 7);
         p.stroke(...colour, 100);
         p.strokeWeight(1);
         p.noFill();
-        p.rect(x, y, w, 155, 7);
+        p.rect(x, y, w, 182, 7);
         p.noStroke();
 
         // Header bar
@@ -333,7 +345,7 @@ export class TutorialState extends State {
 
         p.fill(...colour);
         p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(12);
+        p.textSize(5.2);
         p.text(title, x + w / 2, y + 14);
 
         // Bindings
@@ -345,7 +357,7 @@ export class TutorialState extends State {
                 if (i > 0) {
                     p.fill(100, 110, 140);
                     p.textAlign(p.LEFT, p.CENTER);
-                    p.textSize(9);
+                    p.textSize(5.2);
                     p.text('+', kx, ky + 10);
                     kx += 14;
                 }
@@ -360,7 +372,7 @@ export class TutorialState extends State {
                 p.noStroke();
                 p.fill(b.highlight ? [...colour] : [200, 210, 240]);
                 p.textAlign(p.CENTER, p.CENTER);
-                p.textSize(10);
+                p.textSize(5.2);
                 p.text(k, kx + kw / 2, ky + 10);
                 kx += kw + 4;
             });
@@ -368,7 +380,7 @@ export class TutorialState extends State {
             // Description
             p.fill(b.highlight ? [...colour] : [170, 185, 215]);
             p.textAlign(p.LEFT, p.CENTER);
-            p.textSize(10);
+            p.textSize(5.2);
             p.text(b.desc, x + 14, ky + 32);
 
             ky += 44;
@@ -388,7 +400,7 @@ export class TutorialState extends State {
         p.rect(bx, by, btnW, btnH, 6);
         p.fill(240, 245, 255);
         p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(13);
+        p.textSize(6.3);
         p.text(label, bx + btnW / 2, by + btnH / 2);
     }
 }

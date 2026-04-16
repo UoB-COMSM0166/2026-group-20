@@ -16,6 +16,8 @@ import { SpikedBall } from '../entities/obstacles/SpikedBall.js';
 import { IceBlock } from '../entities/obstacles/IceBlock.js';
 import { WindZone, WindDir } from '../entities/obstacles/WindZone.js';
 import { Teleporter } from '../entities/obstacles/Teleporter.js';
+import { Bomb } from '../entities/obstacles/Bomb.js';
+import { Shadow } from '../entities/obstacles/Shadow.js';
 // import { drawMap, MAP } from '../maps/MapLoader.js';
 
 // Map tile characters that cannot be overwritten when placing obstacles
@@ -33,6 +35,24 @@ const PLAYER_COLOURS = [
     [90, 170, 255], // P1 blue
     [255, 200, 80], // P2 orange
 ];
+
+const BUILD_ITEM_DESCRIPTIONS = {
+    PLATFORM: 'Solid block that players can stand on.',
+    MOVING_PLATFORM: 'Slides left and right on a fixed path.',
+    FALLING_PLATFORM: 'Drops after a player stands on it.',
+    ICE_PLATFORM: 'Solid but slippery. Players slide on top.',
+    BOUNCE_PAD: 'Launches players upward on contact.',
+    SPIKE: 'Instant kill on touch.',
+    CANNON: 'Fires projectiles in the chosen direction.',
+    SAW: 'Spinning blade that kills on contact.',
+    FLAME: 'Pulses on and off. Deadly while lit.',
+    SPIKED_BALL: 'Static hazard ball. Instant kill on touch.',
+    ICE_BLOCK: 'Pass-through ice zone that boosts slide and speed.',
+    WIND_ZONE: 'Pushes players in the chosen direction.',
+    TELEPORTER: 'Warp gate. One token buys a linked pair.',
+    BOMB: 'Triggered explosive with a short fuse.',
+    SHADOW: 'Replays the player\'s last 5 seconds as a ghost.',
+};
 
 /**
  * BuildState — the turn-based obstacle placement phase.
@@ -164,6 +184,18 @@ export class BuildState extends State {
             hint: '1 token = 1 pair',
             color: [160, 80, 240],
         },
+        {
+            type: ObstacleType.BOMB,
+            label: 'Bomb',
+            hint: 'Destroys platforms',
+            color: [220, 80, 40],
+        },
+        {
+            type: ObstacleType.SHADOW,
+            label: 'Shadow',
+            hint: 'Replays last 5s',
+            color: [140, 90, 220],
+        },
     ];
 
     enter() {
@@ -180,6 +212,86 @@ export class BuildState extends State {
         this._windDir = WindDir.RIGHT;
         this._pendingTeleporter = null; // first placed teleporter waits for its partner
         this._turnObstacles = []; // obstacles placed this turn (for undo)
+        
+        // Build blocked placement map based on platform collision geometry
+        this._buildBlockedPlacementMap();
+    }
+    
+    _buildBlockedPlacementMap() {
+        const { tiledMap } = this.ctx;
+        const MAP = tiledMap.MAP;
+        
+        // Create a map of "reachable from outside" positions
+        // Any position NOT reachable from the map edges is considered "inside a platform"
+        const rows = MAP.length;
+        const cols = MAP[0].length;
+        
+        this._isReachable = [];
+        for (let y = 0; y < rows; y++) {
+            const row = [];
+            for (let x = 0; x < cols; x++) {
+                row.push(false);
+            }
+            this._isReachable.push(row);
+        }
+        
+        // BFS/flood fill from all map edges
+        const queue = [];
+        
+        // Add all edge positions to queue
+        for (let x = 0; x < cols; x++) {
+            // Top edge
+            if (MAP[0][x] !== TileType.SOLID) {
+                queue.push({ x, y: 0 });
+                this._isReachable[0][x] = true;
+            }
+            // Bottom edge
+            if (MAP[rows - 1][x] !== TileType.SOLID) {
+                queue.push({ x, y: rows - 1 });
+                this._isReachable[rows - 1][x] = true;
+            }
+        }
+        
+        for (let y = 0; y < rows; y++) {
+            // Left edge
+            if (MAP[y][0] !== TileType.SOLID) {
+                queue.push({ x: 0, y });
+                this._isReachable[y][0] = true;
+            }
+            // Right edge
+            if (MAP[y][cols - 1] !== TileType.SOLID) {
+                queue.push({ x: cols - 1, y });
+                this._isReachable[y][cols - 1] = true;
+            }
+        }
+        
+        // BFS to mark all positions reachable from edges
+        while (queue.length > 0) {
+            const { x, y } = queue.shift();
+            
+            // Check all 4 neighbors
+            const neighbors = [
+                { x: x + 1, y },
+                { x: x - 1, y },
+                { x, y: y + 1 },
+                { x, y: y - 1 }
+            ];
+            
+            for (const neighbor of neighbors) {
+                if (neighbor.x < 0 || neighbor.x >= cols || neighbor.y < 0 || neighbor.y >= rows) {
+                    continue;
+                }
+                
+                // Skip if already visited or if it's a solid platform
+                if (this._isReachable[neighbor.y][neighbor.x] || 
+                    MAP[neighbor.y][neighbor.x] === TileType.SOLID) {
+                    continue;
+                }
+                
+                this._isReachable[neighbor.y][neighbor.x] = true;
+                queue.push(neighbor);
+            }
+        }
     }
 
     update(_dt) {}
@@ -195,6 +307,7 @@ export class BuildState extends State {
     }
 
     _tokenCount(type) {
+        if (this.ctx.devMode) return Infinity;
         if (!this._isShopMode()) return Infinity;
         return this._activePlayer().inventory.get(type) ?? 0;
     }
@@ -231,9 +344,17 @@ export class BuildState extends State {
     render(mx, my) {
         const { p, gameWidth, gameHeight, tiledMap } = this.ctx;
         const col = PLAYER_COLOURS[this._currentTurn] ?? [200, 200, 200];
+        const worldView = this._worldView();
+        const paletteY = gameHeight - this._paletteH();
+        const worldMx = (mx - worldView.x) / worldView.scale;
+        const worldMy = (my - worldView.y) / worldView.scale;
 
         p.background(20);
+        p.push();
+        p.translate(worldView.x, worldView.y);
+        p.scale(worldView.scale);
         tiledMap.render();
+        tiledMap.renderEndpoint(this.ctx.endpointFlag);
 
         for (const obs of this.ctx.placedObstacles) {
             obs.draw();
@@ -241,40 +362,58 @@ export class BuildState extends State {
 
         // Ghost preview
         const T = GameConfig.TILE;
-        const snapX = Math.floor(mx / T) * T;
-        const snapY = Math.floor(my / T) * T;
+        const snapX = Math.floor(worldMx / T) * T;
+        const snapY = Math.floor(worldMy / T) * T;
         const onMap =
             snapX >= 0 &&
-            snapX < gameWidth &&
+            snapX < (this.ctx.mapPixelWidth ?? gameWidth) &&
             snapY >= 0 &&
-            snapY < gameHeight - this._paletteH();
+            snapY < (this.ctx.mapPixelHeight ?? gameHeight) &&
+            my < paletteY;
 
-        if (this._selectedType && onMap && !this._isTileBlocked(snapX, snapY)) {
-            this._drawGhost(p, this._selectedType, snapX, snapY);
+        if (this._selectedType && onMap) {
+            const canPlace = this._canPlaceSelectedAt(snapX, snapY);
+            this._drawGhost(p, this._selectedType, snapX, snapY, !canPlace);
         }
+        p.pop();
 
         this._drawPalette(mx, my, col);
+
+        // Dev mode banner
+        if (this.ctx.devMode) {
+            p.noStroke();
+            p.fill(255, 50, 50, 200);
+            p.rect(0, 0, gameWidth, 48);
+            p.fill(255, 255, 255);
+            p.textAlign(p.CENTER, p.TOP);
+            p.textSize(6);
+            p.textStyle(p.BOLD);
+            p.text('🛠  DEVELOPER MODE ENABLED', gameWidth / 2, 4);
+            p.textStyle(p.NORMAL);
+            p.textSize(5.5);
+            p.text('Unlimited placement • D to toggle  •  Right-click to undo', gameWidth / 2, 22);
+        }
 
         // Header
         p.noStroke();
         p.fill(...col);
         p.textAlign(p.CENTER, p.TOP);
-        p.textSize(15);
-        p.text(`P${this._currentTurn + 1} — BUILD PHASE`, gameWidth / 2, 10);
+        p.textSize(7);
+        p.text(`P${this._currentTurn + 1} — BUILD PHASE`, gameWidth / 2, this.ctx.devMode ? 52 : 10);
 
         p.fill(180, 180, 200);
-        p.textSize(12);
+        p.textSize(5.5);
         p.text(
             'Place your purchased obstacles — ENTER to confirm turn',
             gameWidth / 2,
-            30,
+            this.ctx.devMode ? 72 : 30,
         );
 
         // Inventory summary
         if (this._isShopMode()) {
             const inv = this._activePlayer().inventory;
             const entries = [...inv.entries()].filter(([t, c]) => typeof t === 'string' && c > 0);
-            p.textSize(11);
+            p.textSize(5.5);
             if (entries.length > 0) {
                 p.fill(...col);
                 const summary = entries
@@ -294,7 +433,7 @@ export class BuildState extends State {
         if (this._selectedType === ObstacleType.CANNON) {
             p.noStroke();
             p.fill(255, 180, 80);
-            p.textSize(12);
+            p.textSize(5.5);
             p.text(
                 `Cannon direction: ${this._cannonDir}  (R to rotate)`,
                 gameWidth / 2,
@@ -303,7 +442,7 @@ export class BuildState extends State {
         } else if (this._selectedType === ObstacleType.WIND_ZONE) {
             p.noStroke();
             p.fill(120, 230, 230);
-            p.textSize(12);
+            p.textSize(5.5);
             p.text(
                 `Wind direction: ${this._windDir}  (R to rotate)`,
                 gameWidth / 2,
@@ -312,7 +451,7 @@ export class BuildState extends State {
         } else if (this._selectedType === ObstacleType.TELEPORTER) {
             p.noStroke();
             p.fill(160, 80, 240);
-            p.textSize(12);
+            p.textSize(5.5);
             const hint = this._pendingTeleporter
                 ? 'Place the second portal to complete the pair'
                 : 'Place the first portal';
@@ -324,14 +463,17 @@ export class BuildState extends State {
         const { p, gameHeight } = this.ctx;
         const T = GameConfig.TILE;
         const paletteY = gameHeight - this._paletteH();
+        const worldView = this._worldView();
 
         if (my >= paletteY) {
             this._handlePaletteClick(mx, my);
             return;
         }
 
-        const snapX = Math.floor(mx / T) * T;
-        const snapY = Math.floor(my / T) * T;
+        const worldMx = (mx - worldView.x) / worldView.scale;
+        const worldMy = (my - worldView.y) / worldView.scale;
+        const snapX = Math.floor(worldMx / T) * T;
+        const snapY = Math.floor(worldMy / T) * T;
 
         if (p.mouseButton === p.RIGHT) {
             // Only undo obstacles placed this player's own turn
@@ -373,8 +515,7 @@ export class BuildState extends State {
 
         // Left click — place
         if (!this._selectedType) return;
-        if (this._isTileBlocked(snapX, snapY)) return;
-        if (this._obstacleAt(snapX, snapY)) return;
+        if (!this._canPlaceSelectedAt(snapX, snapY)) return;
 
         // Teleporter second portal is free — one token covers both ends of a pair
         const isTeleporterSecond =
@@ -418,9 +559,11 @@ export class BuildState extends State {
         if (p.keyCode === p.ENTER || p.keyCode === 13) {
             this._advanceTurn();
         } else if (p.keyCode === p.ESCAPE) {
-            this.goTo(GameStage.MAPMENU);
+            this.goTo(this.ctx.shopHasRun ? GameStage.SHOP : GameStage.TUTORIAL);
         } else if (p.key === 'r' || p.key === 'R') {
             this._rotateDirection();
+        } else if (p.key === 'd' || p.key === 'D') {
+            this.ctx.devMode = !this.ctx.devMode;
         }
     }
 
@@ -449,22 +592,36 @@ export class BuildState extends State {
     }
 
     _paletteH() {
-        return 152;
+        return 92;
     }
 
-    _drawGhost(p, type, x, y) {
+    _worldView() {
+        const viewportW = this.ctx.gameWidth;
+        const viewportH = this.ctx.gameHeight;
+        const worldW = this.ctx.mapPixelWidth ?? viewportW;
+        const worldH = this.ctx.mapPixelHeight ?? viewportH;
+        const scale = Math.min(viewportW / worldW, viewportH / worldH);
+        return {
+            scale,
+            x: (viewportW - worldW * scale) / 2,
+            y: (viewportH - worldH * scale) / 2,
+        };
+    }
+
+    _drawGhost(p, type, x, y, invalid = false) {
+        const sprites = this.ctx.shopIcons ?? {};
         switch (type) {
             case ObstacleType.PLATFORM:
-                Platform.drawGhost(p, x, y);
+                Platform.drawGhost(p, x, y, sprites.PLATFORM);
                 break;
             case ObstacleType.MOVING_PLATFORM:
-                MovingPlatform.drawGhost(p, x, y);
+                MovingPlatform.drawGhost(p, x, y, sprites.MOVING_PLATFORM);
                 break;
             case ObstacleType.FALLING_PLATFORM:
                 FallingPlatform.drawGhost(p, x, y, this.fallingPlatformFrames);
                 break;
             case ObstacleType.ICE_PLATFORM:
-                IcePlatform.drawGhost(p, x, y);
+                IcePlatform.drawGhost(p, x, y, sprites.ICE_PLATFORM);
                 break;
             case ObstacleType.BOUNCE_PAD:
                 BouncePad.drawGhost(p, x, y, this.trampolineBouncing);
@@ -485,28 +642,42 @@ export class BuildState extends State {
                 SpikedBall.drawGhost(p, x, y, this.spikedBallImg);
                 break;
             case ObstacleType.ICE_BLOCK:
-                IceBlock.drawGhost(p, x, y);
+                IceBlock.drawGhost(p, x, y, sprites.ICE_BLOCK);
                 break;
             case ObstacleType.WIND_ZONE:
-                WindZone.drawGhost(p, x, y, this._windDir);
+                WindZone.drawGhost(p, x, y, this._windDir, sprites.WIND_ZONE);
                 break;
             case ObstacleType.TELEPORTER:
-                Teleporter.drawGhost(p, x, y);
+                Teleporter.drawGhost(p, x, y, sprites.TELEPORTER);
                 break;
+            case ObstacleType.BOMB:
+                Bomb.drawGhost(p, x, y);
+                break;
+            case ObstacleType.SHADOW:
+                Shadow.drawGhost(p, x, y);
+                break;
+        }
+
+        if (invalid) {
+            p.noStroke();
+            p.fill(255, 60, 60, 110);
+            p.rect(x, y, GameConfig.TILE, GameConfig.TILE, 4);
         }
     }
 
     _drawPalette(mx, my, playerCol) {
         const { p, gameWidth, gameHeight } = this.ctx;
+        const sprites = this.ctx.shopIcons ?? {};
         const pH = this._paletteH();
         const pY = gameHeight - pH;
         const ROW_SZ = 7; // items per row
-        const btnW = 116;
-        const btnH = 46;
-        const startX = 40;
+        const btnW = 118;
+        const btnH = 22;
+        const startX = 28;
         const btnGap = 6;
-        const row0Y = pY + 8;
-        const row1Y = row0Y + btnH + 6;
+        const row0Y = pY + 6;
+        const row1Y = row0Y + btnH + 5;
+        let hoveredItem = null;
 
         p.noStroke();
         p.fill(20, 22, 35, 235);
@@ -523,8 +694,8 @@ export class BuildState extends State {
 
         p.fill(...playerCol);
         p.textAlign(p.LEFT, p.CENTER);
-        p.textSize(11);
-        p.text(`P${this._currentTurn + 1}:`, 8, pY + pH / 2);
+        p.textSize(4.8);
+        p.text(`P${this._currentTurn + 1}`, 8, pY + pH / 2 - 10);
 
         BuildState.PALETTE.forEach((item, i) => {
             const row = Math.floor(i / ROW_SZ);
@@ -534,6 +705,7 @@ export class BuildState extends State {
 
             const hovered =
                 mx >= bx && mx <= bx + btnW && my >= by && my <= by + btnH;
+            if (hovered) hoveredItem = item;
             const selected = this._selectedType === item.type;
             const tokens = this._tokenCount(item.type);
             const available = tokens > 0;
@@ -553,35 +725,53 @@ export class BuildState extends State {
                 p.noStroke();
             }
 
-            p.fill(
-                ...item.color.map((c) => (available ? c : Math.floor(c * 0.3))),
-            );
-            p.rect(bx + 5, by + btnH / 2 - 6, 12, 12, 2);
+            const iconX = bx + 4;
+            const iconY = by + 3;
+            const iconS = 16;
+            p.fill(15, 18, 28);
+            p.rect(iconX, iconY, iconS, iconS, 3);
+            p.push();
+            if (!available) p.tint(120, 120);
+            else p.tint(255, 230);
+            if (sprites[item.type]) {
+                if (item.type === ObstacleType.MOVING_PLATFORM) {
+                    p.image(sprites[item.type], iconX + 1, iconY + 5, iconS - 2, 6, 0, 0, 32, 8);
+                } else if (item.type === ObstacleType.WIND_ZONE) {
+                    p.image(sprites[item.type], iconX + 1, iconY + 1, iconS - 2, iconS - 2, 0, 0, 32, 32);
+                } else if (item.type === ObstacleType.TELEPORTER) {
+                    p.image(sprites[item.type], iconX + 1, iconY + 1, iconS - 2, iconS - 2, 0, 0, 40, 40);
+                } else {
+                    p.image(sprites[item.type], iconX + 1, iconY + 1, iconS - 2, iconS - 2);
+                }
+            } else {
+                p.noTint();
+                p.fill(
+                    ...item.color.map((c) => (available ? c : Math.floor(c * 0.3))),
+                );
+                p.rect(iconX + 2, iconY + 2, iconS - 4, iconS - 4, 2);
+            }
+            p.pop();
 
             p.fill(available ? [210, 210, 235] : [65, 65, 75]);
-            p.textAlign(p.LEFT, p.TOP);
-            p.textSize(10);
-            p.text(item.label, bx + 21, by + 6);
-
-            p.fill(available ? [110, 110, 140] : [50, 50, 60]);
-            p.textSize(9);
-            p.text(item.hint, bx + 21, by + 20);
+            p.textAlign(p.LEFT, p.CENTER);
+            p.textSize(4.8);
+            p.text(item.label, bx + 25, by + btnH / 2);
 
             if (this._isShopMode()) {
                 const badge = tokens === Infinity ? '' : `×${tokens}`;
                 p.fill(tokens > 0 ? [100, 200, 120] : [130, 60, 60]);
-                p.textAlign(p.RIGHT, p.TOP);
-                p.textSize(9);
-                p.text(badge, bx + btnW - 3, by + 3);
+                p.textAlign(p.RIGHT, p.CENTER);
+                p.textSize(4.8);
+                p.text(badge, bx + btnW - 5, by + btnH / 2);
             }
         });
 
         // ── Action row (below both obstacle rows) ─────────────────────────
-        const actionY   = row1Y + btnH + 4;
-        const actionH   = 30;
+        const actionY   = row1Y + btnH + 5;
+        const actionH   = 18;
 
         // Undo Last — left side
-        const undoBtnW  = 130;
+        const undoBtnW  = 104;
         const undoBtnX  = startX;
         const canUndo   = this._turnObstacles.length > 0;
         const undoHov   = mx >= undoBtnX && mx <= undoBtnX + undoBtnW &&
@@ -590,12 +780,12 @@ export class BuildState extends State {
         p.fill(canUndo ? (undoHov ? [90, 70, 140] : [65, 48, 105]) : [30, 28, 45]);
         p.rect(undoBtnX, actionY, undoBtnW, actionH, 5);
         p.fill(canUndo ? [200, 175, 255] : [70, 65, 90]);
-        p.textAlign(p.LEFT, p.CENTER);
-        p.textSize(12);
-        p.text('  ↩  Undo Last', undoBtnX + 6, actionY + actionH / 2);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(4.8);
+        p.text('UNDO', undoBtnX + undoBtnW / 2, actionY + actionH / 2 + 0.5);
 
         // Quit to Menu — right side
-        const quitBtnW  = 130;
+        const quitBtnW  = 104;
         const quitBtnX  = gameWidth - quitBtnW - startX;
         const quitHov   = mx >= quitBtnX && mx <= quitBtnX + quitBtnW &&
                           my >= actionY   && my <= actionY + actionH;
@@ -603,9 +793,9 @@ export class BuildState extends State {
         p.fill(quitHov ? [130, 38, 38] : [88, 26, 26]);
         p.rect(quitBtnX, actionY, quitBtnW, actionH, 5);
         p.fill(230, 130, 130);
-        p.textAlign(p.RIGHT, p.CENTER);
-        p.textSize(12);
-        p.text('✕  Quit to Menu  ', quitBtnX + quitBtnW - 6, actionY + actionH / 2);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(4.8);
+        p.text('QUIT', quitBtnX + quitBtnW / 2, actionY + actionH / 2 + 0.5);
 
         // ENTER hint — centre
         const nextLabel =
@@ -614,21 +804,48 @@ export class BuildState extends State {
                 : 'ENTER → Start Run';
         p.fill(100, 200, 120);
         p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(12);
+        p.textSize(4.8);
         p.text(nextLabel, gameWidth / 2, actionY + actionH / 2);
+
+        if (hoveredItem) {
+            const tipW = 220;
+            const tipH = 44;
+            const tipX = Math.min(mx + 12, gameWidth - tipW - 8);
+            const tipY = pY - tipH - 6;
+            p.noStroke();
+            p.fill(16, 18, 30, 238);
+            p.rect(tipX, tipY, tipW, tipH, 6);
+            p.stroke(...playerCol, 180);
+            p.strokeWeight(1);
+            p.noFill();
+            p.rect(tipX, tipY, tipW, tipH, 6);
+            p.noStroke();
+            p.fill(225, 232, 255);
+            p.textAlign(p.LEFT, p.TOP);
+            p.textSize(4.8);
+            p.text(hoveredItem.label, tipX + 8, tipY + 7);
+            p.fill(170, 178, 205);
+            p.textSize(4.2);
+            p.text(
+                BUILD_ITEM_DESCRIPTIONS[hoveredItem.type] ?? hoveredItem.hint,
+                tipX + 8,
+                tipY + 21,
+                tipW - 16,
+            );
+        }
     }
 
     _handlePaletteClick(mx, my) {
         const { gameWidth, gameHeight } = this.ctx;
         const ROW_SZ = 7;
-        const btnW = 116;
-        const btnH = 46;
-        const startX = 40;
+        const btnW = 118;
+        const btnH = 22;
+        const startX = 28;
         const btnGap = 6;
         const pH     = this._paletteH();
         const pY     = gameHeight - pH;
-        const row0Y  = pY + 8;
-        const row1Y  = row0Y + btnH + 6;
+        const row0Y  = pY + 6;
+        const row1Y  = row0Y + btnH + 5;
 
         // Obstacle palette buttons
         BuildState.PALETTE.forEach((item, i) => {
@@ -645,12 +862,12 @@ export class BuildState extends State {
         });
 
         // Action row buttons
-        const undoBtnW = 130;
+        const undoBtnW = 104;
         const undoBtnX = startX;
-        const quitBtnW = 130;
+        const quitBtnW = 104;
         const quitBtnX = gameWidth - quitBtnW - startX;
-        const actionY  = row1Y + btnH + 4;
-        const actionH  = 30;
+        const actionY  = row1Y + btnH + 5;
+        const actionH  = 18;
 
         if (mx >= undoBtnX && mx <= undoBtnX + undoBtnW &&
             my >= actionY   && my <= actionY + actionH) {
@@ -659,7 +876,7 @@ export class BuildState extends State {
         }
         if (mx >= quitBtnX && mx <= quitBtnX + quitBtnW &&
             my >= actionY   && my <= actionY + actionH) {
-            this.goTo(GameStage.MAPMENU);
+            this.goTo(GameStage.MENU);
         }
     }
 
@@ -687,23 +904,81 @@ export class BuildState extends State {
     }
 
     _isTileBlocked(px, py) {
+        // Even in devMode, enforce blocking to prevent穿模
         const { tiledMap } = this.ctx;
         const T = GameConfig.TILE;
         const tx = Math.floor(px / T);
         const ty = Math.floor(py / T);
-        if (
-            ty < 0 ||
-            ty >= tiledMap.MAP.length ||
-            tx < 0 ||
-            tx >= tiledMap.MAP[0].length
-        )
+        const MAP = tiledMap.MAP;
+        
+        // Bounds check
+        if (ty < 0 || ty >= MAP.length || tx < 0 || tx >= MAP[0].length) {
             return true;
-        return BLOCKED_TILES.has(tiledMap.MAP[ty][tx]);
+        }
+        
+        // If this position is NOT reachable from the map edges, it's inside a platform
+        // Block it to prevent placement
+        if (this._isReachable && !this._isReachable[ty][tx]) {
+            return true;
+        }
+        
+        // Also block if the position itself is a solid platform
+        if (MAP[ty][tx] === TileType.SOLID) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    _canPlaceSelectedAt(px, py) {
+        if (this._isTileBlocked(px, py)) return false;
+        if (this._obstacleAt(px, py)) return false;
+
+        if (this._selectedType === ObstacleType.BOMB) {
+            return this._canPlaceBomb(px, py);
+        }
+
+        return true;
+    }
+
+    /**
+     * Bombs are surface-only items:
+     *   - the bomb tile itself must be empty
+     *   - the tile directly below must be solid ground
+     *   - the tile above must also be empty, so the bomb is not tucked into terrain
+     */
+    _canPlaceBomb(bombX, bombY) {
+        const { tiledMap } = this.ctx;
+        const T = GameConfig.TILE;
+        const MAP = tiledMap.MAP;
+
+        const bombTx = Math.floor(bombX / T);
+        const bombTy = Math.floor(bombY / T);
+
+        if (
+            bombTy <= 0 ||
+            bombTy >= MAP.length - 1 ||
+            bombTx < 0 ||
+            bombTx >= MAP[0].length
+        ) {
+            return false;
+        }
+
+        const currentTile = MAP[bombTy]?.[bombTx];
+        const belowTile = MAP[bombTy + 1]?.[bombTx];
+        const aboveTile = MAP[bombTy - 1]?.[bombTx];
+
+        if (currentTile !== TileType.EMPTY) {
+            return false;
+        }
+
+        return belowTile === TileType.SOLID && aboveTile === TileType.EMPTY;
     }
 
     _obstacleAt(px, py) {
         return this.ctx.placedObstacles.some((o) => o.x === px && o.y === py);
     }
+
 
     _removeAt(px, py) {
         const arr = this.ctx.placedObstacles;
@@ -714,21 +989,24 @@ export class BuildState extends State {
 
     _createObstacle(type, x, y) {
         const { p } = this.ctx;
+        const sprites = this.ctx.shopIcons ?? {};
         let obs = null;
         switch (type) {
-            case ObstacleType.PLATFORM:          obs = new Platform(p, x, y); break;
-            case ObstacleType.MOVING_PLATFORM:   obs = new MovingPlatform(p, x, y); break;
+            case ObstacleType.PLATFORM:          obs = new Platform(p, x, y, sprites.PLATFORM); break;
+            case ObstacleType.MOVING_PLATFORM:   obs = new MovingPlatform(p, x, y, sprites.MOVING_PLATFORM); break;
             case ObstacleType.FALLING_PLATFORM:  obs = new FallingPlatform(p, x, y, this.fallingPlatformFrames); break;
-            case ObstacleType.ICE_PLATFORM:      obs = new IcePlatform(p, x, y); break;
+            case ObstacleType.ICE_PLATFORM:      obs = new IcePlatform(p, x, y, sprites.ICE_PLATFORM); break;
             case ObstacleType.BOUNCE_PAD:        obs = new BouncePad(p, x, y, this.trampolineBouncing); break;
             case ObstacleType.SPIKE:             obs = new SpikeObstacle(p, x, y); break;
             case ObstacleType.CANNON:            obs = new Cannon(p, x, y, this._cannonDir, this.cannonImg); break;
             case ObstacleType.SAW:               obs = new Saw(p, x, y, this.sawFrames); break;
             case ObstacleType.FLAME:             obs = new Flame(p, x, y, this.fireFrames); break;
             case ObstacleType.SPIKED_BALL:       obs = new SpikedBall(p, x, y, this.spikedBallImg); break;
-            case ObstacleType.ICE_BLOCK:         obs = new IceBlock(p, x, y); break;
-            case ObstacleType.WIND_ZONE:         obs = new WindZone(p, x, y, this._windDir); break;
-            case ObstacleType.TELEPORTER:        obs = new Teleporter(p, x, y); break;
+            case ObstacleType.ICE_BLOCK:         obs = new IceBlock(p, x, y, sprites.ICE_BLOCK); break;
+            case ObstacleType.WIND_ZONE:         obs = new WindZone(p, x, y, this._windDir, sprites.WIND_ZONE); break;
+            case ObstacleType.TELEPORTER:        obs = new Teleporter(p, x, y, sprites.TELEPORTER); break;
+            case ObstacleType.BOMB:              obs = new Bomb(p, x, y, this.ctx); break;
+            case ObstacleType.SHADOW:            obs = new Shadow(p, x, y, this.ctx); break;
             default: return null;
         }
         if (obs) obs.type = type; // stamp type so undo/refund can read it back
