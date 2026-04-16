@@ -19,6 +19,7 @@ export class ScoreManager {
      * @param {Player[]} players
      */
     constructor(players) {
+        this.currentRound = 0;
         this.wallet = new Map(players.map((p) => [p.playerNo, 0]));
         this.roundCoins = new Map(players.map((p) => [p.playerNo, 0]));
 
@@ -188,6 +189,7 @@ export class ScoreManager {
      * Call at the start of each new round.
      */
     resetRound() {
+        this.currentRound++;
         for (const [playerNo] of this.roundCoins) {
             this.roundCoins.set(playerNo, 0);
             this.scores.set(playerNo, new PlayerScore(playerNo));

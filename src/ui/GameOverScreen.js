@@ -20,7 +20,7 @@ export class GameOverScreen {
      * Render the game-over overlay.
      * @param {TimeManager} timeManager
      */
-    render(timeManager) {
+    render(scoreManager) {
         const p = this.p;
 
         p.fill(0, 0, 0, 150);
@@ -32,10 +32,12 @@ export class GameOverScreen {
         p.text('GAME OVER', this.gameWidth / 2, this.gameHeight / 2 - 50);
 
         p.textSize(24);
-        if (timeManager.rankings.length > 0) {
-            const winner = timeManager.rankings[0];
+        const rankedScores = scoreManager.getRankedScores();
+        const winnerScore = rankedScores[0];
+
+        if (winnerScore) {
             p.text(
-                `Winner: Player ${winner.playerNo + 1} !`,
+                `Winner: Player ${winnerScore.playerNo + 1} !`,
                 this.gameWidth / 2,
                 this.gameHeight / 2 + 10,
             );

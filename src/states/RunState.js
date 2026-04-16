@@ -78,6 +78,7 @@ export class RunState extends State {
                 this.respawnManager,
                 placedObstacles,
                 tiledMap.MAP,
+                gameHeight,
             );
 
             const { p } = this.ctx;
@@ -133,6 +134,13 @@ export class RunState extends State {
         } = this.ctx;
 
         p.background(25);
+
+        // Draw themed background if available
+        const bg = this.ctx.backgroundImage;
+        if (bg && bg.width > 1) {
+            p.image(bg, 0, 0, gameWidth, gameHeight);
+        }
+
         tiledMap.render();
 
         // Draw placed obstacles
@@ -166,6 +174,11 @@ export class RunState extends State {
             gameWidth / 2,
             26,
         );
+
+        // HUD — round
+        p.textSize(14);
+        p.fill(200, 200, 200);
+        p.text(`Round: ${scoreManager.currentRound} / 5`, gameWidth / 2, 50);
 
         // HUD — per-player coins + wallet
         p.textSize(15);

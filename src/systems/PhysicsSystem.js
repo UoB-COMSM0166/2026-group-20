@@ -13,8 +13,10 @@ export function aabbIntersects(ax, ay, aw, ah, bx, by, bw, bh) {
 
 function getMapTile(MAP, tx, ty) {
     if (!MAP?.length || !MAP[0]?.length) return TileType.SOLID;
-    if (ty < 0 || ty >= MAP.length || tx < 0 || tx >= MAP[0].length)
-        return TileType.SOLID;
+    // Above or to the left of the map → solid walls
+    if (ty < 0 || tx < 0) return TileType.SOLID;
+    // Below or to the right of the map → empty (players can fall off)
+    if (ty >= MAP.length || tx >= MAP[0].length) return TileType.EMPTY;
     return MAP[ty][tx];
 }
 

@@ -79,6 +79,11 @@ export class BuildState extends State {
         this.cannonImg = cannonImg;
         this.fallingPlatformFrames = fallingPlatformFrames;
         //this.trampolineIdle= trampolineIdle;
+
+        // Initialise turn state so render() is safe even before enter() runs.
+        this._currentTurn = 0;
+        this._selectedType = null;
+        this._turnObstacles = [];
     }
 
     static PALETTE = [
@@ -166,7 +171,16 @@ export class BuildState extends State {
         },
     ];
 
-    enter() {
+    async enter() {
+        // Rounds 2+ use randomly generated maps for maps with chunk themes.
+        // Round 1 (shopHasRun=false) keeps the static map — it bypasses build entirely.
+        if (this.ctx.shopHasRun) {
+            const mapManager = this.ctx.mapManager;
+            if (mapManager) {
+                await mapManager.generateRandomMap(this.ctx.mapKey, this.ctx);
+            }
+        }
+
         // Round 1: shop has not run yet — skip straight to RUN
         if (!this.ctx.shopHasRun) {
             this.goTo(GameStage.RUN);
@@ -187,7 +201,9 @@ export class BuildState extends State {
     // ── Turn / token helpers ──────────────────────────────────────────────
 
     _activePlayer() {
-        return this.ctx.players[this._currentTurn];
+        const players = this.ctx.players;
+        if (!players || this._currentTurn >= players.length) return null;
+        return players[this._currentTurn];
     }
 
     _isShopMode() {
@@ -196,7 +212,9 @@ export class BuildState extends State {
 
     _tokenCount(type) {
         if (!this._isShopMode()) return Infinity;
-        return this._activePlayer().inventory.get(type) ?? 0;
+        const player = this._activePlayer();
+        if (!player || !player.inventory) return 0;
+        return player.inventory.get(type) ?? 0;
     }
 
     _consumeToken(type) {
@@ -233,6 +251,13 @@ export class BuildState extends State {
         const col = PLAYER_COLOURS[this._currentTurn] ?? [200, 200, 200];
 
         p.background(20);
+
+        // Draw themed background if available
+        const bg = this.ctx.backgroundImage;
+        if (bg && bg.width > 1) {
+            p.image(bg, 0, 0, gameWidth, gameHeight);
+        }
+
         tiledMap.render();
 
         for (const obs of this.ctx.placedObstacles) {
@@ -271,7 +296,7 @@ export class BuildState extends State {
         );
 
         // Inventory summary
-        if (this._isShopMode()) {
+        if (this._isShopMode() && this._activePlayer()) {
             const inv = this._activePlayer().inventory;
             const entries = [...inv.entries()].filter(([, c]) => c > 0);
             p.textSize(11);

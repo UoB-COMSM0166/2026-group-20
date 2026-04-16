@@ -101,6 +101,7 @@ export const sketch = (p) => {
             scoreManager: null,
             mapKey: 'map1',
             selectMap: (mapKey) => mapManager.selectMap(mapKey, ctx),
+            mapManager,
             sprites: {
                 chicken: chickenSheet,
                 bunny: bunnySheet,
@@ -115,10 +116,10 @@ export const sketch = (p) => {
         gameWidth = ctx.gameWidth;
         gameHeight = ctx.gameHeight;
 
-        const goTo = (stage) => {
+        const goTo = async (stage) => {
             activeState?.exit();
             activeState = states[stage];
-            activeState.enter();
+            await activeState.enter();
         };
 
         states = {
