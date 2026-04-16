@@ -19,6 +19,7 @@ export class GameOverScreen {
     /**
      * Render the game-over overlay.
      * @param {TimeManager} timeManager
+     * @param scoreManager
      */
     render(scoreManager) {
         const p = this.p;

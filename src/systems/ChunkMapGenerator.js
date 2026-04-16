@@ -42,7 +42,6 @@ export class ChunkMapGenerator {
     /**
      * Load all chunk JSONs from the given directory.
      * Call this inside p5.preload().
-     *
      * @param {string} chunkDir - e.g. 'assets/maps/chunks/'
      */
     preload(chunkDir = 'assets/maps/chunks/') {
@@ -59,7 +58,6 @@ export class ChunkMapGenerator {
     /**
      * Alternative: scan a flat list of chunk file names.
      * Use this if there is no index file.
-     *
      * @param {string} chunkDir
      * @param {string[]} filenames
      */
@@ -70,7 +68,11 @@ export class ChunkMapGenerator {
         }
     }
 
-    /** @internal */
+    /**
+     * @param json
+     * @param filename
+     * @internal
+     */
     _registerChunk(json, filename) {
         const key = this._chunkPrefix(filename); // e.g. 'I_N_1_10'
         if (!this.chunkPool.has(key)) {
@@ -84,7 +86,6 @@ export class ChunkMapGenerator {
      * e.g. 'I_N_1_9_15.json' → 'I_N_1'
      *       {THEME}_{TYPE}_{DIFFICULTY}_{EDGE}_{INDEX}.json
      * Keeps only the first three underscore-separated fields.
-     *
      * @param {string} filename
      * @returns {string}
      */
@@ -99,7 +100,6 @@ export class ChunkMapGenerator {
     /**
      * Select chunks for a horizontal run: 1 start (S) + N normal (N) + 1 end (E).
      * Pool key format: {THEME}_{TYPE}_{DIFFICULTY}  e.g. 'I_S_1', 'I_N_1', 'I_E_1'
-     *
      * @param {string} theme     - map theme, e.g. 'I'
      * @param {number} difficulty - difficulty tier, e.g. 1
      * @param {number} normalCount - how many normal chunks to insert between S and E (default 10)
@@ -136,7 +136,6 @@ export class ChunkMapGenerator {
      * Select a 2-D grid of normal chunks. Useful for open-world / explorer modes.
      * Every cell uses the same {THEME}_N_{DIFFICULTY} pool.
      * Grid dimensions come from this.gridCols and this.gridRows.
-     *
      * @param {string} theme
      * @param {number} difficulty
      */
@@ -164,7 +163,6 @@ export class ChunkMapGenerator {
 
     /**
      * Free-form selection — provide the exact chunk objects directly.
-     *
      * @param {object[]} chunks
      */
     selectChunks(chunks) {
@@ -176,7 +174,6 @@ export class ChunkMapGenerator {
     /**
      * Merge selected chunks into a single map data object.
      * After calling this, call buildCollisionMap() to get the MAP grid.
-     *
      * @param {'horizontal'|'vertical'} direction - how chunks are arranged
      * @returns {object} merged Tiled-compatible JSON (without Image_Layer)
      */
@@ -262,7 +259,6 @@ export class ChunkMapGenerator {
      * Merge selected chunks into a 2-D grid layout.
      * Call after selectGrid().
      * Grid dimensions come from this.gridCols and this.gridRows.
-     *
      * @returns {object} merged Tiled-compatible JSON
      */
     mergeGrid() {
@@ -325,7 +321,14 @@ export class ChunkMapGenerator {
         return this.mergedMapData;
     }
 
-    /** @internal */
+    /**
+     * @param _direction
+     * @param cols
+     * @param rows
+     * @param chunkW
+     * @param _chunkH
+     * @internal
+     */
     _createMergedLayerTemplates(_direction, cols, rows, chunkW, _chunkH) {
         const totalWidth = chunkW * cols;
         const totalHeight = _chunkH * rows;
@@ -359,13 +362,24 @@ export class ChunkMapGenerator {
         return new Map();
     }
 
-    /** @internal */
+    /**
+     * @param gid
+     * @param gidTable
+     * @internal
+     */
     _remapGid(gid, gidTable) {
         if (gid === 0) return 0;
         return gidTable.has(gid) ? gidTable.get(gid) : gid;
     }
 
-    /** @internal */
+    /**
+     * @param chunk
+     * @param mergedLayers
+     * @param gidTable
+     * @param offsetX
+     * @param offsetY
+     * @internal
+     */
     _stampChunk(chunk, mergedLayers, gidTable, offsetX, offsetY) {
         const chunkW = chunk.width;
         const chunkH = chunk.height;
@@ -410,7 +424,6 @@ export class ChunkMapGenerator {
     /**
      * Build a string[][] collision grid from the merged Collision_Layer.
      * Values are TileType constants ('solid', 'empty', 'spike', 'endPoint', etc.)
-     *
      * @returns {string[][]}
      */
     buildCollisionMap() {
@@ -442,7 +455,10 @@ export class ChunkMapGenerator {
         return map;
     }
 
-    /** @internal */
+    /**
+     * @param gid
+     * @internal
+     */
     _gidToTileType(gid) {
         if (gid === 0) return TileType.EMPTY;
         // Chunk-specific: 15 → solid (ice tileset local-id 14 + firstgid 1 → 15)
@@ -463,7 +479,10 @@ export class ChunkMapGenerator {
         return this._findObject('endPoint');
     }
 
-    /** @internal */
+    /**
+     * @param name
+     * @internal
+     */
     _findObject(name) {
         for (const chunk of this.selectedChunks) {
             for (const layer of chunk.layers || []) {

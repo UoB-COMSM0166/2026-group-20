@@ -21,7 +21,10 @@ export class TiledMapLoader {
         this.p = p;
         this.jsonPath = jsonPath;
         this.tilesetPath = tilesetPath;
-        this.baseDir = this.jsonPath.slice(0, this.jsonPath.lastIndexOf('/') + 1);
+        this.baseDir = this.jsonPath.slice(
+            0,
+            this.jsonPath.lastIndexOf('/') + 1,
+        );
 
         this.mapData = null;
         this.tilesetImage = null;
@@ -56,8 +59,12 @@ export class TiledMapLoader {
         for (const layer of this.mapData.layers || []) {
             if (layer.type !== 'imagelayer' || !layer.image) continue;
 
-            const candidatePaths = this._getImageLayerCandidatePaths(layer.image);
-            const candidates = candidatePaths.map((path) => this.p.loadImage(path));
+            const candidatePaths = this._getImageLayerCandidatePaths(
+                layer.image,
+            );
+            const candidates = candidatePaths.map((path) =>
+                this.p.loadImage(path),
+            );
             this.imageLayerAssets.set(layer.id, candidates);
         }
     }
@@ -118,12 +125,19 @@ export class TiledMapLoader {
 
                         // Render from tileset-local index (not global gid index).
                         const srcX = (gidInfo.localId % tilesetCols) * tileW;
-                        const srcY = p.floor(gidInfo.localId / tilesetCols) * tileH;
+                        const srcY =
+                            p.floor(gidInfo.localId / tilesetCols) * tileH;
 
                         p.image(
                             tilesetImage,
-                            destX, destY, tileW, tileH,
-                            srcX, srcY, tileW, tileH,
+                            destX,
+                            destY,
+                            tileW,
+                            tileH,
+                            srcX,
+                            srcY,
+                            tileW,
+                            tileH,
                         );
                     }
                 }
@@ -134,13 +148,17 @@ export class TiledMapLoader {
     /**
      * Returns the tile character at grid position (tx, ty).
      * Out-of-bounds tiles are treated as solid walls.
-     *
      * @param {number} tx
      * @param {number} ty
      * @returns {string}
      */
     getTile(tx, ty) {
-        if (ty < 0 || ty >= this.MAP.length || tx < 0 || tx >= this.MAP[0].length) {
+        if (
+            ty < 0 ||
+            ty >= this.MAP.length ||
+            tx < 0 ||
+            tx >= this.MAP[0].length
+        ) {
             return TileType.SOLID;
         }
         return this.MAP[ty][tx];
@@ -167,7 +185,6 @@ export class TiledMapLoader {
     /**
      * Returns coin entities parsed from object layers.
      * Objects named 'coin' are treated as coin spawn points.
-     *
      * @returns {Coin[]}
      */
     getCoins() {
@@ -220,7 +237,6 @@ export class TiledMapLoader {
 
     /**
      * Public helper for systems that want gid conversion info.
-     *
      * @param {number} gid
      * @returns {{
      *   rawGid:number,
@@ -241,7 +257,6 @@ export class TiledMapLoader {
 
     /**
      * Convenience helper when only local id is needed.
-     *
      * @param {number} gid
      * @returns {number}
      */
@@ -371,8 +386,12 @@ export class TiledMapLoader {
                 } else if (obj.name === 'endPoint') {
                     const startCol = p.floor(obj.x / mapData.tilewidth);
                     const startRow = p.floor(obj.y / mapData.tileheight);
-                    const endCol = p.floor((obj.x + obj.width) / mapData.tilewidth);
-                    const endRow = p.floor((obj.y + obj.height) / mapData.tileheight);
+                    const endCol = p.floor(
+                        (obj.x + obj.width) / mapData.tilewidth,
+                    );
+                    const endRow = p.floor(
+                        (obj.y + obj.height) / mapData.tileheight,
+                    );
 
                     for (let r = startRow; r <= endRow; r++) {
                         for (let c = startCol; c <= endCol; c++) {

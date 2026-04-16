@@ -78,7 +78,6 @@ export class MapManager {
     /**
      * Load index.json and populate _chunkPool synchronously via p5.loadJSON
      * (call only inside p5.preload).
-     *
      * @internal
      */
     _preloadChunkPool() {
@@ -134,7 +133,6 @@ export class MapManager {
 
     /**
      * Asynchronously load a chunk JSON using fetch.
-     *
      * @param {string} filename
      * @returns {Promise<object|null>}
      */
@@ -159,7 +157,6 @@ export class MapManager {
     /**
      * Generate a random map for the given mapKey and apply it to ctx.
      * Called at the start of each round after round 1.
-     *
      * @param {string} mapKey - e.g. 'map2'
      * @param {object} ctx - shared session context
      */
@@ -432,7 +429,6 @@ export class MapManager {
     /**
      * Find a named object across merged grid chunks,
      * adjusting coordinates by each chunk's 2D grid offset.
-     *
      * @param {object[]} chunks  - row-major ordered list of selected chunks
      * @param {string}   name    - object name to find
      * @param {number}   chunkW  - chunk width in tiles
