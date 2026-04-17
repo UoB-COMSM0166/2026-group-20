@@ -29,6 +29,7 @@ https://github.com/user-attachments/assets/4d740826-4f04-4a33-90aa-97b0868dfc5b
 <h3>Group Members</h3>
 
 GROUP PHOTO. Add a group photo here.
+//Detailed responsibilities each member had to be added  
 
 | Name       | Email                              |
 | ---------- | ---------------------------------- |
