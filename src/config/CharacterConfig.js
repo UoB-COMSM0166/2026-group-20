@@ -34,13 +34,13 @@ export const CHARACTERS = [
         spriteKey: 'bunny',
         animConfig: AnimationConfigBunny,
         colour: [255, 160, 200],
-        // High jump, triple jump
-        speed:    3.0,
+        // Triple jump specialist
+        speed:    3.2,
         jumpVel:  12,
         maxJumps: 3,
-        gravity:  0.68,
+        gravity:  0.7,
         tagline:  'Triple jump, floaty',
-        stats:    { Speed: 2, Jump: 4, Agility: 4 },
+        stats:    { Speed: 3, Jump: 3, Agility: 4 },
         pixelScale: 1,
     },
     {
@@ -49,13 +49,13 @@ export const CHARACTERS = [
         spriteKey: 'duck',
         animConfig: AnimationConfigDuck,
         colour: [100, 200, 255],
-        // Fast but lower jump
-        speed:    4.8,
-        jumpVel:  10,
+        // Fast runner
+        speed:    3.2,
+        jumpVel:  12,
         maxJumps: 2,
-        gravity:  0.9,
+        gravity:  0.7,
         tagline:  'Speed demon',
-        stats:    { Speed: 5, Jump: 2, Agility: 3 },
+        stats:    { Speed: 3, Jump: 3, Agility: 3 },
         pixelScale: 0.62,
     },
     {
@@ -65,12 +65,12 @@ export const CHARACTERS = [
         animConfig: AnimationConfigPolar,
         colour: [200, 230, 255],
         // Slow heavy tanky
-        speed:    2.4,
-        jumpVel:  11,
+        speed:    3.2,
+        jumpVel:  12,
         maxJumps: 2,
-        gravity:  1.1,
+        gravity:  0.7,
         tagline:  'Heavy & sturdy',
-        stats:    { Speed: 1, Jump: 2, Agility: 2 },
+        stats:    { Speed: 3, Jump: 3, Agility: 2 },
         pixelScale: 1,
     },
 ];
