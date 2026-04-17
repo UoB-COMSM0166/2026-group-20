@@ -242,11 +242,14 @@ export class RunState extends State {
             26,
         );
 
-        // HUD — per-player coins + wallet
+        // HUD — per-player coins + wallet + inventory bag
         p.textSize(6);
+        const bagRects = this._bagButtonRects();
         for (const player of players) {
             const side = player.playerNo === 0 ? p.LEFT : p.RIGHT;
             const hx = player.playerNo === 0 ? 10 : gameWidth - 10;
+            const bag = bagRects[player.playerNo];
+            const bagLabel = `🎒 ${this._showBackpack && this._backpackPlayer === player.playerNo ? 'OPEN' : 'BAG'}`;
             p.textAlign(side, p.TOP);
             p.fill(
                 player.playerNo === 0
@@ -254,7 +257,7 @@ export class RunState extends State {
                     : p.color(255, 200, 80),
             );
             p.text(
-                `P${player.playerNo + 1}  🪙 ${scoreManager.getRoundCoins(player)}  💰 ${scoreManager.getWallet(player)}`,
+                `P${player.playerNo + 1}  🪙 ${scoreManager.getRoundCoins(player)}  💰 ${scoreManager.getWallet(player)}  ${bagLabel}`,
                 hx,
                 10,
             );
@@ -263,25 +266,8 @@ export class RunState extends State {
         // Controls hint
         p.fill(160, 160, 180);
         p.textSize(5);
-        p.textAlign(p.LEFT, p.BOTTOM);
-        p.text('P1: A/D + W   P2: ←/→ + ↑   ESC: Pause', 10, gameHeight - 8);
-
-        // Backpack buttons (P1 left, P2 right)
-        const bpW = 36, bpH = 28;
-        const bp1X = 10, bp2X = gameWidth - bpW - 10;
-        const bpY2 = gameHeight - bpH - 6;
-        const bp1Hov = mx >= bp1X && mx <= bp1X + bpW && my >= bpY2 && my <= bpY2 + bpH;
-        const bp2Hov = mx >= bp2X && mx <= bp2X + bpW && my >= bpY2 && my <= bpY2 + bpH;
-        p.noStroke();
-        p.fill(bp1Hov ? [60, 80, 130] : [38, 52, 88]);
-        p.rect(bp1X, bpY2, bpW, bpH, 5);
-        p.fill(bp2Hov ? [130, 100, 30] : [90, 70, 20]);
-        p.rect(bp2X, bpY2, bpW, bpH, 5);
-        p.fill(220, 225, 255);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(6);
-        p.text('🎒', bp1X + bpW / 2, bpY2 + bpH / 2);
-        p.text('🎒', bp2X + bpW / 2, bpY2 + bpH / 2);
+        p.textAlign(p.CENTER, p.TOP);
+        p.text('P1: A/D + W   P2: ←/→ + ↑   ESC: Pause', gameWidth / 2, 52);
 
         // Backpack overlay
         if (this._showBackpack) {
@@ -413,15 +399,15 @@ export class RunState extends State {
         }
 
         // Backpack buttons
-        const { gameWidth, gameHeight } = this.ctx;
-        const bpW2 = 36, bpH2 = 28;
-        const bpY3 = gameHeight - bpH2 - 6;
-        if (mx >= 10 && mx <= 10 + bpW2 && my >= bpY3 && my <= bpY3 + bpH2) {
+        const bagRects = this._bagButtonRects();
+        const p1Bag = bagRects[0];
+        const p2Bag = bagRects[1];
+        if (mx >= p1Bag.x && mx <= p1Bag.x + p1Bag.w && my >= p1Bag.y && my <= p1Bag.y + p1Bag.h) {
             if (this._showBackpack && this._backpackPlayer === 0) { this._showBackpack = false; }
             else { this._showBackpack = true; this._backpackPlayer = 0; }
             return;
         }
-        if (mx >= gameWidth - bpW2 - 10 && mx <= gameWidth - 10 && my >= bpY3 && my <= bpY3 + bpH2) {
+        if (mx >= p2Bag.x && mx <= p2Bag.x + p2Bag.w && my >= p2Bag.y && my <= p2Bag.y + p2Bag.h) {
             if (this._showBackpack && this._backpackPlayer === 1) { this._showBackpack = false; }
             else { this._showBackpack = true; this._backpackPlayer = 1; }
             return;
@@ -513,6 +499,17 @@ export class RunState extends State {
         };
     }
 
+    _bagButtonRects() {
+        const { gameWidth } = this.ctx;
+        const bagW = 42;
+        const bagH = 10;
+        const topY = 10;
+        return [
+            { x: 138, y: topY, w: bagW, h: bagH },
+            { x: gameWidth - 178, y: topY, w: bagW, h: bagH },
+        ];
+    }
+
     _recordShadowSnapshot(player) {
         if (!player || !player.isVisible) return;
         if (!Array.isArray(player._shadowHistory)) {
@@ -577,21 +574,8 @@ export class RunState extends State {
         p.push();
         p.noSmooth();
         if (img) {
-            if (type === ObstacleType.MOVING_PLATFORM) {
-                p.image(img, x + 4, y + 16, w - 8, 10, 0, 0, 32, 8);
-            } else if (type === ObstacleType.WIND_ZONE) {
-                p.image(img, x + 6, y + 6, w - 12, h - 12, 0, 0, 32, 32);
-            } else if (type === ObstacleType.TELEPORTER) {
-                p.image(img, x + 5, y + 5, w - 10, h - 10, 0, 0, 40, 40);
-            } else if (
-                type === ObstacleType.PLATFORM ||
-                type === ObstacleType.ICE_PLATFORM ||
-                type === ObstacleType.ICE_BLOCK
-            ) {
-                p.image(img, x + 6, y + 6, w - 12, h - 12, 0, 0, 40, 40);
-            } else {
-                p.image(img, x + 5, y + 5, w - 10, h - 10);
-            }
+            const { sx, sy, sw, sh, dx, dy, dw, dh } = this._inventoryIconSpec(type, img, x, y, w, h);
+            p.image(img, dx, dy, dw, dh, sx, sy, sw, sh);
         } else if (type === ObstacleType.BOMB) {
             const cx = x + w / 2;
             const cy = y + h / 2 + 2;
@@ -626,5 +610,86 @@ export class RunState extends State {
             p.rect(x + 8, y + 8, w - 16, h - 16, 4);
         }
         p.pop();
+    }
+
+    _inventoryIconSpec(type, img, x, y, w, h) {
+        if (type === ObstacleType.MOVING_PLATFORM) {
+            return {
+                sx: 0, sy: 0, sw: 32, sh: 8,
+                dx: x + 4, dy: y + Math.floor(h / 2) - 5, dw: w - 8, dh: 10,
+            };
+        }
+
+        if (type === ObstacleType.FALLING_PLATFORM) {
+            return {
+                sx: 0, sy: 0, sw: 32, sh: 10,
+                dx: x + 5, dy: y + Math.floor(h / 2) - 5, dw: w - 10, dh: 10,
+            };
+        }
+
+        if (type === ObstacleType.BOUNCE_PAD) {
+            return {
+                sx: 0, sy: 0, sw: 28, sh: 28,
+                dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+            };
+        }
+
+        if (type === ObstacleType.SAW) {
+            return {
+                sx: 0, sy: 0, sw: 38, sh: 38,
+                dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+            };
+        }
+
+        if (type === ObstacleType.FLAME) {
+            return {
+                sx: 0, sy: 0, sw: 16, sh: 32,
+                dx: x + 13, dy: y + 5, dw: w - 26, dh: h - 10,
+            };
+        }
+
+        if (type === ObstacleType.WIND_ZONE) {
+            return {
+                sx: 0, sy: 0, sw: 32, sh: 32,
+                dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+            };
+        }
+
+        if (type === ObstacleType.CANNON) {
+            return {
+                sx: 0, sy: 0, sw: 30, sh: 18,
+                dx: x + 6, dy: y + 12, dw: w - 12, dh: 20,
+            };
+        }
+
+        if (type === ObstacleType.SPIKED_BALL) {
+            return {
+                sx: 0, sy: 0, sw: 28, sh: 28,
+                dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+            };
+        }
+
+        if (type === ObstacleType.TELEPORTER) {
+            return {
+                sx: 0, sy: 0, sw: 40, sh: 40,
+                dx: x + 4, dy: y + 4, dw: w - 8, dh: h - 8,
+            };
+        }
+
+        if (
+            type === ObstacleType.PLATFORM ||
+            type === ObstacleType.ICE_PLATFORM ||
+            type === ObstacleType.ICE_BLOCK
+        ) {
+            return {
+                sx: 0, sy: 0, sw: 40, sh: 40,
+                dx: x + 5, dy: y + 5, dw: w - 10, dh: h - 10,
+            };
+        }
+
+        return {
+            sx: 0, sy: 0, sw: img.width, sh: img.height,
+            dx: x + 5, dy: y + 5, dw: w - 10, dh: h - 10,
+        };
     }
 }

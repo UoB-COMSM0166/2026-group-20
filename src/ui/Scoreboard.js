@@ -18,22 +18,15 @@ export class Scoreboard {
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
 
-        // Colours per player index
         this.playerColours = [
-            { r: 90, g: 170, b: 255 }, // P1 — blue
-            { r: 255, g: 200, b: 80 }, // P2 — orange
-            { r: 100, g: 220, b: 120 }, // P3 — green
-            { r: 255, g: 100, b: 120 }, // P4 — red
+            { r: 90, g: 170, b: 255 },
+            { r: 255, g: 200, b: 80 },
+            { r: 100, g: 220, b: 120 },
+            { r: 255, g: 100, b: 120 },
         ];
     }
 
     /**
-     * Render the full scoreboard overlay.
-     * Call every frame while isGameOver is true.
-<<<<<<< HEAD
-=======
-     *
->>>>>>> feature/charSelect
      * @param {ScoreManager} scoreManager
      */
     render(scoreManager) {
@@ -41,14 +34,12 @@ export class Scoreboard {
         const gw = this.gameWidth;
         const gh = this.gameHeight;
 
-        // ── Background overlay ──────────────────────────────────────────────
         p.fill(0, 0, 0, 185);
         p.noStroke();
         p.rect(0, 0, gw, gh);
 
-        // ── Panel ───────────────────────────────────────────────────────────
-        const panelW = gw * 0.72;
-        const panelH = gh * 0.72;
+        const panelW = gw * 0.76;
+        const panelH = gh * 0.7;
         const panelX = (gw - panelW) / 2;
         const panelY = (gh - panelH) / 2;
 
@@ -58,22 +49,19 @@ export class Scoreboard {
         p.rect(panelX, panelY, panelW, panelH, 12);
         p.noStroke();
 
-        // ── Title ────────────────────────────────────────────────────────────
         p.fill(255);
         p.textAlign(p.CENTER, p.TOP);
-        p.textSize(16);
+        p.textSize(14);
         p.textStyle(p.BOLD);
         p.text('ROUND OVER', gw / 2, panelY + 18);
         p.textStyle(p.NORMAL);
 
-        // ── Column headers ───────────────────────────────────────────────────
         const cols = this._colPositions(panelX, panelW);
-        const headerY = panelY + 68;
+        const headerY = panelY + 62;
 
         p.fill(160, 160, 200);
-        p.textSize(7.5);
+        p.textSize(6.4);
         p.textAlign(p.CENTER, p.TOP);
-
         p.text('RANK', cols.rank, headerY);
         p.text('PLAYER', cols.player, headerY);
         p.text('STATUS', cols.status, headerY);
@@ -82,112 +70,79 @@ export class Scoreboard {
         p.text('COINS', cols.coins, headerY);
         p.text('WALLET', cols.wallet, headerY);
 
-        // Divider
         p.stroke(60, 60, 90);
         p.strokeWeight(1);
-        p.line(panelX + 16, headerY + 22, panelX + panelW - 16, headerY + 22);
+        p.line(panelX + 16, headerY + 18, panelX + panelW - 16, headerY + 18);
         p.noStroke();
 
-        // ── Rows ─────────────────────────────────────────────────────────────
         const ranked = scoreManager.getRankedScores();
-        const rowH = 38;
-        const firstRowY = headerY + 30;
+        const rowH = 32;
+        const firstRowY = headerY + 26;
 
         ranked.forEach((score, i) => {
             const rowY = firstRowY + i * rowH;
-            const col = this.playerColours[score.playerNo] ?? {
-                r: 200,
-                g: 200,
-                b: 200,
-            };
-            const isTop = i === 0;
+            const col = this.playerColours[score.playerNo] ?? { r: 200, g: 200, b: 200 };
+            const isTop = i === 0 && score.finished;
 
-            // Highlight top row
-            if (isTop && score.finished) {
-                p.fill(255, 215, 0, 25);
-                p.rect(panelX + 10, rowY - 4, panelW - 20, rowH - 4, 6);
+            if (isTop) {
+                p.fill(255, 215, 0, 22);
+                p.rect(panelX + 10, rowY - 3, panelW - 20, rowH - 3, 6);
             }
 
-            p.textSize(7.5);
             p.textAlign(p.CENTER, p.TOP);
+            p.textSize(6.2);
 
-            // Rank medal / number
             p.fill(255, 215, 0);
-            p.textSize(isTop ? 10 : 7.5);
-            const medal = ['🥇', '🥈', '🥉'][i] ?? `#${score.rank}`;
-            p.text(medal, cols.rank, rowY);
-            p.textSize(7.5);
+            p.text(this._rankLabel(i, score.rank), cols.rank, rowY + 1);
 
-            // Player name (coloured)
             p.fill(col.r, col.g, col.b);
-            p.text(`P${score.playerNo + 1}`, cols.player, rowY + 2);
+            p.text(`P${score.playerNo + 1}`, cols.player, rowY + 1);
 
-            // Status badge
-            if (score.finished) {
-                p.fill(100, 220, 100);
-                p.text('✓ Finished', cols.status, rowY + 2);
-            } else {
-                p.fill(220, 80, 80);
-                p.text('✗ Failed', cols.status, rowY + 2);
-            }
+            p.fill(score.finished ? 100 : 220, score.finished ? 220 : 80, 100);
+            p.text(score.finished ? 'FINISHED' : 'FAILED', cols.status, rowY + 1);
 
-            // Time
             p.fill(200, 200, 220);
-            p.text(score.finishTimeFormatted, cols.time, rowY + 2);
+            p.text(this._fitText(score.finishTimeFormatted, 9), cols.time, rowY + 1);
 
-            // Deaths
-            p.fill(
-                score.deaths > 0
-                    ? p.color(255, 130, 130)
-                    : p.color(180, 180, 200),
-            );
-            p.text(score.deaths, cols.deaths, rowY + 2);
+            p.fill(score.deaths > 0 ? 255 : 180, score.deaths > 0 ? 130 : 180, score.deaths > 0 ? 130 : 200);
+            p.text(String(score.deaths), cols.deaths, rowY + 1);
 
-            // Coins
             p.fill(255, 215, 0);
-            p.text(`🪙 ${score.coins}`, cols.coins, rowY + 2);
+            p.text(String(score.coins), cols.coins, rowY + 1);
 
-            // Wallet
             p.fill(100, 220, 180);
-            p.text(`💰 ${score.wallet}`, cols.wallet, rowY + 2);
+            p.text(String(score.wallet), cols.wallet, rowY + 1);
 
-            // Row divider
             if (i < ranked.length - 1) {
                 p.stroke(40, 40, 60);
                 p.strokeWeight(1);
-                p.line(
-                    panelX + 16,
-                    rowY + rowH - 6,
-                    panelX + panelW - 16,
-                    rowY + rowH - 6,
-                );
+                p.line(panelX + 16, rowY + rowH - 5, panelX + panelW - 16, rowY + rowH - 5);
                 p.noStroke();
             }
         });
 
-        // ── Footer hint ──────────────────────────────────────────────────────
         p.fill(120, 120, 150);
-        p.textSize(6.5);
+        p.textSize(6.2);
         p.textAlign(p.CENTER, p.BOTTOM);
-        p.text('ENTER → Shop  •  ESC → Map Menu', gw / 2, panelY + panelH - 12);
+        p.text('ENTER → Shop  •  ESC → Menu', gw / 2, panelY + panelH - 12);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    _rankLabel(index, rank) {
+        if (index === 0) return '1ST';
+        if (index === 1) return '2ND';
+        if (index === 2) return '3RD';
+        return `#${rank}`;
+    }
 
-    /**
-     * Returns x-centre positions for each column given a panel origin and width.
-<<<<<<< HEAD
-     * @param panelX
-     * @param panelW
-=======
->>>>>>> feature/charSelect
-     * @private
-     */
+    _fitText(text, maxChars) {
+        const safe = String(text ?? '');
+        return safe.length <= maxChars ? safe : `${safe.slice(0, maxChars - 1)}…`;
+    }
+
     _colPositions(panelX, panelW) {
-        // Seven columns — distribute across panel width with small margins
         const usable = panelW - 32;
-        const segments = [0.07, 0.14, 0.22, 0.15, 0.14, 0.14, 0.14];
-        let positions = [];
+        const segments = [0.08, 0.12, 0.22, 0.18, 0.14, 0.12, 0.14];
+        const positions = [];
         let acc = 0;
         for (const frac of segments) {
             positions.push(panelX + 16 + (acc + frac / 2) * usable);

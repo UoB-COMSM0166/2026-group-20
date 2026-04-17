@@ -68,7 +68,7 @@ export class CharSelectState extends State {
         p.textSize(5);
         p.text(
             this._pendingNameFor
-                ? 'Type your ID above the selected character  •  ENTER to confirm'
+                ? 'Type your ID above the selected character  •  ENTER to confirm  •  ESC to cancel'
                 : 'Click a character to select  •  Hover to view stats',
             gameWidth / 2,
             40,
@@ -209,7 +209,7 @@ export class CharSelectState extends State {
         p.textSize(5);
         p.text(
             this._pendingNameFor
-                ? 'ENTER to confirm name  •  BACKSPACE to delete  •  ESC to use default'
+                ? 'ENTER to confirm name  •  BACKSPACE to delete  •  ESC to cancel selection'
                 : 'Click to select a character',
             gameWidth / 2,
             gameHeight - 4,
@@ -320,7 +320,7 @@ export class CharSelectState extends State {
                 this._nicknames[this._currentTurn] =
                     this._nicknames[this._currentTurn].slice(0, -1);
             } else if (p.keyCode === p.ESCAPE) {
-                this._confirmCurrentName(true);
+                this._cancelCurrentSelection();
             } else if (p.key && p.key.length === 1 && /[a-zA-Z0-9 ]/.test(p.key)) {
                 if (this._nicknames[this._currentTurn].length < 12) {
                     this._nicknames[this._currentTurn] += p.key;
@@ -369,6 +369,19 @@ export class CharSelectState extends State {
         this._currentTurn++;
         if (this._currentTurn >= this.ctx.players.length) {
             this.goTo(GameStage.WALK_MAP);
+        }
+    }
+
+    _cancelCurrentSelection() {
+        const playerIdx = this._currentTurn;
+        this._chosen[playerIdx] = null;
+        this._nicknames[playerIdx] = '';
+        this._pendingNameFor = null;
+
+        const player = this.ctx.players[playerIdx];
+        if (player) {
+            player.character = null;
+            player.nickname = `Player ${playerIdx + 1}`;
         }
     }
 

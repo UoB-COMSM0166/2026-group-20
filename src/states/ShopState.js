@@ -3,23 +3,41 @@ import { GameStage } from '../config/GameStage.js';
 import { GameConfig } from '../config/GameConfig.js';
 import { ObstacleType } from '../config/ObstacleType.js';
 
+const ITEM_SUMMARIES = {
+    PLATFORM: 'Solid support block.',
+    MOVING_PLATFORM: 'Horizontal moving lift.',
+    FALLING_PLATFORM: 'Drops after contact.',
+    ICE_PLATFORM: 'Slippery solid tile.',
+    BOUNCE_PAD: 'Launches players upward.',
+    SPIKE: 'Contact kills instantly.',
+    CANNON: 'Shoots timed projectiles.',
+    SAW: 'Rotating instant-kill blade.',
+    FLAME: 'Hazard that blinks on and off.',
+    SPIKED_BALL: 'Heavy static hazard.',
+    ICE_BLOCK: 'Slide-through speed zone.',
+    WIND_ZONE: 'Push field with direction.',
+    TELEPORTER: 'Links a two-portal pair.',
+    BOMB: 'Triggered explosive trap.',
+    SHADOW: 'Replays the last 5 seconds.',
+};
+
 // Rich item descriptions for hover tooltips
 const ITEM_DESCRIPTIONS = {
-    PLATFORM:         'Solid block that players can stand on.',
-    MOVING_PLATFORM:  'Slides left and right on a fixed path.',
-    FALLING_PLATFORM: 'Drops after a player stands on it.',
-    ICE_PLATFORM:     'Solid but frictionless — players slide.',
-    BOUNCE_PAD:       'Launches players upward on contact.',
-    SPIKE:            'Instant kill on touch.',
-    CANNON:           'Fires projectiles periodically.',
-    SAW:              'Spinning blade — instant kill.',
-    FLAME:            'Pulses on/off. Kills when active.',
-    SPIKED_BALL:      'Static hazard ball — instant kill.',
-    ICE_BLOCK:        'Pass-through zone that increases speed.',
-    WIND_ZONE:        'Pushes players in a set direction.',
-    TELEPORTER:       '1 token = 2 portals. Warps players.',
-    BOMB:             'Destroys terrain tiles on explosion!',
-    SHADOW:           'Replays the last 5 seconds of a player as a ghost clone.',
+    PLATFORM: 'Place a solid block that players can stand on, jump from, or use to block a route.',
+    MOVING_PLATFORM: 'Creates a platform that patrols left and right and can carry players along its path.',
+    FALLING_PLATFORM: 'Looks safe at first, then drops after a player stands on it for a short moment.',
+    ICE_PLATFORM: 'A solid platform with very low friction. Players keep sliding after they land on it.',
+    BOUNCE_PAD: 'A spring tile that throws players upward the moment they land on it.',
+    SPIKE: 'A compact trap that kills instantly on contact.',
+    CANNON: 'A directional trap that periodically fires projectiles across the map.',
+    SAW: 'A spinning hazard that kills on touch and is best used in tight spaces.',
+    FLAME: 'A timed fire trap that alternates between safe and deadly states.',
+    SPIKED_BALL: 'A dangerous static hazard that kills on contact but does not move.',
+    ICE_BLOCK: 'A pass-through ice zone that boosts slide and movement speed while overlapping it.',
+    WIND_ZONE: 'A directional force field that pushes players while they are inside it.',
+    TELEPORTER: 'One token places a linked portal pair. Step in one end to come out of the other.',
+    BOMB: 'A proximity trap with a short fuse that explodes and destroys nearby placed obstacles.',
+    SHADOW: 'Places a replay trigger that spawns a ghost copy of the last 5 seconds of movement.',
 };
 
 // All purchasable items derived from GameConfig.SHOP_PRICES
@@ -203,8 +221,8 @@ export class ShopState extends State {
             p.text(`OWNED ${owned}`, rx + 82, ry + 50);
 
             p.fill(120, 132, 170);
-            p.textSize(4.6);
-            p.text(this._shortDesc(item.type), rx + 12, ry + 86, 126);
+            p.textSize(4.3);
+            p.text(ITEM_SUMMARIES[item.type] ?? '', rx + 12, ry + 82, CARD_W - 24, 28);
 
             p.fill(canAfford ? (buyHovered ? [72, 156, 90] : [46, 112, 62]) : [44, 44, 54]);
             p.rect(buyRect.x, buyRect.y, buyRect.w, buyRect.h, 4);
@@ -236,8 +254,8 @@ export class ShopState extends State {
             p.fill(255, 215, 0);
             p.text(`PRICE ${item.price}`, tipX + 62, tipY + 28);
             p.fill(180, 185, 210);
-            p.textSize(5);
-            p.text(item.desc, tipX + 10, tipY + 56);
+            p.textSize(4.7);
+            p.text(item.desc, tipX + 10, tipY + 48, tipW - 20, 22);
         }
 
         // Done button
@@ -316,9 +334,9 @@ export class ShopState extends State {
         }
 
         // Done button
-        const doneY = gameHeight - 44;
+        const doneY = gameHeight - 48;
         const doneW = 160;
-        const doneH = 34;
+        const doneH = 28;
         const doneX = gameWidth / 2 - doneW / 2;
         if (
             mx >= doneX &&
@@ -409,34 +427,21 @@ export class ShopState extends State {
             .join(' ');
     }
 
-    _shortDesc(type) {
-        const desc = ITEM_DESCRIPTIONS[type] || '';
-        const words = desc.split(' ');
-        return words.slice(0, 5).join(' ') + (words.length > 5 ? '...' : '');
-    }
-
     _drawShopIcon(type, x, y, w, h) {
         const { p, shopIcons } = this.ctx;
         const img = shopIcons?.[type] ?? null;
         p.push();
         p.noSmooth();
         if (img) {
-            if (type === ObstacleType.MOVING_PLATFORM) {
-                p.image(img, x + 5, y + 18, w - 10, 14, 0, 0, 32, 8);
-            } else if (type === ObstacleType.WIND_ZONE) {
-                p.image(img, x + 8, y + 8, w - 16, h - 16, 0, 0, 32, 32);
-            } else if (type === ObstacleType.TELEPORTER) {
-                p.image(img, x + 6, y + 6, w - 12, h - 12, 0, 0, 40, 40);
-            } else if (type === ObstacleType.PLATFORM) {
-                p.image(img, x + 8, y + 8, w - 16, h - 16, 0, 0, 40, 40);
-            } else if (type === ObstacleType.ICE_PLATFORM) {
-                p.image(img, x + 8, y + 8, w - 16, h - 16, 0, 0, 40, 40);
-            } else if (type === ObstacleType.ICE_BLOCK) {
-                p.image(img, x + 8, y + 8, w - 16, h - 16, 0, 0, 40, 40);
-            } else {
-                const pad = 6;
-                p.image(img, x + pad, y + pad, w - pad * 2, h - pad * 2);
-            }
+            const { sx, sy, sw, sh, dx, dy, dw, dh } = this._iconDrawSpec(
+                type,
+                img,
+                x,
+                y,
+                w,
+                h,
+            );
+            p.image(img, dx, dy, dw, dh, sx, sy, sw, sh);
         } else if (type === ObstacleType.BOMB) {
             const cx = x + w / 2;
             const cy = y + h / 2 + 3;
@@ -471,5 +476,86 @@ export class ShopState extends State {
             p.rect(x + 8, y + 8, w - 16, h - 16, 4);
         }
         p.pop();
+    }
+
+    _iconDrawSpec(type, img, x, y, w, h) {
+        if (type === ObstacleType.MOVING_PLATFORM) {
+            return {
+                sx: 0, sy: 0, sw: 32, sh: 8,
+                dx: x + 4, dy: y + Math.floor(h / 2) - 7, dw: w - 8, dh: 14,
+            };
+        }
+
+        if (type === ObstacleType.FALLING_PLATFORM) {
+            return {
+                sx: 0, sy: 0, sw: 32, sh: 10,
+                dx: x + 5, dy: y + Math.floor(h / 2) - 7, dw: w - 10, dh: 14,
+            };
+        }
+
+        if (type === ObstacleType.BOUNCE_PAD) {
+            return {
+                sx: 0, sy: 0, sw: 28, sh: 28,
+                dx: x + 8, dy: y + 8, dw: w - 16, dh: h - 16,
+            };
+        }
+
+        if (type === ObstacleType.SAW) {
+            return {
+                sx: 0, sy: 0, sw: 38, sh: 38,
+                dx: x + 8, dy: y + 8, dw: w - 16, dh: h - 16,
+            };
+        }
+
+        if (type === ObstacleType.FLAME) {
+            return {
+                sx: 0, sy: 0, sw: 16, sh: 32,
+                dx: x + 15, dy: y + 6, dw: w - 30, dh: h - 12,
+            };
+        }
+
+        if (type === ObstacleType.WIND_ZONE) {
+            return {
+                sx: 0, sy: 0, sw: 32, sh: 32,
+                dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+            };
+        }
+
+        if (type === ObstacleType.CANNON) {
+            return {
+                sx: 0, sy: 0, sw: 30, sh: 18,
+                dx: x + 7, dy: y + 14, dw: w - 14, dh: 26,
+            };
+        }
+
+        if (type === ObstacleType.SPIKED_BALL) {
+            return {
+                sx: 0, sy: 0, sw: 28, sh: 28,
+                dx: x + 8, dy: y + 8, dw: w - 16, dh: h - 16,
+            };
+        }
+
+        if (type === ObstacleType.TELEPORTER) {
+            return {
+                sx: 0, sy: 0, sw: 40, sh: 40,
+                dx: x + 4, dy: y + 4, dw: w - 8, dh: h - 8,
+            };
+        }
+
+        if (
+            type === ObstacleType.PLATFORM ||
+            type === ObstacleType.ICE_PLATFORM ||
+            type === ObstacleType.ICE_BLOCK
+        ) {
+            return {
+                sx: 0, sy: 0, sw: 40, sh: 40,
+                dx: x + 5, dy: y + 5, dw: w - 10, dh: h - 10,
+            };
+        }
+
+        return {
+            sx: 0, sy: 0, sw: img.width, sh: img.height,
+            dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+        };
     }
 }

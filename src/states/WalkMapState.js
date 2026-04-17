@@ -173,16 +173,17 @@ export class WalkMapState extends State {
         p.fill(160, 160, 190);
         p.textSize(5);
         p.text('Use double jump to select the map', gW / 2, 40);
-        
-        // 显示两个玩家选择的角色
         p.fill(100, 110, 155);
         p.textSize(5);
+        p.text('ESC to go back', gW / 2, 56);
+        
+        // 显示两个玩家选择的角色
         const p1Char = players[0]?.character?.displayName || 'Character';
         const p2Char = players[1]?.character?.displayName || 'Character';
         p.textAlign(p.LEFT, p.TOP);
-        p.text(`P1: ${p1Char}`, 20, 58);
+        p.text(`P1: ${p1Char}`, 20, 72);
         p.textAlign(p.RIGHT, p.TOP);
-        p.text(`${p2Char} :P2`, gW - 20, 58);
+        p.text(`${p2Char} :P2`, gW - 20, 72);
 
         // Map cards
         for (const portal of this._portals) {
@@ -297,11 +298,6 @@ export class WalkMapState extends State {
             this._drawControlHint(p, w);
         }
 
-        // Controls hint
-        p.fill(60, 70, 100);
-        p.textAlign(p.CENTER, p.BOTTOM);
-        p.textSize(5.5);
-        p.text('P1: A/D + W   P2: ←/→ + ↑   (ESC to go back)', gW / 2, gH - 4);
     }
 
     keyPressed() {

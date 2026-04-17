@@ -1,8 +1,5 @@
 import { Obstacle } from '../Obstacle.js';
 import { GameConfig } from '../../config/GameConfig.js';
-import { TileType } from '../../config/TileType.js';
-import { aabbIntersects } from '../../systems/PhysicsSystem.js';
-
 /**
  * MovingPlatform — a solid platform that slides horizontally on a fixed path.
  *
@@ -18,6 +15,7 @@ export class MovingPlatform extends Obstacle {
         this._startX = x;
         this._dir = 1; // 1 = right, -1 = left
         this._frameDX = 0; // displacement this frame, used by carryPlayers
+        this._animAge = 0;
     }
 
     get isSolid() {
@@ -27,9 +25,10 @@ export class MovingPlatform extends Obstacle {
         return false;
     }
 
-    update(deltaTime, _gameWidth, _gameHeight, MAP) {
+    update(deltaTime) {
         const dt = deltaTime / 16.67; // normalise to 60 fps
         const prevX = this.x;
+        this._animAge += deltaTime;
 
         this.x += this._dir * GameConfig.MOVING_PLATFORM_SPEED * dt;
 
@@ -41,35 +40,6 @@ export class MovingPlatform extends Obstacle {
         } else if (this.x <= this._startX) {
             this.x = this._startX;
             this._dir = 1;
-        }
-
-        // Check collision with map platforms to prevent穿模
-        if (MAP) {
-            const T = GameConfig.TILE;
-            const obsLeft = this.x;
-            const obsRight = this.x + this.w;
-            const obsTop = this.y;
-            const obsBottom = this.y + this.h;
-            
-            for (let ty = 0; ty < MAP.length; ty++) {
-                for (let tx = 0; tx < MAP[ty].length; tx++) {
-                    if (MAP[ty][tx] === TileType.SOLID) {
-                        const tileX = tx * T;
-                        const tileY = ty * T;
-                        const tileRight = tileX + T;
-                        const tileBottom = tileY + T;
-                        
-                        // Check AABB collision
-                        if (obsLeft < tileRight && obsRight > tileX &&
-                            obsTop < tileBottom && obsBottom > tileY) {
-                            // Collision detected - revert to previous position
-                            this.x = prevX;
-                            this._dir *= -1; // Reverse direction
-                            break;
-                        }
-                    }
-                }
-            }
         }
 
         this._frameDX = this.x - prevX;
@@ -95,7 +65,9 @@ export class MovingPlatform extends Obstacle {
     draw() {
         const p = this.p;
         if (this.obstacleSheet) {
-            p.image(this.obstacleSheet, this.x, this.y, this.w, this.h, 0, 0, 32, 8);
+            const frameCount = Math.max(1, Math.floor(this.obstacleSheet.width / 32));
+            const frame = Math.floor((this._animAge / 120) % frameCount);
+            p.image(this.obstacleSheet, this.x, this.y, this.w, this.h, frame * 32, 0, 32, 8);
             return;
         }
         p.noStroke();

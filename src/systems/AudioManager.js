@@ -24,7 +24,7 @@ export class AudioManager {
         this._musicTimer = null; // setInterval handle
 
         this._sfxEnabled   = true;
-        this._musicEnabled = true;
+        this._musicEnabled = false;
         this._musicPlaying = false;
 
         // Beat index for the music sequencer
