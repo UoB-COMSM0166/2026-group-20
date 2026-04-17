@@ -4,6 +4,7 @@ import { TiledMapLoader } from '../maps/TiledMapLoader.js';
 import { ChunkMapGenerator } from './ChunkMapGenerator.js';
 import { TileType } from '../config/TileType.js';
 import { GameConfig } from '../config/GameConfig.js';
+import { Coin } from '../entities/Coin.js';
 
 import { AnimationConfigChick } from '../config/AnimationConfigChick.js';
 import { AnimationConfigBunny } from '../config/AnimationConfigBunny.js';
@@ -39,6 +40,12 @@ export class MapManager {
 
         this.currentKey = 'map1';
         this.current = this.mapLoaders.map1;
+
+        /** @type {p5.Image|null} coin sprite */
+        this._coinSprite = null;
+
+        /** @type {p5.Image|null} endpoint flag sprite */
+        this._endPointSprite = null;
     }
 
     /** Background file names per theme */
@@ -73,6 +80,19 @@ export class MapManager {
         this._preloadChunkPool();
         // Preload background images for each theme.
         this._preloadBackgrounds();
+        // Preload coin and endpoint sprites.
+        this._coinSprite = this.p.loadImage(
+            'src/assets/obstacles/Coin/coin.png',
+        );
+        this._endPointSprite = this.p.loadImage(
+            'src/assets/obstacles/endpoint/Checkpoint (Flag Idle)(64x64).png',
+        );
+
+        // Pass sprites to all map loaders.
+        for (const loader of Object.values(this.mapLoaders)) {
+            loader.setCoinSprite(this._coinSprite);
+            loader.setEndpointSprite(this._endPointSprite);
+        }
     }
 
     /**
@@ -362,8 +382,19 @@ export class MapManager {
         );
         const mapCols = mergedData.width;
 
+        // ── Collect coins from all chunks' Object_Layer_1 ──
+        const coinList = this._findAllCoinsInMergedGrid(
+            gen.selectedChunks,
+            chunkW,
+            chunkH,
+            tileW,
+            tileH,
+            GRID_COLS,
+        );
+
         // ── Pick a random background for this theme (stored on ctx) ──
         const bgImage = this._pickBackground(theme);
+        const epSprite = this._endPointSprite;
 
         const generatedMap = {
             MAP: collisionMap,
@@ -398,10 +429,32 @@ export class MapManager {
                         tileH,
                     );
                 }
+
+                if (endPoint && epSprite) {
+                    const fw = 64;
+                    const fh = 64;
+                    const frames = 10;
+                    const frameIdx = p.floor(p.frameCount / 5) % frames;
+
+                    const drawX = endPoint.x;
+                    const drawY = endPoint.y - (fh - (endPoint.h || tileH));
+
+                    p.image(
+                        epSprite,
+                        drawX,
+                        drawY,
+                        fw,
+                        fh,
+                        frameIdx * fw,
+                        0,
+                        fw,
+                        fh,
+                    );
+                }
             },
 
             getCoins() {
-                return [];
+                return coinList;
             },
         };
 
@@ -468,6 +521,46 @@ export class MapManager {
             }
         }
         return null;
+    }
+
+    /**
+     * Collect all coin objects from Object_Layer_1 across all merged grid chunks,
+     * applying grid offsets to each coin's position.
+     * @param {object[]} chunks  - row-major ordered list of selected chunks
+     * @param {number}   chunkW  - chunk width in tiles
+     * @param {number}   chunkH  - chunk height in tiles
+     * @param {number}   tileW   - tile width in pixels
+     * @param {number}   tileH   - tile height in pixels
+     * @param {number}   gridCols - number of columns in the grid
+     * @returns {Coin[]}
+     */
+    _findAllCoinsInMergedGrid(chunks, chunkW, chunkH, tileW, tileH, gridCols) {
+        const coins = [];
+        for (let ci = 0; ci < chunks.length; ci++) {
+            const chunk = chunks[ci];
+            const gridCol = ci % gridCols;
+            const gridRow = Math.floor(ci / gridCols);
+            const offsetX = gridCol * chunkW * tileW;
+            const offsetY = gridRow * chunkH * tileH;
+            for (const layer of chunk.layers || []) {
+                if (layer.type !== 'objectgroup') continue;
+                for (const obj of layer.objects || []) {
+                    if (obj.name !== 'coin') continue;
+                    const x = obj.x + offsetX;
+                    const y = obj.y + offsetY;
+                    coins.push(
+                        new Coin(
+                            this.p,
+                            x,
+                            y,
+                            GameConfig.COIN_VALUE,
+                            this._coinSprite,
+                        ),
+                    );
+                }
+            }
+        }
+        return coins;
     }
 
     _applySelectedMap(ctx) {

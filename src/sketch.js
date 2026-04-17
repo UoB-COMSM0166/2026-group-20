@@ -29,6 +29,7 @@ import trampoline from './assets/obstacles/Trampoline/Jump (28x28).png';
 import spikedBall from './assets/obstacles/Spiked Ball/Spiked Ball.png';
 import cannon from './assets/obstacles/Cannon/cannon (30x18).png';
 import fallingPlatform from './assets/obstacles/Falling Platforms/On (32x10).png';
+import coinSprite from './assets/obstacles/Coin/coin.png';
 
 /**
  * Root p5 sketch.
@@ -59,6 +60,7 @@ export const sketch = (p) => {
     let spikedBallImg;
     let cannonImg;
     let fallingPlatformFrames;
+    let coinImg;
 
     let chickenSheet;
     let bunnySheet;
@@ -78,6 +80,7 @@ export const sketch = (p) => {
         spikedBallImg = p.loadImage(spikedBall);
         cannonImg = p.loadImage(cannon);
         fallingPlatformFrames = p.loadImage(fallingPlatform);
+        coinImg = p.loadImage(coinSprite);
         mapManager.preloadAll();
     };
 
@@ -107,6 +110,7 @@ export const sketch = (p) => {
                 bunny: bunnySheet,
                 duck: duckSheet,
                 polar: polarSheet,
+                coin: coinImg,
             },
             placedObstacles: [],
             shopHasRun: false,

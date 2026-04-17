@@ -46,6 +46,28 @@ export class TiledMapLoader {
         this.GID_FLIP_D = 0x20000000;
 
         this._tilesetsSorted = [];
+
+        /** @type {p5.Image|null} coin sprite image */
+        this.coinSprite = null;
+
+        /** @type {p5.Image|null} endpoint sprite image */
+        this.endPointSprite = null;
+    }
+
+    /**
+     * Set the coin sprite image to use when creating Coin entities.
+     * @param {p5.Image} img
+     */
+    setCoinSprite(img) {
+        this.coinSprite = img;
+    }
+
+    /**
+     * Set the endpoint sprite image to use when rendering the map endpoint.
+     * @param {p5.Image} img
+     */
+    setEndpointSprite(img) {
+        this.endPointSprite = img;
     }
 
     // preload JSON and tileset image
@@ -143,6 +165,33 @@ export class TiledMapLoader {
                 }
             }
         }
+
+        if (
+            this.endPointSprite &&
+            this.endX !== undefined &&
+            this.endY !== undefined
+        ) {
+            const fw = 64;
+            const fh = 64;
+            const frames = 10;
+            const frameIdx = p.floor(p.frameCount / 5) % frames;
+
+            // Adjust Y so the 64px tall flag sits on the same bottom edge as the tiled object box
+            const drawX = this.endX;
+            const drawY = this.endY - (fh - (this.endHeight || tileH));
+
+            p.image(
+                this.endPointSprite,
+                drawX,
+                drawY,
+                fw,
+                fh,
+                frameIdx * fw,
+                0,
+                fw,
+                fh,
+            );
+        }
     }
 
     /**
@@ -198,7 +247,15 @@ export class TiledMapLoader {
 
                 const x = obj.x + obj.width * 0.25;
                 const y = obj.y + obj.height * 0.25;
-                coins.push(new Coin(this.p, x, y, GameConfig.COIN_VALUE));
+                coins.push(
+                    new Coin(
+                        this.p,
+                        x,
+                        y,
+                        GameConfig.COIN_VALUE,
+                        this.coinSprite,
+                    ),
+                );
             }
         }
 
@@ -384,6 +441,11 @@ export class TiledMapLoader {
                     this.startX = obj.x;
                     this.startY = obj.y;
                 } else if (obj.name === 'endPoint') {
+                    this.endX = obj.x;
+                    this.endY = obj.y;
+                    this.endWidth = obj.width;
+                    this.endHeight = obj.height;
+
                     const startCol = p.floor(obj.x / mapData.tilewidth);
                     const startRow = p.floor(obj.y / mapData.tileheight);
                     const endCol = p.floor(
