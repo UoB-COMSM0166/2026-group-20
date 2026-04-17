@@ -85,7 +85,7 @@ export class MapManager {
             'src/assets/obstacles/Coin/coin.png',
         );
         this._endPointSprite = this.p.loadImage(
-            'src/assets/obstacles/endpoint/Checkpoint (Flag Idle)(64x64).png',
+            'src/assets/obstacles/endpoint/Checkpoint(FlagIdle)(64x64).png',
         );
 
         // Pass sprites to all map loaders.

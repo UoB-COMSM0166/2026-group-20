@@ -236,22 +236,74 @@ export class TiledMapLoader {
      * Objects named 'coin' are treated as coin spawn points.
      * @returns {Coin[]}
      */
-    getCoins() {
-        const coins = [];
+    /**
+     * Returns coin entities from the map's object layer.
+     * If a placed obstacle occupies a coin's tile, that coin is relocated
+     * to a random free EMPTY tile so the total count never changes.
+     *
+     * @param {object[]} [placedObstacles=[]]
+     * @returns {Coin[]}
+     */
+    getCoins(placedObstacles = []) {
+        const T = GameConfig.TILE;
+        const MAP = this.MAP;
+        const cols = MAP[0]?.length ?? 0;
+        const rows = MAP.length;
 
+        // Build occupied set from placed obstacles
+        const occupiedKeys = new Set(
+            placedObstacles.map(
+                (obs) => `${Math.round(obs.x / T)},${Math.round(obs.y / T)}`,
+            ),
+        );
+
+        // Candidate relocation tiles: EMPTY with solid directly below
+        const candidates = [];
+        for (let ty = 0; ty < rows - 1; ty++) {
+            for (let tx = 0; tx < cols; tx++) {
+                if (
+                    MAP[ty][tx] === TileType.EMPTY &&
+                    MAP[ty + 1][tx] === TileType.SOLID &&
+                    !occupiedKeys.has(`${tx},${ty}`)
+                ) {
+                    candidates.push({ tx, ty });
+                }
+            }
+        }
+        // Fisher-Yates shuffle
+        for (let i = candidates.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+        }
+        let relocIdx = 0;
+
+        const coins = [];
         for (const layer of this.mapData.layers) {
             if (layer.type !== 'objectgroup') continue;
 
             for (const obj of layer.objects) {
                 if (obj.name !== 'coin') continue;
 
-                const x = obj.x + obj.width * 0.25;
-                const y = obj.y + obj.height * 0.25;
+                let cx = obj.x + obj.width * 0.25;
+                let cy = obj.y + obj.height * 0.25;
+
+                // Check if an obstacle is on this coin's tile
+                const coinTx = Math.floor((cx + obj.width * 0.25) / T);
+                const coinTy = Math.floor((cy + obj.height * 0.25) / T);
+                if (occupiedKeys.has(`${coinTx},${coinTy}`)) {
+                    if (relocIdx < candidates.length) {
+                        const { tx, ty } = candidates[relocIdx++];
+                        cx = tx * T + T * 0.25;
+                        cy = ty * T + T * 0.25;
+                    }
+                    // else: stay in place — count always preserved
+                }
+
                 coins.push(
                     new Coin(
                         this.p,
-                        x,
-                        y,
+                        cx,
+                        cy,
                         GameConfig.COIN_VALUE,
                         this.coinSprite,
                     ),

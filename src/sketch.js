@@ -12,6 +12,7 @@ import { BuildState } from './states/BuildState.js';
 import { RunState } from './states/RunState.js';
 import { ResultsState } from './states/ResultsState.js';
 import { ShopState } from './states/ShopState.js';
+import { TutorialState } from './states/TutorialState.js';
 // import { Map2State } from './states/Map2State.js';
 import { AnimationConfigChick } from './config/AnimationConfigChick.js';
 import { AnimationConfigBunny } from './config/AnimationConfigBunny.js';
@@ -30,6 +31,10 @@ import spikedBall from './assets/obstacles/Spiked Ball/Spiked Ball.png';
 import cannon from './assets/obstacles/Cannon/cannon (30x18).png';
 import fallingPlatform from './assets/obstacles/Falling Platforms/On (32x10).png';
 import coinSprite from './assets/obstacles/Coin/coin.png';
+
+import startScreen from './assets/images/background/startscreen-bg.png';
+//import PixelCowboy from './assets/fonts/PixelCowboy.otf';
+import PixelCowboy from './assets/fonts/PanasChill.ttf';
 
 /**
  * Root p5 sketch.
@@ -66,6 +71,8 @@ export const sketch = (p) => {
     let bunnySheet;
     let duckSheet;
     let polarSheet;
+    let startScreenBackground;
+    let startScreenFont;
 
     let ctx;
 
@@ -81,6 +88,8 @@ export const sketch = (p) => {
         cannonImg = p.loadImage(cannon);
         fallingPlatformFrames = p.loadImage(fallingPlatform);
         coinImg = p.loadImage(coinSprite);
+        startScreenBackground = p.loadImage(startScreen);
+        startScreenFont = p.loadFont(PixelCowboy);
         mapManager.preloadAll();
     };
 
@@ -97,6 +106,7 @@ export const sketch = (p) => {
          */
         ctx = {
             p,
+            font: startScreenFont,
             gameWidth,
             gameHeight,
             players: [],
@@ -128,9 +138,14 @@ export const sketch = (p) => {
 
         states = {
             [GameStage.BOOT]: new BootState(ctx, goTo),
-            [GameStage.MENU]: new MenuState(ctx, goTo),
+            [GameStage.MENU]: new MenuState(
+                ctx,
+                goTo,
+                startScreenBackground,
+                startScreenFont,
+            ),
             [GameStage.CHAR_SELECT]: new CharSelectState(ctx, goTo),
-            [GameStage.MAPMENU]: new MapMenuState(ctx, goTo),
+            [GameStage.MAPMENU]: new MapMenuState(ctx, goTo, startScreenFont),
             [GameStage.BUILD]: new BuildState(
                 ctx,
                 goTo,
@@ -144,6 +159,7 @@ export const sketch = (p) => {
             [GameStage.RUN]: new RunState(ctx, goTo),
             [GameStage.RESULTS]: new ResultsState(ctx, goTo),
             [GameStage.SHOP]: new ShopState(ctx, goTo),
+            [GameStage.TUTORIAL]: new TutorialState(ctx, goTo),
             //            [GameStage.MAP2]: new Map2State(ctx, goTo),
         };
 
@@ -158,19 +174,24 @@ export const sketch = (p) => {
             gameHeight = ctx.gameHeight;
         }
 
-        p.background(0);
+        if (activeState === states[GameStage.MENU]) {
+            // fix aspect ratio in start screen
+            p.image(startScreenBackground, 0, 0, p.width, p.height);
+        }
 
         scaleFactor = p.min(p.width / gameWidth, p.height / gameHeight);
-        offsetX = (p.width - gameWidth * scaleFactor) / 2;
-        offsetY = (p.height - gameHeight * scaleFactor) / 2;
+        const scaleX = p.width / gameWidth;
+        const scaleY = p.height / gameHeight;
+        // offsetX = (p.width - gameWidth * scaleFactor) / 2;
+        // offsetY = (p.height - gameHeight * scaleFactor) / 2;
 
-        const mx = (p.mouseX - offsetX) / scaleFactor;
-        const my = (p.mouseY - offsetY) / scaleFactor;
+        const mx = p.mouseX / scaleX;
+        const my = p.mouseY / scaleY;
 
         p.cursor(p.ARROW);
         p.push();
-        p.translate(offsetX, offsetY);
-        p.scale(scaleFactor);
+        // p.translate(offsetX, offsetY);
+        p.scale(scaleX, scaleY);
 
         activeState.update(p.deltaTime || 16.6);
         activeState.render(mx, my);
@@ -181,8 +202,10 @@ export const sketch = (p) => {
     // ── Input ──
 
     p.mousePressed = function () {
-        const mx = (p.mouseX - offsetX) / scaleFactor;
-        const my = (p.mouseY - offsetY) / scaleFactor;
+        const scaleX = p.width / gameWidth;
+        const scaleY = p.height / gameHeight;
+        const mx = p.mouseX / scaleX;
+        const my = p.mouseY / scaleY;
         activeState.mousePressed(mx, my);
     };
 
@@ -192,5 +215,10 @@ export const sketch = (p) => {
 
     p.windowResized = function () {
         p.resizeCanvas(p.windowWidth, p.windowHeight);
+    };
+
+    p.doubleClicked = function () {
+        let a = p.fullscreen();
+        p.fullscreen(!a);
     };
 };

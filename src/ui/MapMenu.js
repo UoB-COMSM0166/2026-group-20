@@ -13,7 +13,8 @@ export class MapMenu {
      * @param {p5} p - The p5 instance
      * @param {string} stage - Current game stage
      */
-    constructor(p) {
+    constructor(p, font) {
+        this.font = font;
         this.buttonMap1 = new RectButton(
             p,
             GameConfig.MAP_BUTTON1_X,
@@ -46,8 +47,11 @@ export class MapMenu {
      */
     render(p, mx, my) {
         // placeholder title
-        p.textAlign(p.CENTER, p.BASELINE);
-        p.textFont(GameConfig.FONT, 20);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textFont(this.font);
+        p.stroke(0);
+        p.strokeWeight(4);
+        p.textSize(80);
         p.fill(
             GameConfig.MAP_TITLE_COLOUR.r,
             GameConfig.MAP_TITLE_COLOUR.g,

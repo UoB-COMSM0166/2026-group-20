@@ -24,4 +24,5 @@ export const GameStage = Object.freeze({
     RUN: 'RUN',
     RESULTS: 'RESULTS',
     SHOP: 'SHOP',
+    TUTORIAL: 'TUTORIAL',
 });
