@@ -45,7 +45,7 @@ import map1Preview from './assets/maps/map1/background.png';
 import map2Preview from './assets/maps/map2/background.png';
 import startScreen from './assets/images/background/startscreen-bg.png';
 import panasChillFont from './assets/fonts/PanasChill.ttf';
-
+import mapBackground from './assets/images/background/map-selection-bg.png';
 /**
  * Root p5 sketch.
  *
@@ -85,6 +85,7 @@ export const sketch = (p) => {
     let map2PreviewImg;
     let startScreenBackground;
     let menuFont;
+    let mapMenuBackgroundImg;
 
     let chickenSheet;
     let bunnySheet;
@@ -116,7 +117,9 @@ export const sketch = (p) => {
         map2PreviewImg = p.loadImage(map2Preview);
         startScreenBackground = p.loadImage(startScreen);
         menuFont = p.loadFont(panasChillFont);
+        mapMenuBackgroundImg = p.loadImage(mapBackground);
         mapManager.preloadAll();
+
     };
 
     // ── Setup ──
@@ -134,6 +137,7 @@ export const sketch = (p) => {
             p,
             gameWidth: GameConfig.GAME_WIDTH,
             gameHeight: GameConfig.GAME_HEIGHT,
+            walkMapBg: mapMenuBackgroundImg,
             players: [],
             tiledMap: null,
             scoreManager: null,

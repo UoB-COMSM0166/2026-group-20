@@ -10,14 +10,26 @@ import { GameStage } from '../config/GameStage.js';
  *   Map button    → BuildState (after map switch)
  */
 export class MapMenuState extends State {
+    // constructor(ctx, goTo, bgImage = null) {
+    //     super(ctx, goTo);
+    //     this.bgImage = bgImage;
+    //     console.log("map");
+    // }
+
     enter() {
         const { p, gameWidth, gameHeight } = this.ctx;
         this.mapMenu = new MapMenu(p, gameWidth, gameHeight);
     }
 
+    // useless 
     render(mx, my) {
-        const { p } = this.ctx;
-        p.background(40);
+        const { p, mapSelectBg, gameWidth, gameHeight } = this.ctx;
+        console.log("bgImage is missing in MapMenuState");
+        if (this.bgImage) {
+            p.image(mapSelectBg, 0, 0, gameWidth, gameHeight);
+        } else {
+            p.background(40);
+        }
         this.mapMenu.render(p, mx, my);
     }
 

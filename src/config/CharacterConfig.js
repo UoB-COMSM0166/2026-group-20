@@ -45,7 +45,7 @@ export const CHARACTERS = [
     },
     {
         id: 'duck',
-        displayName: 'Duck',
+        displayName: 'Penguin',
         spriteKey: 'duck',
         animConfig: AnimationConfigDuck,
         colour: [100, 200, 255],

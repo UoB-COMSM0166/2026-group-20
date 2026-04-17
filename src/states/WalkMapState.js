@@ -40,7 +40,7 @@ export class WalkMapState extends State {
             idx: i,
             col: i === 0 ? [90, 170, 255] : [255, 200, 80],
             inp: new HandleInput(p, i),
-            player: pl, // 保存玩家引用
+            player: pl, 
         }));
 
         // Portals: left = map1, right = map2
@@ -58,7 +58,7 @@ export class WalkMapState extends State {
             },
             {
                 key: 'map2',
-                label: 'Iceberg Map',
+                label: 'Ice Map',
                 subtitle: 'slippery frozen climb',
                 x: gW - 96 - 300,
                 y: 128,
@@ -70,7 +70,7 @@ export class WalkMapState extends State {
         ];
 
         this._age      = 0;
-        this._selectedMap = {}; // 记录每个玩家选择的地图
+        this._selectedMap = {}; 
         this._selectTimer = 0; // brief delay before transitioning
         this._previewCache = new Map();
     }
@@ -156,8 +156,11 @@ export class WalkMapState extends State {
         const T  = GameConfig.TILE || 32;
 
         // Background
-        p.background(12, 16, 28);
-
+        if (this.ctx.walkMapBg){
+            p.image(this.ctx.walkMapBg, 0, 0, gW, gH); 
+        }else{
+            p.background(12, 16, 28);
+        }
         // Floor
         p.noStroke();
         p.fill(40, 44, 68);
@@ -174,7 +177,6 @@ export class WalkMapState extends State {
         p.textSize(5);
         p.text('Use double jump to select the map', gW / 2, 40);
         
-        // 显示两个玩家选择的角色
         p.fill(100, 110, 155);
         p.textSize(5);
         const p1Char = players[0]?.character?.displayName || 'Character';
