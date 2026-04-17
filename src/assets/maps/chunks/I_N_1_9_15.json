@@ -1,0 +1,150 @@
+{
+    "compressionlevel": -1,
+    "height": 11,
+    "infinite": false,
+    "layers": [
+        {
+            "data": [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 1, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 26, 24, 3, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 26, 12, 12, 24, 3, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 12, 12, 12, 12, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ],
+            "height": 11,
+            "id": 1,
+            "name": "Tile_Layer_1",
+            "opacity": 1,
+            "type": "tilelayer",
+            "visible": true,
+            "width": 15,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "data": [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 15, 15, 15, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 15, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 15,
+                15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 15, 15, 15, 15, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 15, 15, 15,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 15, 15, 15, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+            ],
+            "height": 11,
+            "id": 2,
+            "name": "Collision_Layer",
+            "opacity": 1,
+            "type": "tilelayer",
+            "visible": true,
+            "width": 15,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "draworder": "topdown",
+            "id": 4,
+            "name": "Object_Layer_1",
+            "objects": [
+                {
+                    "height": 0,
+                    "id": 5,
+                    "name": "coin",
+                    "opacity": 1,
+                    "rotation": 0,
+                    "type": "",
+                    "visible": true,
+                    "width": 0,
+                    "x": 367.766874814154,
+                    "y": 113.232233125186
+                },
+                {
+                    "height": 0,
+                    "id": 6,
+                    "name": "coin",
+                    "opacity": 1,
+                    "rotation": 0,
+                    "type": "",
+                    "visible": true,
+                    "width": 0,
+                    "x": 335.890573892358,
+                    "y": 144.157002676182
+                },
+                {
+                    "height": 0,
+                    "id": 7,
+                    "name": "coin",
+                    "opacity": 1,
+                    "rotation": 0,
+                    "type": "",
+                    "visible": true,
+                    "width": 0,
+                    "x": 111.804936068986,
+                    "y": 273.089503419566
+                },
+                {
+                    "height": 0,
+                    "id": 8,
+                    "name": "coin",
+                    "opacity": 1,
+                    "rotation": 0,
+                    "type": "",
+                    "visible": true,
+                    "width": 0,
+                    "x": 79.4528694617901,
+                    "y": 272.613737734166
+                },
+                {
+                    "height": 0,
+                    "id": 9,
+                    "name": "coin",
+                    "opacity": 1,
+                    "rotation": 0,
+                    "type": "",
+                    "visible": true,
+                    "width": 0,
+                    "x": 81.3559322033898,
+                    "y": 48.5280999107939
+                },
+                {
+                    "height": 0,
+                    "id": 10,
+                    "name": "coin",
+                    "opacity": 1,
+                    "rotation": 0,
+                    "type": "",
+                    "visible": true,
+                    "width": 0,
+                    "x": 143.681236990782,
+                    "y": 48.5280999107939
+                }
+            ],
+            "opacity": 1,
+            "type": "objectgroup",
+            "visible": true,
+            "x": 0,
+            "y": 0
+        }
+    ],
+    "nextlayerid": 5,
+    "nextobjectid": 11,
+    "orientation": "orthogonal",
+    "renderorder": "right-down",
+    "tiledversion": "1.12.1",
+    "tileheight": 32,
+    "tilesets": [
+        {
+            "firstgid": 1,
+            "source": "tileset4_ice.tsx"
+        }
+    ],
+    "tilewidth": 32,
+    "type": "map",
+    "version": "1.10",
+    "width": 15
+}

@@ -24,11 +24,12 @@ import { PauseManager } from '../systems/PauseManager.js';
  */
 export class RunState extends State {
     enter() {
-        const { p, gameWidth, gameHeight, players, scoreManager, tiledMap } = this.ctx;
+        const { p, gameWidth, gameHeight, players, scoreManager, tiledMap } =
+            this.ctx;
 
-        this.coins        = tiledMap.getCoins(this.ctx.placedObstacles);
+        this.coins = tiledMap.getCoins(this.ctx.placedObstacles);
         this.respawnManager = new RespawnManager(scoreManager);
-        this.timeManager  = new TimeManager(players, scoreManager);
+        this.timeManager = new TimeManager(players, scoreManager);
         this.pauseManager = new PauseManager(p, gameWidth, gameHeight);
 
         this._resetRound();
@@ -82,6 +83,7 @@ export class RunState extends State {
                 this.respawnManager,
                 placedObstacles,
                 tiledMap.MAP,
+                gameHeight,
             );
 
             const { p } = this.ctx;
@@ -127,112 +129,137 @@ export class RunState extends State {
 
     render(mx, my) {
         try {
-        const {
-            p,
-            players,
-            scoreManager,
-            gameWidth,
-            gameHeight,
-            placedObstacles,
-            tiledMap,
-        } = this.ctx;
+            const {
+                p,
+                players,
+                scoreManager,
+                gameWidth,
+                gameHeight,
+                placedObstacles,
+                tiledMap,
+            } = this.ctx;
 
-        p.background(25);
-        tiledMap.render();
+            p.background(25);
 
-        // Draw placed obstacles
-        for (const obs of placedObstacles) {
-            obs.draw();
-        }
+            // Draw themed background if available
+            const bg = this.ctx.backgroundImage;
+            if (bg && bg.width > 1) {
+                p.image(bg, 0, 0, gameWidth, gameHeight);
+            }
 
-        // Draw coins
-        for (const coin of this.coins) {
-            coin.draw();
-        }
+            tiledMap.render();
 
-        // Draw players
-        for (const player of players) {
-            DrawPlayer(player);
-        }
+            // Draw placed obstacles
+            for (const obs of placedObstacles) {
+                obs.draw();
+            }
 
-        // HUD — phase label
-        p.noStroke();
-        p.fill(100, 200, 120);
-        p.textAlign(p.CENTER, p.TOP);
-        p.textSize(13);
-        p.text('RUN PHASE', gameWidth / 2, 8);
+            // Draw coins
+            for (const coin of this.coins) {
+                coin.draw();
+            }
 
-        // HUD — timer
-        p.fill(255);
-        p.textSize(22);
-        p.textAlign(p.CENTER, p.TOP);
-        p.text(
-            `Time: ${Math.ceil(this.timeManager.timeLeft)}s`,
-            gameWidth / 2,
-            26,
-        );
+            // Draw players
+            for (const player of players) {
+                DrawPlayer(player);
+            }
 
-        // HUD — per-player coins + wallet
-        p.textSize(15);
-        for (const player of players) {
-            const side = player.playerNo === 0 ? p.LEFT : p.RIGHT;
-            const hx = player.playerNo === 0 ? 10 : gameWidth - 10;
-            p.textAlign(side, p.TOP);
-            p.fill(
-                player.playerNo === 0
-                    ? p.color(90, 170, 255)
-                    : p.color(255, 200, 80),
-            );
+            // HUD — phase label
+            p.noStroke();
+            p.fill(100, 200, 120);
+            p.textAlign(p.CENTER, p.TOP);
+            p.textSize(13);
+            p.text('RUN PHASE', gameWidth / 2, 8);
+
+            // HUD — timer
+            p.fill(255);
+            p.textSize(22);
+            p.textAlign(p.CENTER, p.TOP);
             p.text(
-                `P${player.playerNo + 1}  🪙 ${scoreManager.getRoundCoins(player)}  💰 ${scoreManager.getWallet(player)}`,
-                hx,
-                10,
+                `Time: ${Math.ceil(this.timeManager.timeLeft)}s`,
+                gameWidth / 2,
+                26,
             );
+
+            // HUD — round
+            p.textSize(14);
+            p.fill(200, 200, 200);
+            p.text(
+                `Round: ${scoreManager.currentRound} / 5`,
+                gameWidth / 2,
+                50,
+            );
+
+            // HUD — per-player coins + wallet
+            p.textSize(15);
+            for (const player of players) {
+                const side = player.playerNo === 0 ? p.LEFT : p.RIGHT;
+                const hx = player.playerNo === 0 ? 10 : gameWidth - 10;
+                p.textAlign(side, p.TOP);
+                p.fill(
+                    player.playerNo === 0
+                        ? p.color(90, 170, 255)
+                        : p.color(255, 200, 80),
+                );
+                p.text(
+                    `P${player.playerNo + 1}  🪙 ${scoreManager.getRoundCoins(player)}  💰 ${scoreManager.getWallet(player)}`,
+                    hx,
+                    10,
+                );
+            }
+
+            // Controls hint
+            p.fill(160, 160, 180);
+            p.textSize(13);
+            p.textAlign(p.LEFT, p.BOTTOM);
+            p.text('P1: A/D + W   P2: ←/→ + ↑', 10, gameHeight - 8);
+
+            // Pause button (bottom-right)
+            const qW = 100,
+                qH = 24;
+            const qX = gameWidth - qW - 8;
+            const qY = gameHeight - qH - 6;
+            const qHov = mx >= qX && mx <= qX + qW && my >= qY && my <= qY + qH;
+            p.noStroke();
+            p.fill(qHov ? [55, 65, 110] : [35, 42, 78]);
+            p.rect(qX, qY, qW, qH, 5);
+            p.fill(180, 195, 255);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.textSize(11);
+            p.text('⏸  Pause', qX + qW / 2, qY + qH / 2);
+
+            // Pause overlay — drawn last so it sits on top
+            this.pauseManager.render(mx, my);
+        } catch (e) {
+            console.error('[RunState.render] CRASH:', e.stack || e);
         }
-
-        // Controls hint
-        p.fill(160, 160, 180);
-        p.textSize(13);
-        p.textAlign(p.LEFT, p.BOTTOM);
-        p.text('P1: A/D + W   P2: ←/→ + ↑', 10, gameHeight - 8);
-
-        // Pause button (bottom-right)
-        const qW = 100, qH = 24;
-        const qX = gameWidth - qW - 8;
-        const qY = gameHeight - qH - 6;
-        const qHov = mx >= qX && mx <= qX + qW && my >= qY && my <= qY + qH;
-        p.noStroke();
-        p.fill(qHov ? [55, 65, 110] : [35, 42, 78]);
-        p.rect(qX, qY, qW, qH, 5);
-        p.fill(180, 195, 255);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(11);
-        p.text('⏸  Pause', qX + qW / 2, qY + qH / 2);
-
-        // Pause overlay — drawn last so it sits on top
-        this.pauseManager.render(mx, my);
-        } catch(e) { console.error('[RunState.render] CRASH:', e.stack || e); }
     }
 
     mousePressed(mx, my) {
         if (this.pauseManager.isPaused) {
-            this.pauseManager.mousePressed(mx, my,
+            this.pauseManager.mousePressed(
+                mx,
+                my,
                 () => this.pauseManager.resume(),
-                () => { this._resetRound(); this.pauseManager.resume(); },
+                () => {
+                    this._resetRound();
+                    this.pauseManager.resume();
+                },
                 () => {
                     // Store where to return so TutorialState knows to come back
                     this.ctx.tutorialReturnStage = GameStage.RUN;
                     this.pauseManager.resume();
                     this.goTo(GameStage.TUTORIAL);
                 },
-                () => this.goTo(GameStage.MENU)
+                () => this.goTo(GameStage.MENU),
             );
             return;
         }
 
         // Pause button
         const { gameWidth, gameHeight } = this.ctx;
-        const qW = 100, qH = 24;
+        const qW = 100,
+            qH = 24;
         const qX = gameWidth - qW - 8;
         const qY = gameHeight - qH - 6;
         if (mx >= qX && mx <= qX + qW && my >= qY && my <= qY + qH) {

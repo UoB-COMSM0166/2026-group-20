@@ -1,7 +1,9 @@
 import { State } from './State.js';
+import { DrawPlayer } from '../utils/DrawPlayer.js';
 import { GameStage } from '../config/GameStage.js';
 import { GameConfig } from '../config/GameConfig.js';
 import { ObstacleType } from '../config/ObstacleType.js';
+import { PlayerGameState } from '../config/PlayerGameState.js';
 import { TileType } from '../config/TileType.js';
 import { Platform } from '../entities/obstacles/Platform.js';
 import { MovingPlatform } from '../entities/obstacles/MovingPlatform.js';
@@ -79,6 +81,11 @@ export class BuildState extends State {
         this.cannonImg = cannonImg;
         this.fallingPlatformFrames = fallingPlatformFrames;
         //this.trampolineIdle= trampolineIdle;
+
+        // Initialise turn state so render() is safe even before enter() runs.
+        this._currentTurn = 0;
+        this._selectedType = null;
+        this._turnObstacles = [];
     }
 
     static PALETTE = [
@@ -166,7 +173,16 @@ export class BuildState extends State {
         },
     ];
 
-    enter() {
+    async enter() {
+        // Rounds 2+ use randomly generated maps for maps with chunk themes.
+        // Round 1 (shopHasRun=false) keeps the static map — it bypasses build entirely.
+        if (this.ctx.shopHasRun) {
+            const mapManager = this.ctx.mapManager;
+            if (mapManager) {
+                await mapManager.generateRandomMap(this.ctx.mapKey, this.ctx);
+            }
+        }
+
         // Round 1: shop has not run yet — skip straight to RUN
         if (!this.ctx.shopHasRun) {
             this.goTo(GameStage.RUN);
@@ -180,6 +196,13 @@ export class BuildState extends State {
         this._windDir = WindDir.RIGHT;
         this._pendingTeleporter = null; // first placed teleporter waits for its partner
         this._turnObstacles = []; // obstacles placed this turn (for undo)
+
+        // Reset players so they are visible during BUILD (they may be DEAD from previous round)
+        for (const player of this.ctx.players) {
+            player.prepareRespawn();
+            player.finishRespawn();
+            player.setGameState(PlayerGameState.PLAYING);
+        }
     }
 
     update(_dt) {}
@@ -187,7 +210,9 @@ export class BuildState extends State {
     // ── Turn / token helpers ──────────────────────────────────────────────
 
     _activePlayer() {
-        return this.ctx.players[this._currentTurn];
+        const players = this.ctx.players;
+        if (!players || this._currentTurn >= players.length) return null;
+        return players[this._currentTurn];
     }
 
     _isShopMode() {
@@ -196,7 +221,9 @@ export class BuildState extends State {
 
     _tokenCount(type) {
         if (!this._isShopMode()) return Infinity;
-        return this._activePlayer().inventory.get(type) ?? 0;
+        const player = this._activePlayer();
+        if (!player || !player.inventory) return 0;
+        return player.inventory.get(type) ?? 0;
     }
 
     _consumeToken(type) {
@@ -233,10 +260,22 @@ export class BuildState extends State {
         const col = PLAYER_COLOURS[this._currentTurn] ?? [200, 200, 200];
 
         p.background(20);
+
+        // Draw themed background if available
+        const bg = this.ctx.backgroundImage;
+        if (bg && bg.width > 1) {
+            p.image(bg, 0, 0, gameWidth, gameHeight);
+        }
+
         tiledMap.render();
 
         for (const obs of this.ctx.placedObstacles) {
             obs.draw();
+        }
+
+        // Draw players so the starting position is visible
+        for (const player of this.ctx.players) {
+            DrawPlayer(player);
         }
 
         // Ghost preview
@@ -271,9 +310,11 @@ export class BuildState extends State {
         );
 
         // Inventory summary
-        if (this._isShopMode()) {
+        if (this._isShopMode() && this._activePlayer()) {
             const inv = this._activePlayer().inventory;
-            const entries = [...inv.entries()].filter(([t, c]) => typeof t === 'string' && c > 0);
+            const entries = [...inv.entries()].filter(
+                ([t, c]) => typeof t === 'string' && c > 0,
+            );
             p.textSize(11);
             if (entries.length > 0) {
                 p.fill(...col);
@@ -577,17 +618,22 @@ export class BuildState extends State {
         });
 
         // ── Action row (below both obstacle rows) ─────────────────────────
-        const actionY   = row1Y + btnH + 4;
-        const actionH   = 30;
+        const actionY = row1Y + btnH + 4;
+        const actionH = 30;
 
         // Undo Last — left side
-        const undoBtnW  = 130;
-        const undoBtnX  = startX;
-        const canUndo   = this._turnObstacles.length > 0;
-        const undoHov   = mx >= undoBtnX && mx <= undoBtnX + undoBtnW &&
-                          my >= actionY   && my <= actionY + actionH;
+        const undoBtnW = 130;
+        const undoBtnX = startX;
+        const canUndo = this._turnObstacles.length > 0;
+        const undoHov =
+            mx >= undoBtnX &&
+            mx <= undoBtnX + undoBtnW &&
+            my >= actionY &&
+            my <= actionY + actionH;
         p.noStroke();
-        p.fill(canUndo ? (undoHov ? [90, 70, 140] : [65, 48, 105]) : [30, 28, 45]);
+        p.fill(
+            canUndo ? (undoHov ? [90, 70, 140] : [65, 48, 105]) : [30, 28, 45],
+        );
         p.rect(undoBtnX, actionY, undoBtnW, actionH, 5);
         p.fill(canUndo ? [200, 175, 255] : [70, 65, 90]);
         p.textAlign(p.LEFT, p.CENTER);
@@ -595,17 +641,24 @@ export class BuildState extends State {
         p.text('  ↩  Undo Last', undoBtnX + 6, actionY + actionH / 2);
 
         // Quit to Menu — right side
-        const quitBtnW  = 130;
-        const quitBtnX  = gameWidth - quitBtnW - startX;
-        const quitHov   = mx >= quitBtnX && mx <= quitBtnX + quitBtnW &&
-                          my >= actionY   && my <= actionY + actionH;
+        const quitBtnW = 130;
+        const quitBtnX = gameWidth - quitBtnW - startX;
+        const quitHov =
+            mx >= quitBtnX &&
+            mx <= quitBtnX + quitBtnW &&
+            my >= actionY &&
+            my <= actionY + actionH;
         p.noStroke();
         p.fill(quitHov ? [130, 38, 38] : [88, 26, 26]);
         p.rect(quitBtnX, actionY, quitBtnW, actionH, 5);
         p.fill(230, 130, 130);
         p.textAlign(p.RIGHT, p.CENTER);
         p.textSize(12);
-        p.text('✕  Quit to Menu  ', quitBtnX + quitBtnW - 6, actionY + actionH / 2);
+        p.text(
+            '✕  Quit to Menu  ',
+            quitBtnX + quitBtnW - 6,
+            actionY + actionH / 2,
+        );
 
         // ENTER hint — centre
         const nextLabel =
@@ -625,10 +678,10 @@ export class BuildState extends State {
         const btnH = 46;
         const startX = 40;
         const btnGap = 6;
-        const pH     = this._paletteH();
-        const pY     = gameHeight - pH;
-        const row0Y  = pY + 8;
-        const row1Y  = row0Y + btnH + 6;
+        const pH = this._paletteH();
+        const pY = gameHeight - pH;
+        const row0Y = pY + 8;
+        const row1Y = row0Y + btnH + 6;
 
         // Obstacle palette buttons
         BuildState.PALETTE.forEach((item, i) => {
@@ -649,16 +702,24 @@ export class BuildState extends State {
         const undoBtnX = startX;
         const quitBtnW = 130;
         const quitBtnX = gameWidth - quitBtnW - startX;
-        const actionY  = row1Y + btnH + 4;
-        const actionH  = 30;
+        const actionY = row1Y + btnH + 4;
+        const actionH = 30;
 
-        if (mx >= undoBtnX && mx <= undoBtnX + undoBtnW &&
-            my >= actionY   && my <= actionY + actionH) {
+        if (
+            mx >= undoBtnX &&
+            mx <= undoBtnX + undoBtnW &&
+            my >= actionY &&
+            my <= actionY + actionH
+        ) {
             this._undoLast();
             return;
         }
-        if (mx >= quitBtnX && mx <= quitBtnX + quitBtnW &&
-            my >= actionY   && my <= actionY + actionH) {
+        if (
+            mx >= quitBtnX &&
+            mx <= quitBtnX + quitBtnW &&
+            my >= actionY &&
+            my <= actionY + actionH
+        ) {
             this.goTo(GameStage.MAPMENU);
         }
     }
@@ -716,20 +777,47 @@ export class BuildState extends State {
         const { p } = this.ctx;
         let obs = null;
         switch (type) {
-            case ObstacleType.PLATFORM:          obs = new Platform(p, x, y); break;
-            case ObstacleType.MOVING_PLATFORM:   obs = new MovingPlatform(p, x, y); break;
-            case ObstacleType.FALLING_PLATFORM:  obs = new FallingPlatform(p, x, y, this.fallingPlatformFrames); break;
-            case ObstacleType.ICE_PLATFORM:      obs = new IcePlatform(p, x, y); break;
-            case ObstacleType.BOUNCE_PAD:        obs = new BouncePad(p, x, y, this.trampolineBouncing); break;
-            case ObstacleType.SPIKE:             obs = new SpikeObstacle(p, x, y); break;
-            case ObstacleType.CANNON:            obs = new Cannon(p, x, y, this._cannonDir, this.cannonImg); break;
-            case ObstacleType.SAW:               obs = new Saw(p, x, y, this.sawFrames); break;
-            case ObstacleType.FLAME:             obs = new Flame(p, x, y, this.fireFrames); break;
-            case ObstacleType.SPIKED_BALL:       obs = new SpikedBall(p, x, y, this.spikedBallImg); break;
-            case ObstacleType.ICE_BLOCK:         obs = new IceBlock(p, x, y); break;
-            case ObstacleType.WIND_ZONE:         obs = new WindZone(p, x, y, this._windDir); break;
-            case ObstacleType.TELEPORTER:        obs = new Teleporter(p, x, y); break;
-            default: return null;
+            case ObstacleType.PLATFORM:
+                obs = new Platform(p, x, y);
+                break;
+            case ObstacleType.MOVING_PLATFORM:
+                obs = new MovingPlatform(p, x, y);
+                break;
+            case ObstacleType.FALLING_PLATFORM:
+                obs = new FallingPlatform(p, x, y, this.fallingPlatformFrames);
+                break;
+            case ObstacleType.ICE_PLATFORM:
+                obs = new IcePlatform(p, x, y);
+                break;
+            case ObstacleType.BOUNCE_PAD:
+                obs = new BouncePad(p, x, y, this.trampolineBouncing);
+                break;
+            case ObstacleType.SPIKE:
+                obs = new SpikeObstacle(p, x, y);
+                break;
+            case ObstacleType.CANNON:
+                obs = new Cannon(p, x, y, this._cannonDir, this.cannonImg);
+                break;
+            case ObstacleType.SAW:
+                obs = new Saw(p, x, y, this.sawFrames);
+                break;
+            case ObstacleType.FLAME:
+                obs = new Flame(p, x, y, this.fireFrames);
+                break;
+            case ObstacleType.SPIKED_BALL:
+                obs = new SpikedBall(p, x, y, this.spikedBallImg);
+                break;
+            case ObstacleType.ICE_BLOCK:
+                obs = new IceBlock(p, x, y);
+                break;
+            case ObstacleType.WIND_ZONE:
+                obs = new WindZone(p, x, y, this._windDir);
+                break;
+            case ObstacleType.TELEPORTER:
+                obs = new Teleporter(p, x, y);
+                break;
+            default:
+                return null;
         }
         if (obs) obs.type = type; // stamp type so undo/refund can read it back
         return obs;

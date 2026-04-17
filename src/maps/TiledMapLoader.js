@@ -21,7 +21,10 @@ export class TiledMapLoader {
         this.p = p;
         this.jsonPath = jsonPath;
         this.tilesetPath = tilesetPath;
-        this.baseDir = this.jsonPath.slice(0, this.jsonPath.lastIndexOf('/') + 1);
+        this.baseDir = this.jsonPath.slice(
+            0,
+            this.jsonPath.lastIndexOf('/') + 1,
+        );
 
         this.mapData = null;
         this.tilesetImage = null;
@@ -43,6 +46,28 @@ export class TiledMapLoader {
         this.GID_FLIP_D = 0x20000000;
 
         this._tilesetsSorted = [];
+
+        /** @type {p5.Image|null} coin sprite image */
+        this.coinSprite = null;
+
+        /** @type {p5.Image|null} endpoint sprite image */
+        this.endPointSprite = null;
+    }
+
+    /**
+     * Set the coin sprite image to use when creating Coin entities.
+     * @param {p5.Image} img
+     */
+    setCoinSprite(img) {
+        this.coinSprite = img;
+    }
+
+    /**
+     * Set the endpoint sprite image to use when rendering the map endpoint.
+     * @param {p5.Image} img
+     */
+    setEndpointSprite(img) {
+        this.endPointSprite = img;
     }
 
     // preload JSON and tileset image
@@ -56,8 +81,12 @@ export class TiledMapLoader {
         for (const layer of this.mapData.layers || []) {
             if (layer.type !== 'imagelayer' || !layer.image) continue;
 
-            const candidatePaths = this._getImageLayerCandidatePaths(layer.image);
-            const candidates = candidatePaths.map((path) => this.p.loadImage(path));
+            const candidatePaths = this._getImageLayerCandidatePaths(
+                layer.image,
+            );
+            const candidates = candidatePaths.map((path) =>
+                this.p.loadImage(path),
+            );
             this.imageLayerAssets.set(layer.id, candidates);
         }
     }
@@ -118,29 +147,67 @@ export class TiledMapLoader {
 
                         // Render from tileset-local index (not global gid index).
                         const srcX = (gidInfo.localId % tilesetCols) * tileW;
-                        const srcY = p.floor(gidInfo.localId / tilesetCols) * tileH;
+                        const srcY =
+                            p.floor(gidInfo.localId / tilesetCols) * tileH;
 
                         p.image(
                             tilesetImage,
-                            destX, destY, tileW, tileH,
-                            srcX, srcY, tileW, tileH,
+                            destX,
+                            destY,
+                            tileW,
+                            tileH,
+                            srcX,
+                            srcY,
+                            tileW,
+                            tileH,
                         );
                     }
                 }
             }
+        }
+
+        if (
+            this.endPointSprite &&
+            this.endX !== undefined &&
+            this.endY !== undefined
+        ) {
+            const fw = 64;
+            const fh = 64;
+            const frames = 10;
+            const frameIdx = p.floor(p.frameCount / 5) % frames;
+
+            // Adjust Y so the 64px tall flag sits on the same bottom edge as the tiled object box
+            const drawX = this.endX;
+            const drawY = this.endY - (fh - (this.endHeight || tileH));
+
+            p.image(
+                this.endPointSprite,
+                drawX,
+                drawY,
+                fw,
+                fh,
+                frameIdx * fw,
+                0,
+                fw,
+                fh,
+            );
         }
     }
 
     /**
      * Returns the tile character at grid position (tx, ty).
      * Out-of-bounds tiles are treated as solid walls.
-     *
      * @param {number} tx
      * @param {number} ty
      * @returns {string}
      */
     getTile(tx, ty) {
-        if (ty < 0 || ty >= this.MAP.length || tx < 0 || tx >= this.MAP[0].length) {
+        if (
+            ty < 0 ||
+            ty >= this.MAP.length ||
+            tx < 0 ||
+            tx >= this.MAP[0].length
+        ) {
             return TileType.SOLID;
         }
         return this.MAP[ty][tx];
@@ -167,7 +234,6 @@ export class TiledMapLoader {
     /**
      * Returns coin entities parsed from object layers.
      * Objects named 'coin' are treated as coin spawn points.
-     *
      * @returns {Coin[]}
      */
     /**
@@ -179,23 +245,27 @@ export class TiledMapLoader {
      * @returns {Coin[]}
      */
     getCoins(placedObstacles = []) {
-        const T    = GameConfig.TILE;
-        const MAP  = this.MAP;
+        const T = GameConfig.TILE;
+        const MAP = this.MAP;
         const cols = MAP[0]?.length ?? 0;
         const rows = MAP.length;
 
         // Build occupied set from placed obstacles
         const occupiedKeys = new Set(
-            placedObstacles.map(obs => `${Math.round(obs.x / T)},${Math.round(obs.y / T)}`)
+            placedObstacles.map(
+                (obs) => `${Math.round(obs.x / T)},${Math.round(obs.y / T)}`,
+            ),
         );
 
         // Candidate relocation tiles: EMPTY with solid directly below
         const candidates = [];
         for (let ty = 0; ty < rows - 1; ty++) {
             for (let tx = 0; tx < cols; tx++) {
-                if (MAP[ty][tx] === TileType.EMPTY &&
+                if (
+                    MAP[ty][tx] === TileType.EMPTY &&
                     MAP[ty + 1][tx] === TileType.SOLID &&
-                    !occupiedKeys.has(`${tx},${ty}`)) {
+                    !occupiedKeys.has(`${tx},${ty}`)
+                ) {
                     candidates.push({ tx, ty });
                 }
             }
@@ -229,7 +299,15 @@ export class TiledMapLoader {
                     // else: stay in place — count always preserved
                 }
 
-                coins.push(new Coin(this.p, cx, cy, GameConfig.COIN_VALUE));
+                coins.push(
+                    new Coin(
+                        this.p,
+                        cx,
+                        cy,
+                        GameConfig.COIN_VALUE,
+                        this.coinSprite,
+                    ),
+                );
             }
         }
 
@@ -268,7 +346,6 @@ export class TiledMapLoader {
 
     /**
      * Public helper for systems that want gid conversion info.
-     *
      * @param {number} gid
      * @returns {{
      *   rawGid:number,
@@ -289,7 +366,6 @@ export class TiledMapLoader {
 
     /**
      * Convenience helper when only local id is needed.
-     *
      * @param {number} gid
      * @returns {number}
      */
@@ -417,10 +493,19 @@ export class TiledMapLoader {
                     this.startX = obj.x;
                     this.startY = obj.y;
                 } else if (obj.name === 'endPoint') {
+                    this.endX = obj.x;
+                    this.endY = obj.y;
+                    this.endWidth = obj.width;
+                    this.endHeight = obj.height;
+
                     const startCol = p.floor(obj.x / mapData.tilewidth);
                     const startRow = p.floor(obj.y / mapData.tileheight);
-                    const endCol = p.floor((obj.x + obj.width) / mapData.tilewidth);
-                    const endRow = p.floor((obj.y + obj.height) / mapData.tileheight);
+                    const endCol = p.floor(
+                        (obj.x + obj.width) / mapData.tilewidth,
+                    );
+                    const endRow = p.floor(
+                        (obj.y + obj.height) / mapData.tileheight,
+                    );
 
                     for (let r = startRow; r <= endRow; r++) {
                         for (let c = startCol; c <= endCol; c++) {
