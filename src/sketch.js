@@ -22,10 +22,10 @@ import { AnimationConfigBunny } from './config/AnimationConfigBunny.js';
 //import { AnimationConfigDuck } from './config/AnimationConfigDuck.js';
 //import { AnimationConfigPolar } from './config/AnimationConfigPolar.js';
 // import images
-import chickenSprite from './assets/sprites/chicken_all_frames2.png';
-import bunnySprite from './assets/sprites/bunny_all_frames.png';
-import duckSprite from './assets/sprites/duck_all_frames_flipped.png';
-import polarSprite from './assets/sprites/polar_all_frames_flipped.png';
+import chickenSprite from './assets/sprites/chicken_all_frames2-biggerCharacter.png';
+import bunnySprite from './assets/sprites/bunny_all_frames-biggerCharacter.png';
+import duckSprite from './assets/sprites/duck_all_frames_flipped-biggerCharacter.png';
+import polarSprite from './assets/sprites/polar_all_frames_flipped-biggerCharacter.png';
 
 import saw from './assets/obstacles/Saw/On (38x38).png';
 import fire from './assets/obstacles/Fire/On (16x32).png';
@@ -44,6 +44,7 @@ import endpointFlag from './assets/endpoint/Checkpoint (Flag Idle)(64x64).png';
 import map1Preview from './assets/maps/map1/background.png';
 import map2Preview from './assets/maps/map2/background.png';
 import startScreen from './assets/images/background/startscreen-bg.png';
+import mapBackground from './assets/images/background/map-selection-bg.png';
 import panasChillFont from './assets/fonts/PanasChill.ttf';
 
 /**
@@ -84,6 +85,7 @@ export const sketch = (p) => {
     let map1PreviewImg;
     let map2PreviewImg;
     let startScreenBackground;
+    let mapMenuBackgroundImg;
     let menuFont;
 
     let chickenSheet;
@@ -115,6 +117,7 @@ export const sketch = (p) => {
         map1PreviewImg = p.loadImage(map1Preview);
         map2PreviewImg = p.loadImage(map2Preview);
         startScreenBackground = p.loadImage(startScreen);
+        mapMenuBackgroundImg = p.loadImage(mapBackground);
         menuFont = p.loadFont(panasChillFont);
         mapManager.preloadAll();
     };
@@ -134,6 +137,7 @@ export const sketch = (p) => {
             p,
             gameWidth: GameConfig.GAME_WIDTH,
             gameHeight: GameConfig.GAME_HEIGHT,
+            walkMapBg: mapMenuBackgroundImg,
             players: [],
             tiledMap: null,
             scoreManager: null,

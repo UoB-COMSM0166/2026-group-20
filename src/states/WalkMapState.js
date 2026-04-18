@@ -58,7 +58,7 @@ export class WalkMapState extends State {
             },
             {
                 key: 'map2',
-                label: 'Iceberg Map',
+                label: 'Ice Map',
                 subtitle: 'slippery frozen climb',
                 x: gW - 96 - 300,
                 y: 128,
@@ -156,7 +156,28 @@ export class WalkMapState extends State {
         const T  = GameConfig.TILE || 32;
 
         // Background
-        p.background(12, 16, 28);
+        if (this.ctx.walkMapBg) {
+            const bg = this.ctx.walkMapBg;
+            const imgRatio = bg.width / bg.height;
+            const canvasRatio = gW / gH;
+
+            let sx = 0;
+            let sy = 0;
+            let sw = bg.width;
+            let sh = bg.height;
+
+            if (imgRatio > canvasRatio) {
+                sw = bg.height * canvasRatio;
+                sx = (bg.width - sw) / 2;
+            } else {
+                sh = bg.width / canvasRatio;
+                sy = (bg.height - sh) / 2;
+            }
+
+            p.image(bg, 0, 0, gW, gH, sx, sy, sw, sh);
+        } else {
+            p.background(12, 16, 28);
+        }
 
         // Floor
         p.noStroke();
