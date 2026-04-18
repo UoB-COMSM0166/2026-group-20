@@ -58,18 +58,25 @@ export class Shadow extends Obstacle {
             : [];
         if (history.length < 2) return;
 
+        const startSnap = history[0];
+        const endSnap = history[history.length - 1];
+
         const firstTime = history[0].time;
         const frames = history.map((snap) => ({
             t: snap.time - firstTime,
             left: snap.left,
             right: snap.right,
             jump: snap.jump,
+            x: snap.x,
+            y: snap.y,
+            facingRight: snap.facingRight,
+            movementState: snap.movementState,
         }));
 
         const ghost = new Player(
             this.p,
-            player.x,
-            player.y,
+            startSnap.x,
+            startSnap.y,
             this._nextGhostId++,
             player.spriteSheet,
             player.animConfig,
@@ -82,8 +89,10 @@ export class Shadow extends Obstacle {
         ghost.jumpsLeft = player.maxJumps;
         ghost.gravity = player.gravity;
         ghost.maxFall = player.maxFall;
-        ghost.x = player.x;
-        ghost.y = player.y;
+        ghost.x = startSnap.x;
+        ghost.y = startSnap.y;
+        ghost.facingRight = startSnap.facingRight ?? true;
+        ghost.movementState = startSnap.movementState ?? 'IDLE';
 
         const tint = this._playerTint(playerNo);
         this._replays.push({
@@ -93,6 +102,9 @@ export class Shadow extends Obstacle {
             tint,
             ghost,
             trail: [],
+            worldW: this._ctx.mapPixelWidth ?? this._ctx.gameWidth,
+            worldH: this._ctx.mapPixelHeight ?? this._ctx.gameHeight,
+            lastSnap: endSnap,
         });
         this._cooldowns.set(playerNo, GameConfig.SHADOW_COOLDOWN_MS);
     }
@@ -270,6 +282,8 @@ export class Shadow extends Obstacle {
             ctx.mapPixelHeight ?? ctx.gameHeight,
         );
 
+        this._clampReplayGhost(replay);
+
         if (replay.ghost.lifeState !== PlayerState.ALIVE) return;
 
         for (const obs of ctx.placedObstacles) {
@@ -296,6 +310,35 @@ export class Shadow extends Obstacle {
         replay.trail.forEach((frame, index) => {
             frame.alpha = 45 + index * 28;
         });
+    }
+
+    _clampReplayGhost(replay) {
+        const ghost = replay.ghost;
+        const worldW = replay.worldW ?? this._ctx.gameWidth;
+        const worldH = replay.worldH ?? this._ctx.gameHeight;
+
+        if (Number.isNaN(ghost.x) || Number.isNaN(ghost.y)) {
+            ghost.die('SHADOW_INVALID');
+            return;
+        }
+
+        if (ghost.x < 0) {
+            ghost.x = 0;
+            ghost.vx = Math.max(0, ghost.vx);
+        } else if (ghost.x + ghost.w > worldW) {
+            ghost.x = worldW - ghost.w;
+            ghost.vx = Math.min(0, ghost.vx);
+        }
+
+        // Allow some space above the map for jumps, but never let the replay
+        // drift completely out of the playable area or re-enter from outside.
+        const topLimit = -ghost.h * 2;
+        if (ghost.y < topLimit) {
+            ghost.y = topLimit;
+            ghost.vy = Math.max(0, ghost.vy);
+        } else if (ghost.y > worldH + ghost.h) {
+            ghost.die('SHADOW_FELL_OUT');
+        }
     }
 
     _getReplayInput(replay) {
