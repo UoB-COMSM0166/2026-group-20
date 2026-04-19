@@ -98,13 +98,11 @@ GROUP PHOTO. Add a group photo here.
 
 ## 2. Requirements
 
--> outlines the requirements engineering process (15% ~750 words)
+(15% ~750 words)
 
 Our team began by brainstorming various game ideas and collectively selected the concept to develop. After the game was selected, we identified the stakeholders to understand who would be affected by the system and whose needs should be considered during the design process. Based on this understanding, we outlined epics for the game's key features, followed by user stories describing the detailed functional requirements. 
 
 ### 2.1 Ideation and Game Selection
-
--> how the idea started
 
 Each member of the team brainstormed 5-9 games of their faviourite games and brought their ideas to the meeting. During the meeting, everyone presented the core game mechanics of their proposed games.
 
@@ -124,18 +122,17 @@ Both games were analysed to identify the most suitable base for the project. To 
 
 Based on this comparison, **The Ultimate Chicken Horse** was selected as the base game due to its feature-rich design. This ensures that even if time constraints limit the implementation of the planned technical challenges, the project will still remain functional and cohesive as a playable game.
 
--> Add Appendix A: selection process
 
 ### 2.2 Stakeholders 
 
--> who is involved
-
-To begin our game design process, we identified all relevant stakeholders including individuals and entities that needed to be taken into account when developing our game. These stakeholders were visualised using an onion model diagram.
+To begin our game design process, we identified all relevant stakeholders including individuals and entities that needed to be taken into account when developing our game. These stakeholders were visualised using an onion model diagram (see Figure ?).
 
 <div align="center">
   <img src="docs/assets/images/onion-model.png" alt="Onion Model" width="700">
 </div>
 
+<p><em>Figure ?: Onion model of the game stakeholders. (Presntation of the table was adapted from [10]) </em></p>
+</div>
 
 Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users to whom we had direct access. We categorised the most relevant stakeholders into three groups: gamers, lecturers, and other students, to better identify the qualities each group would expect in a game.
 
@@ -146,8 +143,6 @@ Given the academic context of our game, we did not need to account for legal or 
 - **Other students**: As peer testers, they provide critical feedbacks on bugs and playability.
 
 ### 2.3 Epics
-
--> high level requirements
 
 Building on our stakeholder analysis, we defined a set of epics (high-level requirements). These requirements were designed to satisfy the expectations of each stakeholder group, as the goal of the project was to develop a game aligns with user expectations.
 
@@ -184,8 +179,6 @@ After defining the epics, we created a set of system requirements to describe wh
 | NFR-4 | Performance | The game shall maintain smooth gameplay without noticeable lag during play. | 
 
 ### 2.5 User Stories
-
--> detailed requirements
 
 We deconstructed epics into a set of user stories to describe the specific features and functionalities of the game from the perspective of the identified stakeholders.
 
@@ -262,6 +255,9 @@ flowchart LR
     style AISolver fill:#FFCDD2,stroke:#000000
     style TheGame fill:#ffffff,stroke:#000000
 ```
+<div align="center">
+<p><em>Figure ?: Use case diagram of the game system. (re edit we don't have AI solver now)</em></p>
+</div>
 
 ## 3. Design
 
@@ -271,10 +267,37 @@ flowchart LR
 
 ### 3.1 System Architecture Overview
 
-The project adopts a modular game architecture that combines **Entity–Component–System (ECS) architecture**(in ref 6) and traditional **object-centric design (OCD) architecture** (in ref 5). In a pure ECS architecture, entities are simple identifiers that store data, while systems contain all the logic that processes this data. In contrast, traditional OOP designs usually combine data and behaviour within the same class. For example, in an OCD design, a **Player** class might manage its own position, movement logic and collision detection within a single object. In a pure ECS design, the player would instead store data, while external systems would handle all gameplay logic.
+The project adopts a modular game architecture that combines **Entity–Component–System (ECS)** architecture[5] and **object-oriented design**[9]. In a typical object-oriented design, a game object contains both its data and the logic that operates on that data. For example, a **Player** class may store data such as position and velocity while also containing functions that control movement and detect collisions. 
 
+In contrast, an ECS architecture separates data from logic. Entities mainly store data, while systems contain all the logic that processes this data. For instance, a **player** entity may only store position and velocity data, while a **physics system** is responsible for updating movement or detecting collisions for multiple entities (see Figure ). 
 
-The system architecture in this project follows a hybrid approach, which combines some aspects of both ECS and OCD. The player is represented as an **entity** that stores data such as position and movement speed, whereas certain gameplay behaviours are handled by independent systems. For instance, the Physics System processes collision detection between the player and obstacles, and the Respawn Manager handles resetting the player when the character collides with a hazard. However, some game logic, such as the player’s movement, remains implemented within the player object itself.
+#### OOP approach 
+```
+Player
+ ├─ position
+ ├─ velocity
+ ├─ move()
+ └─ detectCollision()
+``` 
+
+#### ECS approach 
+```
+Player Entity
+ ├─ PositionComponent
+ └─ VelocityComponent
+
+PhysicsSystem
+ └─ updates movement and collision
+```
+<div align="center">
+<p><em>Figure ?: Conceptual comparison between object-oriented design and ECS architecture.</em></p>
+</div>
+
+Both architectures have advantages and limitations. Object-oriented design is easier to understand and implement as data and behaviour are encapsulated within the same class. This structure suits smaller projects where logic is organised around individual objects. However, as systems become more complex, tightly coupling logic within objects can reduce flexibility and limit code reuse[9, p.113]. In contrast, ECS architecture improves modularity by separating data from behaviour, allowing systems to process multiple entities using shared logic. This can improve scalability and maintainability, but it may introduce additional design complexity[6]. 
+
+Based on these considerations, the system architecture in this project follows a **hybrid approach**, which combines aspects of both ECS and object-oriented design. The player is represented as an **entity** that stores data such as position and movement speed, while certain gameplay behaviours are handled by independent systems. For instance, the PhysicsSystem processes collision detection between the player and obstacles, and the RespawnManager handles resetting the player when the character collides with a hazard. However, some game logic, such as the player movement, remains implemented within the player object itself.
+
+This hybrid architectural approach is reflected in the organisation of the project’s codebase. The codebase is organised into several folders: `entities`, `systems`, `state`, `config`, `UI` and `resource manager`, each responsible for a specific aspect of the game. These categories correspond to the coloured groups in the class diagram (Figure ?). 
 
 ```mermaid
 ---
@@ -459,21 +482,21 @@ direction TB
   classDef Rose fill:#FFDFE5,stroke:#D24A64,color:#8E2236,stroke-width:2px
   classDef Ash fill:#EEEEEE,stroke:#888888,color:#000000,stroke-width:2px
 ```
+<div align="center">
+<p><em>Figure ?: Class diagram of the system architecture. Colours indicate different class groups: entities (amber), states (blue), systems (green), resource manager (red) and UI (grey).</em></p>
+</div>
+
 
 ### 3.2 Entities 
 
-**Entities** represent the main objects within the game world, such as players, coins and obstacles. To align with the ECS architecture, these entities mainly function as containers for data and properties rather than implementing complex internal logic. This structure is supported by a data-driven design approach (ref 5, p1025), where specific parameters such as movement speed and initial jump velocity are stored in configuration files in the `config` folder. As described by **change to author name**(ref p1024), this separation could improve development iteration speed and system maintainability.
+**Entities** represent the main objects within the game world, such as players, coins and obstacles. These entities store important state information, such as position, velocity and status, and also implement some logic. This structure follows a data-driven design approach [5, p1024], where specific parameters such as movement speed and initial jump velocity are defined in configuration files in the `config` folder.
 
-**add class diagram here**
-During runtime, entities are updated through the **game loop**. The entities are stored in a list, and the `update()` function iterates through this list during each frame to update the state of each entity sequentially. This mechanism ensures that all entities are updated consistently during each iteration of the simulation.
+During runtime, entities are updated through the **game loop**. All entities are stored in a list, and the `update()` function iterates through this list during each frame to update the state of each entity sequentially. This mechanism ensures that all entities are updated consistently during each iteration of the simulation[5, p1088].
 
-(p1088 in 5) 
- 
 ### 3.3 Systems
 **Systems** are responsible for processing behaviours associated with different enities and implementing core gameplay mechanics. While **entities** mainly store data, **systems** contain the logic that operates on this data during each iteration of the game loop. These systems are implemented within the `system` directory. 
 
 Example of system include: 
-should we list all? or some?
 
 - `Physics System` - detects collisions between the player and other entities (e.g. coins or obstacles)
 
@@ -481,7 +504,7 @@ should we list all? or some?
 
 - `Time Manager` - manager gameplay timing during a round.
 
-The following sequence diagram display how the plater interact with these systems during gameplay.
+Figure ? displays how the player interact with these systems during gameplay.
 ```mermaid
 ---
 config:
@@ -520,25 +543,17 @@ sequenceDiagram
     Sketch->>P: render player
     Timer->>Timer: record finish
 ```
+<div align="center">
+<p><em>Figure ?: Sequence diagram of the gameplay update process.</em></p>
+</div>
 
-
-### 3.4 Finite State Machine (FSM)
+### 3.4 States
 The overall flow of the game is controlled using a **Finite State Machine** implemented in `state` folder. Each state represents a different phase of the game, and only one state can be active at any given time. This ensures that the game transitions between different phases in a predictable manner. 
 
-The lifecycle of the game follows several states:
+The main states include `Boot`, which loads the initial game briefing, followed by `StartMenu`, `CharacterSelection` and `MapSelection`. The game then progresses to `Tutorial`. After this, the game moves to `ObstacleSelection`, which allows players to choose obstacles before starting the main `Gameplay` phase. Once the gameplay ends, either by reaching the goal or when the time limit is reached, the game transitions to `GameEnd` to display the results. Finally, it enters the `Shop` state for the players to purchase new obstacles before the next round begins. (keep this or change to the name corresponding to Jinwang)
 
-- `Boot state` - loads the game briefing 
+The following diagram (Figure ?) illustrates the transitions between different game states.
 
-- `Build state` - 
-- `Map Menu state` - 
-- `Play State` - 
-- `Result State` - 
-- `Run State`- 
-- `Shop State` - 
-
-The following diagram illustrates the transitions between different game states.
-
-re edit this diagram 
 ```mermaid
 ---
 config:
@@ -547,39 +562,53 @@ config:
 ---
 stateDiagram
   direction LR
-  [*] --> StartMenu
-  StartMenu --> Lobby
-  Lobby --> CharacterSetup
-  CharacterSetup --> MapSetup
-  MapSetup --> ObstacleSetup
-  ObstacleSetup --> PlacementSetup
-  PlacementSetup --> Gameplay
-  Gameplay --> ReachGoal:goal reached
-  Gameplay --> GameEnd:time limit reached
-  ReachGoal --> GameEnd
-  GameEnd --> [*]
-  style StartMenu,Lobby,CharacterSetup,MapSetup,ObstacleSetup,PlacementSetup,Gameplay,ReachGoal,GameEnd
-```
 
+  [*] --> Boot
+  Boot --> StartMenu
+  StartMenu --> CharacterSelection
+  CharacterSelection --> MapSelection
+  MapSelection --> ObstacleSetup
+  ObstacleSetup --> Tutorial
+  Tutorial --> ObstacleSelection
+
+  ObstacleSelection --> Gameplay
+  Gameplay --> ReachGoal: goal reached
+  Gameplay --> GameEnd: time limit reached
+  ReachGoal --> GameEnd
+
+  GameEnd --> Shop
+  Shop --> ObstacleSelection
+
+  style StartMenu fill:#E2EBFF
+  style CharacterSelection fill:#E2EBFF
+  style MapSelection fill:#E2EBFF
+  style ObstacleSetup fill:#E2EBFF
+  style Tutorial fill:#E2EBFF
+  style ObstacleSelection fill:#E2EBFF
+  style Gameplay fill:#E2EBFF
+  style ReachGoal fill:#E2EBFF
+  style GameEnd fill:#E2EBFF
+  style Shop fill:#E2EBFF
+```
+<div align="center">
+<p><em>Figure ?: State diagram for the game flow.</em></p>
+</div>
 
 ### 3.5 User Interface
-The user interface components are located in the `UI` directory and are responsible for managing the presentation layer of the game. These components include elements such as the heads-up display (HUD), score indicators and timers. The UI layer is separated from gameplay logic to maintain a clear separation between presentation and game mechanics.
+The user interface is responsible for managing the presentation layer of the game. These components include elements such as the heads-up display (HUD), score indicators and timers. The UI layer is separated from gameplay logic to maintain a clear separation between presentation and game mechanics.
 
 ### 3.6 Rescource Manager 
-p493 in ref 5 
+The game implements a **Resource Manager** to handle game assets. A resource manager prepares assets and ensuring they are loaded into memory when needed and released when no longer required[5, p571]. 
 
-The game utilises a resource management system to handle game assets. (ref 5 p571)
+In this project, map assests are managed by `MapLoader`, which reads map configuration files and generates game objects such as obstacles and  coins.
+ 
 
-The game processes player input through Human Interface Devices (HID) such as keyboards or controllers. 
-
-Quoted: Every resource manager is comprised of two distinct but integrated components.One component manages the chain of offline tools used to create the assets and transform them into their engine-ready form. The other component manages the resources at runtime, ensuring that they are loaded into memory in advance of being needed by the game and making sure they are unloaded from memory when no longer needed. 
-
-### 3.7 Asset Pipeline and Formats
+### 3.7 Assets
 The game utilises various asset types. Each asset type is managed by a corresponding resource manager to handle the loading and management of game resources during runtime. The main asset categories are:
 
 - **Visual Assets**: Sprite sheets (PNG) for players, obstacles and other entities.
 
-- **Audio Assets**: 
+- **Audio Assets**: ??? 
 
 - **Data Assets**: configuration files (JSON) that define gameplay parameters for map titles.
 
@@ -590,12 +619,11 @@ The game utilises various asset types. Each asset type is managed by a correspon
 - Describe implementation of your game, in particular highlighting the TWO areas of _technical challenge_ in developing your game.
 
 ## 4.1 Implementaion Overall
-The game implementation follows the modular architecture described in Section 3. A key technical decision in the implementation was the use of **p5.js instance mode** (add ref). In standard mode (or <em>global mode</em>), core functions such as `setup()` and `draw()` are placed in the global namespace by default, meaning they are accessible from any script in the program. While this approach is simple and quick to set up, variables and functions are shared across multiple files, which increases the risk of name collisions. 
-
+The game implementation follows the modular architecture described in Section 3. A key technical decision in the implementation was the use of **p5.js instance mode**[8]. In standard mode (or <em>global mode</em>), core functions such as `setup()` and `draw()` are placed in the global namespace by default, meaning they are accessible from any script in the program. While this approach is simple and quick to set up, variables and functions are shared across multiple files, which increases the risk of name collisions. 
 
 To avoid these issues, we adopted **instance mode**. In this mode, the entire sketch is encapsulated within an object, which isolates p5.js functions from the global scope. This prevents conflicts between variables and functions defined in different modules. As a result, instance mode supports better code organisation and maintainability, particularly when working with a modular architecture. 
  
-The codebase is organised into modules including `entities`, `systems`, `state`, `config`, and `UI`, each responsible for a specific part of the game logic. In this implementation, `main.js` creates a `new p5()` instance that serves as the main entry point of the program. This instance loads `sketch.js`,  which defines the `setup()` and `draw()` functions. The `setup()` function initialises the game environment and loading required resources, and the `draw()` function runs continuously as the main game loop. During each frame, the game first processes player input, updates entity states, executes gameplay systems such as collision detection, respawing, and finally renders the updated game state to the screen. 
+The `main.js` creates a `new p5()` instance that serves as the main entry point of the program. This instance loads `sketch.js`,  which defines the `setup()` and `draw()` functions. The `setup()` function initialises the game environment and loading required resources, and the `draw()` function runs continuously as the main game loop. During each frame, the game first processes player input, updates entity states, executes gameplay systems such as collision detection, respawing, and finally renders the updated game state to the screen. 
 
 ## 4.2 Technical Challenge 1: CI/CD Pipeline 
 (250-300 words)
@@ -625,7 +653,7 @@ The qualitative evaluation aimed to identify usability problems and understand h
 </div>
 
 **A. Think Aloud**
-The think-aloud approach is widely used in usability studies because it provides rich qualitative data while requiring relatively little preparation or participant commitment (ref 1). We chose this approach to efficiently identify usability issues and better understand how players interact with the game during gameplay. During this method, users were asked to verbalise their thoughts while playing the game. This approach enabled us to identify specific usability bottlenecks and understand the reasoning behind user errors as they occurred.
+The think-aloud approach is widely used in usability studies because it provides rich qualitative data while requiring relatively little preparation or participant commitment[1]. We chose this approach to efficiently identify usability issues and better understand how players interact with the game during gameplay. During this method, users were asked to verbalise their thoughts while playing the game. This approach enabled us to identify specific usability bottlenecks and understand the reasoning behind user errors as they occurred.
 
 - Most users agreed the player movement controls were smooth. 
 - Some users were not aware there was a time limit in the game. 
@@ -642,7 +670,7 @@ The think-aloud approach is widely used in usability studies because it provides
 
 **B. Heuristic Evaluation**
 
-To complement user testing, we conducted a Nielsen’s heuristic evaluation. This method was selected because it is a well-established and cost-effective approach for identifying usability issues (ref 2). It enabled us to systematically evaluate the interface and identify potential design problems based on recognised usability guidelines. 
+To complement user testing, we conducted a Nielsen’s heuristic evaluation. This method was selected because it is a well-established and cost-effective approach for identifying usability issues[2]. It enabled us to systematically evaluate the interface and identify potential design problems based on recognised usability guidelines. 
 
 Table ? presents the usability issues identified during the heuristic evaluation.
 
@@ -662,12 +690,12 @@ Therefore, these two issues should be prioritised during the development process
 | 6 | No undo or quick restart option for mistakes | H3 - User Control and Freedom | 3 | 4 | 2 | 3.0 |
 
 <div align="center">
-<p><em>Figure ?: Usability issues identified in the heuristic evaluation (Presntation of the table was adapted from ref 4).</em></p>
+<p><em>Figure ?: Usability issues identified in the heuristic evaluation (Presntation of the table was adapted from [4]).</em></p>
 </div>
 
 
 ### 5.2. Quantitative Evaluation
-According to **author name** (ref 7), usabilty does not exist in any absolute sense but must be evaluated in relation to the context in which a system in used. To systematically measure usability and user experience within the context of our game, we adopted two widely used evaluation instruments: the System Usability Scale (SUS) and the NASA Task Load Index (NASA-TLX). 
+According to Brooke[7], usability does not exist in any absolute sense but must be evaluated in relation to the context in which a system is used. To systematically measure usability and user experience within the context of our game, we adopted two widely used evaluation instruments: the System Usability Scale (SUS) and the NASA Task Load Index (NASA-TLX). 
 
 SUS provides a quick and reliable measure of overall usability, allowing comparison with established benchmarks. NASA-TLX measures perceived workload across several dimensions, including mental demand, effort, and frustration. Using both metrics allows the evaluation to capture not only usability but also the cognitive effort required to play the game.
 
@@ -891,6 +919,14 @@ charater animation
 
 [8] “p5,” p5.js. Accessed: Apr. 12, 2026. [Online]. Available: https://p5js.org/reference/p5/p5/ (instance mode)
 
+[9] G. Booch, R. Maksimchuk, M. Engle, B. Young, J. Conallen, and K. Houston, Object-Oriented Analysis and Design with Applications, 3rd ed.
+Boston, MA, USA: Addison-Wesley, 2007. [Online]. Available:
+https://zjnu2017.github.io/OOAD/reading/Object.Oriented.Analysis.and.Design.with.Applications.3rd.Edition.by.Booch.pdf
+
+
+[10] I. F. Alexander, “A taxonomy of stakeholders: Human roles in system development,”
+Int. J. Technol. Human Interact., vol. 1, no. 1, pp. 23–59, 2005.
+doi: 10.4018/jthi.2005010102. (onion model)
 ### Appendix
 
 You can delete this section in your own repo, it's just here for information. in addition to the marks above, we will be marking you on the following two points:
