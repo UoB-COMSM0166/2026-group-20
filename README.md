@@ -276,7 +276,189 @@ The project adopts a modular game architecture that combines **Entity–Componen
 
 The system architecture in this project follows a hybrid approach, which combines some aspects of both ECS and OCD. The player is represented as an **entity** that stores data such as position and movement speed, whereas certain gameplay behaviours are handled by independent systems. For instance, the Physics System processes collision detection between the player and obstacles, and the Respawn Manager handles resetting the player when the character collides with a hazard. However, some game logic, such as the player’s movement, remains implemented within the player object itself.
 
-add class diagram here 
+```mermaid
+---
+config:
+  layout: elk
+  theme: neutral
+---
+classDiagram
+direction TB
+    class StateManager {
+	    +currentState
+	    +changeState(newState)
+	    +update()
+	    +render()
+    }
+
+    class InputHandler {
+	    +handleKeyboard()
+	    +handleMouse()
+	    +handleController()
+    }
+
+    class State {
+      +enter()
+	    +update()
+	    +render()
+	    +mousePressed()
+	    +keyPressed()
+	    +exit()
+    }
+
+    class BootState
+    class MapMenuState
+    class BuildState
+    class RunState
+    class ResultState
+    class ShopState
+
+    class PhysicsSystem {
+	    +applyGravity()
+	    +checkCollisions()
+	    +resolveMovement()
+    }
+
+    class MapLoader {
+	    +mapJSON
+	    +mapData
+	    +loadMap(jsonFile)
+	    +parseObjects()
+	    +getMapData()
+    }
+
+    class ScoreManager {
+	    +wallet
+	    +roundCoins
+	    +scores
+	    +collectCoin()
+	    +recordDeath()
+	    +getRankedScores()
+	    +resetRound()
+    }
+
+    class RespawnManager {
+	    +queue
+	    +triggerDeath()
+	    +update()
+	    +clear()
+    }
+
+    class HUD {
+	    +timeManager
+	    +scoreManager
+	    +render()
+    }
+
+    class Player {
+	    +x
+	    +y
+	    +vx
+	    +vy
+	    +playerNo
+	    +lifeState
+	    +movementState
+	    +update()
+	    +die()
+	    +prepareRespawn()
+	    +finishRespawn()
+    }
+
+    class Obstacle {
+	    +x
+	    +y
+	    +w
+	    +h
+	    +active
+	    +update()
+	    +applyEffect()
+	    +draw()
+    }
+
+    class Coin {
+	    +x
+	    +y
+	    +value
+	    +collected
+	    +update()
+	    +draw()
+    }
+
+    class Flag {
+	    +x
+	    +y
+	    +checkReached()
+	    +draw()
+    }
+
+    class PlayerScore {
+	    +playerNo
+	    +finished
+	    +finishTime
+	    +deaths
+	    +coins
+	    +wallet
+	    +rank
+    }
+
+    StateManager --> State : controls
+    InputHandler --> StateManager : 
+    State <|-- BootState
+    State <|-- MapMenuState
+    State <|-- BuildState
+    State <|-- RunState
+    State <|-- ResultState
+    State <|-- ShopState
+    InputHandler --> Player : controls movement
+    RunState --> InputHandler 
+    RunState --> PhysicsSystem 
+    RunState --> MapLoader : loads map
+    RunState --> ScoreManager 
+    RunState --> RespawnManager
+    RunState --> Player : updates
+    RunState --> Obstacle : updates
+    RunState --> Coin 
+    PhysicsSystem --> Player 
+    PhysicsSystem --> Obstacle : detects collision
+    MapLoader --> Obstacle : creates
+    MapLoader --> Coin : creates
+    MapLoader --> Flag : creates
+    ScoreManager --> Player : tracks
+    ScoreManager --> PlayerScore : manages
+    RespawnManager --> Player : respawns
+    RespawnManager --> ScoreManager : records deaths
+    HUD --> Player : displays info
+    HUD --> ScoreManager : displays
+    Player --> Obstacle : collides with
+    Player --> Coin : collects
+    Player --> Flag : reaches
+
+	class StateManager:::Aqua
+	class InputHandler:::Aqua
+	class State:::Sky
+	class BootState:::Sky
+	class MapMenuState:::Sky
+	class BuildState:::Sky
+	class RunState:::Sky
+	class ResultState:::Sky
+	class ShopState:::Sky
+	class PhysicsSystem:::Aqua
+	class MapLoader:::Rose
+	class ScoreManager:::Aqua
+	class RespawnManager:::Aqua
+	class HUD:::Ash
+	class Player:::Peach
+	class Obstacle:::Peach
+	class Coin:::Peach
+	class Flag:::Peach
+	class PlayerScore:::Aqua
+
+	classDef Sky fill:#E2EBFF,stroke:#6B86C9,color:#374D7C,stroke-width:2px
+  classDef Peach fill:#FFEFDB,stroke:#E0A24F,color:#8F632D,stroke-width:2px
+  classDef Aqua fill:#DEFFF8,stroke:#35BFA5,color:#378E7A,stroke-width:2px
+  classDef Rose fill:#FFDFE5,stroke:#D24A64,color:#8E2236,stroke-width:2px
+  classDef Ash fill:#EEEEEE,stroke:#888888,color:#000000,stroke-width:2px
+```
 
 ### 3.2 Entities 
 
