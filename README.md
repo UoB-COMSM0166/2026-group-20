@@ -799,7 +799,7 @@ add testing
 
 (15% ~750 words)
 
-- Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project.
+- Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project. (add kanban)
 
 
 ### 6.1 Team Organisation 
@@ -835,8 +835,39 @@ This approach was chosen because the gameplay relies heavily on interactions bet
 
 Additionally, we wanted users to experience the core gameplay at an early stage so that we could gather feedback and identify areas for improvement. For this reason, the team developed basic versions of key systems to produce a Minimum Viable Product (MVP) as early as possible. The game was then progressively refined through subsequent sprint cycles, with placeholder assets replaced and mechanics polished iteratively.
 
-(add a diagram here) 
 
+```mermaid
+---
+config:
+  theme: redux
+---
+flowchart LR
+ subgraph Iteration_1["Iteration 1"]
+        A1["Basic Player Movement"]
+        B1["Basic Map Layout"]
+        C1["Basic Obstacles"]
+        D1["Basic Wallet System"]
+  end
+ subgraph Iteration_2["Iteration 2"]
+        A2["Character Animation"]
+        B2["Map Asset Design"]
+        C2["More Obstacles"]
+        D2["Coin Collection"]
+  end
+ subgraph Iteration_3["Iteration 3"]
+        A3["Refined Character Design"]
+        B3["Refined Map Layout"]
+        C3["Obstacle Animation"]
+        D3["Shop System"]
+  end
+    A1 --> A2
+    B1 --> B2
+    B2 --> B3
+    C1 --> C2
+    C2 --> C3
+    D1 --> D2
+    D2 --> D3
+```
 
 ### 6.3. Sprint Workflow  
 
