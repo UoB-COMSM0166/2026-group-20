@@ -19,13 +19,12 @@ import { WalkMapState }  from './states/WalkMapState.js';
 import { GameConfig } from './config/GameConfig.js';
 import { AnimationConfigChick } from './config/AnimationConfigChick.js';
 import { AnimationConfigBunny } from './config/AnimationConfigBunny.js';
-//import { AnimationConfigDuck } from './config/AnimationConfigDuck.js';
-//import { AnimationConfigPolar } from './config/AnimationConfigPolar.js';
+
 // import images
-import chickenSprite from './assets/sprites/chicken_all_frames2-biggerCharacter.png';
-import bunnySprite from './assets/sprites/bunny_all_frames-biggerCharacter.png';
-import duckSprite from './assets/sprites/duck_all_frames_flipped-biggerCharacter.png';
-import polarSprite from './assets/sprites/polar_all_frames_flipped-biggerCharacter.png';
+import chickenSprite from './assets/sprites/chicken_all_frames.png';
+import bunnySprite from './assets/sprites/bunny_all_frames.png';
+import duckSprite from './assets/sprites/duck_all_frames.png';
+import polarSprite from './assets/sprites/polar_all_frames.png';
 
 import saw from './assets/obstacles/Saw/On (38x38).png';
 import fire from './assets/obstacles/Fire/On (16x32).png';

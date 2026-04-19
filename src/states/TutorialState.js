@@ -118,7 +118,7 @@ export class TutorialState extends State {
         }
     }
 
-    // ── Private render helpers ────────────────────────────────────────────
+    // ── Private render helpers ─
 
     _renderControlsPage(p, panX, panY, panW, panH, mx, my) {
         const { gameWidth, gameHeight } = this.ctx;
@@ -186,7 +186,7 @@ export class TutorialState extends State {
         p.text('✦  Double Jump:', boxX + 16, boxY + 10);
         p.fill(210, 225, 255);
         p.text(
-            'Press jump once to jump,\nthen press jump again mid-air for a second jump!',
+            'Press jump once to jump,\nthen press jump again for a second jump!',
             boxX + 16,
             boxY + 24,
         );
@@ -209,7 +209,7 @@ export class TutorialState extends State {
         p.fill(180, 200, 255);
         p.textAlign(p.CENTER, p.TOP);
         p.textSize(9);
-        p.text('GAME FLOW', cx, panY + 14);
+        p.text('BATTLE PLAN', cx, panY + 14);
 
         p.stroke(50, 65, 110);
         p.strokeWeight(1);
@@ -230,7 +230,7 @@ export class TutorialState extends State {
 
         const phases = [
             {
-                icon: '🎭', label: 'Character Select',
+                icon: '🎭', label: 'The Characters',
                 colour: [180, 140, 255],
                 lines: [
                     'Each player picks a character in turn.',
@@ -239,33 +239,34 @@ export class TutorialState extends State {
                 ],
             },
             {
-                icon: '🔨', label: 'Build Phase',
+                icon: '🔨', label: 'Trap Settings',
                 colour: [255, 200, 80],
                 lines: [
-                    'P1 then P2 place obstacles on the map.',
-                    'Select a type from the palette, click to place.',
-                    '↩ Undo Last or right-click a tile to remove.',
-                    'ENTER confirms your turn.',
+                    'P1 places traps first, then P2.',
+                    'Select a trap from the palette, then click to place it.',
+                    'Backspace or right-click a tile to remove a trap.',
+                    'Press ENTER to confirm your setup.',
                 ],
             },
             {
-                icon: '🏃', label: 'Run Phase',
+                icon: '🏃', label: 'The Race',
                 colour: [100, 220, 120],
                 lines: [
-                    'Race to the GOAL tile before time runs out.',
-                    'Collect coins — they become gold after the round.',
+                    'Race to the GOAL before time runs out.',
+                    'Collect coins during the race.',
+                    'Coins convert to gold after the round.',
                     'Dying loses your round coins, not your gold.',
-                    'ESC or ✕ Quit to return to the map menu.',
+                    'Press ESC or X to quit the race.',
                 ],
             },
             {
-                icon: '🛒', label: 'Shop Phase',
+                icon: '🛒', label: 'Powerup Shop',
                 colour: [80, 190, 255],
                 lines: [
-                    'Spend gold on obstacle tokens for Build phases.',
-                    '1 Teleporter token places one portal pair.',
+                    'Spend gold to buy obstacle tokens.',
+                    '1 Teleporter = 2 linked portals.',
                     'Buy as many tokens as you can afford.',
-                    'ENTER or Done to finish shopping.',
+                    'Press ENTER or Done to finish shopping.',
                 ],
             },
         ];

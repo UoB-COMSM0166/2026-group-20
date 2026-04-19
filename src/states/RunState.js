@@ -230,7 +230,7 @@ export class RunState extends State {
         p.fill(100, 200, 120);
         p.textAlign(p.CENTER, p.TOP);
         p.textSize(6);
-        p.text('RUN PHASE', gameWidth / 2, 8);
+        p.text('The Run', gameWidth / 2, 8);
 
         // HUD — timer
         p.fill(255);

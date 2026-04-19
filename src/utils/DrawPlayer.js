@@ -50,22 +50,22 @@ export function DrawPlayer(player) {
     }
 
     // ── HUD label above player ─
-    p.noStroke();
-    p.fill(255);
-    p.textAlign(p.CENTER, p.BOTTOM);
-    p.textSize(6);
-    p.textFont(GameConfig.FONT);
+    // p.noStroke();
+    // p.fill(255);
+    // p.textAlign(p.CENTER, p.BOTTOM);
+    // p.textSize(6);
+    // p.textFont(GameConfig.FONT);
 
-    if (player.lifeState === PlayerState.RESPAWNING) {
-        p.fill(255, 100, 100);
-        p.text(
-            Math.ceil(player.respawnCountdown) + 's',
-            player.x + player.w / 2,
-            player.y - 5,
-        );
-    } else {
-        p.text(player.movementState, player.x + player.w / 2, player.y - 5);
-    }
+    // if (player.lifeState === PlayerState.RESPAWNING) {
+    //     p.fill(255, 100, 100);
+    //     p.text(
+    //         Math.ceil(player.respawnCountdown) + 's',
+    //         player.x + player.w / 2,
+    //         player.y - 5,
+    //     );
+    // } else {
+    //     p.text(player.movementState, player.x + player.w / 2, player.y - 5);
+    // }
 }
 
 /**

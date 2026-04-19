@@ -399,7 +399,7 @@ export class BuildState extends State {
         p.fill(...col);
         p.textAlign(p.CENTER, p.TOP);
         p.textSize(7);
-        p.text(`P${this._currentTurn + 1} — BUILD PHASE`, gameWidth / 2, this.ctx.devMode ? 52 : 10);
+        p.text(`P${this._currentTurn + 1} — TRAP SETTINGS`, gameWidth / 2, this.ctx.devMode ? 52 : 10);
 
         p.fill(180, 180, 200);
         p.textSize(5.5);

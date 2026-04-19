@@ -187,18 +187,21 @@ export class WalkMapState extends State {
         p.rect(0, gH - T, gW, 4);
 
         // Title
-        p.fill(180, 200, 255);
+        p.fill(255);
         p.textAlign(p.CENTER, p.TOP);
         p.textSize(9);
-        p.text('SELECT YOUR MAP', gW / 2, 16);
-        p.fill(160, 160, 190);
+        p.text('SELECT YOUR MAP', gW / 2, 10);
+
+        if (p.frameCount % 120 < 80) {
+            p.fill(255);
+            p.textSize(5);
+            p.text('Double jump over your choice to lock in the match', gW / 2, 45);
+        }
+
+        p.fill(255, 150);
         p.textSize(5);
-        p.text('Use double jump to select the map', gW / 2, 40);
-        p.fill(100, 110, 155);
-        p.textSize(5);
-        p.text('ESC to go back', gW / 2, 56);
+        p.text('ESC TO GO BACK', gW / 2, 70);
         
-        // 显示两个玩家选择的角色
         const p1Char = players[0]?.character?.displayName || 'Character';
         const p2Char = players[1]?.character?.displayName || 'Character';
         p.textAlign(p.LEFT, p.TOP);
