@@ -558,7 +558,7 @@ The following diagram (Figure ?) illustrates the transitions between different g
 ---
 config:
   layout: dagre
-  theme: default
+  theme: basic
 ---
 stateDiagram
   direction LR
@@ -579,6 +579,7 @@ stateDiagram
   GameEnd --> Shop
   Shop --> ObstacleSelection
 
+  style Boot fill:#E2EBFF
   style StartMenu fill:#E2EBFF
   style CharacterSelection fill:#E2EBFF
   style MapSelection fill:#E2EBFF
