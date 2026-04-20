@@ -67,7 +67,10 @@ export class MovingPlatform extends Obstacle {
         if (this.obstacleSheet) {
             const frameCount = Math.max(1, Math.floor(this.obstacleSheet.width / 32));
             const frame = Math.floor((this._animAge / 120) % frameCount);
-            p.image(this.obstacleSheet, this.x, this.y, this.w, this.h, frame * 32, 0, 32, 8);
+            const dw = this.w;
+            const dh = dw * (8 / 32);
+            const dy = this.y + (this.h - dh) / 2;
+            p.image(this.obstacleSheet, this.x, dy, dw, dh, frame * 32, 0, 32, 8);
             return;
         }
         p.noStroke();
@@ -106,7 +109,9 @@ export class MovingPlatform extends Obstacle {
         if (sprite) {
             p.push();
             p.tint(255, 150);
-            p.image(sprite, x, y, T, T, 0, 0, 32, 8);
+            const dh = T * (8 / 32);
+            const dy = y + (T - dh) / 2;
+            p.image(sprite, x, dy, T, dh, 0, 0, 32, 8);
             p.pop();
             return;
         }

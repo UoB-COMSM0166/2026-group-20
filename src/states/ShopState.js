@@ -2,6 +2,8 @@ import { State } from './State.js';
 import { GameStage } from '../config/GameStage.js';
 import { GameConfig } from '../config/GameConfig.js';
 import { ObstacleType } from '../config/ObstacleType.js';
+import { drawShadowIcon } from '../utils/ShadowIcon.js';
+import { drawBombIcon } from '../utils/BombIcon.js';
 
 const ITEM_SUMMARIES = {
     PLATFORM: 'Solid support block.',
@@ -390,6 +392,7 @@ export class ShopState extends State {
         this._message = '';
         this._currentTurn++;
         if (this._currentTurn >= this.ctx.players.length) {
+            this.ctx.mapManager?.generateRandomMap?.(this.ctx.mapKey, this.ctx);
             this.goTo(GameStage.BUILD);
         }
     }
@@ -443,33 +446,9 @@ export class ShopState extends State {
             );
             p.image(img, dx, dy, dw, dh, sx, sy, sw, sh);
         } else if (type === ObstacleType.BOMB) {
-            const cx = x + w / 2;
-            const cy = y + h / 2 + 3;
-            p.noStroke();
-            p.fill(38, 42, 50);
-            p.circle(cx, cy, Math.min(w, h) - 12);
-            p.stroke(210, 160, 60);
-            p.strokeWeight(3);
-            p.noFill();
-            p.arc(cx + 10, cy - 14, 18, 18, Math.PI, Math.PI * 1.7);
-            p.noStroke();
-            p.fill(255, 180, 80);
-            p.circle(cx + 16, cy - 20, 6);
+            drawBombIcon(p, x, y, w, h);
         } else if (type === ObstacleType.SHADOW) {
-            const cx = x + w / 2;
-            const cy = y + h / 2;
-            p.noStroke();
-            p.fill(70, 46, 122, 210);
-            p.circle(cx, cy, Math.min(w, h) - 12);
-            p.stroke(210, 180, 255);
-            p.strokeWeight(2);
-            p.noFill();
-            p.circle(cx, cy, Math.min(w, h) - 18);
-            p.noStroke();
-            p.fill(240, 230, 255);
-            p.textAlign(p.CENTER, p.CENTER);
-            p.textSize(18);
-            p.text('◌', cx, cy + 1);
+            drawShadowIcon(p, x, y, w, h);
         } else {
             p.noStroke();
             p.fill(...this._itemColor(type));
@@ -478,67 +457,88 @@ export class ShopState extends State {
         p.pop();
     }
 
+    _fitIconRect(x, y, w, h, sourceW, sourceH, maxW = w, maxH = h) {
+        const scale = Math.min(maxW / sourceW, maxH / sourceH);
+        const dw = sourceW * scale;
+        const dh = sourceH * scale;
+        return {
+            dx: x + (w - dw) / 2,
+            dy: y + (h - dh) / 2,
+            dw,
+            dh,
+        };
+    }
+
     _iconDrawSpec(type, img, x, y, w, h) {
         if (type === ObstacleType.MOVING_PLATFORM) {
+            const fit = this._fitIconRect(x, y, w, h, 32, 8, w, h);
             return {
                 sx: 0, sy: 0, sw: 32, sh: 8,
-                dx: x + 4, dy: y + Math.floor(h / 2) - 7, dw: w - 8, dh: 14,
+                ...fit,
             };
         }
 
         if (type === ObstacleType.FALLING_PLATFORM) {
+            const fit = this._fitIconRect(x, y, w, h, 32, 10, w, h);
             return {
                 sx: 0, sy: 0, sw: 32, sh: 10,
-                dx: x + 5, dy: y + Math.floor(h / 2) - 7, dw: w - 10, dh: 14,
+                ...fit,
             };
         }
 
         if (type === ObstacleType.BOUNCE_PAD) {
+            const fit = this._fitIconRect(x, y, w, h, 28, 28, w, h);
             return {
                 sx: 0, sy: 0, sw: 28, sh: 28,
-                dx: x + 8, dy: y + 8, dw: w - 16, dh: h - 16,
+                ...fit,
             };
         }
 
         if (type === ObstacleType.SAW) {
+            const fit = this._fitIconRect(x, y, w, h, 38, 38, w, h);
             return {
                 sx: 0, sy: 0, sw: 38, sh: 38,
-                dx: x + 8, dy: y + 8, dw: w - 16, dh: h - 16,
+                ...fit,
             };
         }
 
         if (type === ObstacleType.FLAME) {
+            const fit = this._fitIconRect(x, y, w, h, 16, 32, w, h);
             return {
                 sx: 0, sy: 0, sw: 16, sh: 32,
-                dx: x + 15, dy: y + 6, dw: w - 30, dh: h - 12,
+                ...fit,
             };
         }
 
         if (type === ObstacleType.WIND_ZONE) {
+            const fit = this._fitIconRect(x, y, w, h, 32, 32, w, h);
             return {
                 sx: 0, sy: 0, sw: 32, sh: 32,
-                dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+                ...fit,
             };
         }
 
         if (type === ObstacleType.CANNON) {
+            const fit = this._fitIconRect(x, y, w, h, 30, 18, w, h);
             return {
                 sx: 0, sy: 0, sw: 30, sh: 18,
-                dx: x + 7, dy: y + 14, dw: w - 14, dh: 26,
+                ...fit,
             };
         }
 
         if (type === ObstacleType.SPIKED_BALL) {
+            const fit = this._fitIconRect(x, y, w, h, 28, 28, w, h);
             return {
                 sx: 0, sy: 0, sw: 28, sh: 28,
-                dx: x + 8, dy: y + 8, dw: w - 16, dh: h - 16,
+                ...fit,
             };
         }
 
         if (type === ObstacleType.TELEPORTER) {
+            const fit = this._fitIconRect(x, y, w, h, 40, 40, w, h);
             return {
                 sx: 0, sy: 0, sw: 40, sh: 40,
-                dx: x + 4, dy: y + 4, dw: w - 8, dh: h - 8,
+                ...fit,
             };
         }
 
@@ -547,15 +547,17 @@ export class ShopState extends State {
             type === ObstacleType.ICE_PLATFORM ||
             type === ObstacleType.ICE_BLOCK
         ) {
+            const fit = this._fitIconRect(x, y, w, h, 40, 40, w, h);
             return {
                 sx: 0, sy: 0, sw: 40, sh: 40,
-                dx: x + 5, dy: y + 5, dw: w - 10, dh: h - 10,
+                ...fit,
             };
         }
 
+        const fit = this._fitIconRect(x, y, w, h, img.width, img.height, w, h);
         return {
             sx: 0, sy: 0, sw: img.width, sh: img.height,
-            dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+            ...fit,
         };
     }
 }

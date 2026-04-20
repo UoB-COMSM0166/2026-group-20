@@ -1,6 +1,7 @@
 import { State } from './State.js';
 import { GameStage } from '../config/GameStage.js';
 import { Scoreboard } from '../ui/Scoreboard.js';
+import { GameOverScreen } from '../ui/GameOverScreen.js';
 import { LeaderboardManager } from '../systems/LeaderboardManager.js';
 
 /**
@@ -20,7 +21,10 @@ import { LeaderboardManager } from '../systems/LeaderboardManager.js';
 export class ResultsState extends State {
     enter() {
         const { p, gameWidth, gameHeight, players, scoreManager, mapKey } = this.ctx;
-        this.scoreboard = new Scoreboard(p, gameWidth, gameHeight);
+        this._isFinalRound = scoreManager.currentRound >= scoreManager.maxRounds;
+        this.scoreboard = this._isFinalRound
+            ? new GameOverScreen(p, gameWidth, gameHeight)
+            : new Scoreboard(p, gameWidth, gameHeight);
 
         // Record this round to the leaderboard
         const key = mapKey ?? 'map1';
@@ -32,9 +36,11 @@ export class ResultsState extends State {
 
     render(mx, my) {
         const { p, gameWidth, gameHeight } = this.ctx;
-        this.scoreboard.render(this.ctx.scoreManager);
+        this.scoreboard.render(this.ctx.scoreManager, this.ctx.players);
 
         // Leaderboard toggle button (top-right)
+        if (this._isFinalRound) return;
+
         const btnW = 120, btnH = 28;
         const btnX = gameWidth - btnW - 10;
         const btnY = 10;
@@ -108,6 +114,8 @@ export class ResultsState extends State {
     }
 
     mousePressed(mx, my) {
+        if (this._isFinalRound) return;
+
         const { gameWidth } = this.ctx;
         const btnW = 130, btnH = 28;
         const btnX = gameWidth - btnW - 10;
@@ -119,9 +127,10 @@ export class ResultsState extends State {
     keyPressed() {
         const { p } = this.ctx;
         if (p.key === 'l' || p.key === 'L') {
+            if (this._isFinalRound) return;
             this._showLB = !this._showLB;
         } else if (p.keyCode === p.ENTER || p.keyCode === 13) {
-            this.goTo(GameStage.SHOP);
+            this.goTo(this._isFinalRound ? GameStage.MENU : GameStage.SHOP);
         } else if (p.keyCode === p.ESCAPE) {
             this.goTo(GameStage.MENU);
         }

@@ -39,7 +39,7 @@ import spikePlatform from './assets/obstacles/Spike Platforms/spike platform (40
 import teleporter from './assets/obstacles/Teleporter/teleporter (40x40).png';
 import windZone from './assets/obstacles/Wind Zone/wind zone (32x32).png';
 import iceBlock from './assets/obstacles/Ice Block/ice block (40x40).png';
-import endpointFlag from './assets/endpoint/Checkpoint (Flag Idle)(64x64).png';
+import endpointFlag from './assets/obstacles/endpoint/Checkpoint(FlagIdle)(64x64).png';
 import map1Preview from './assets/maps/map1/background.png';
 import map2Preview from './assets/maps/map2/background.png';
 import startScreen from './assets/images/background/startscreen-bg.png';

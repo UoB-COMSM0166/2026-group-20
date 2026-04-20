@@ -32,7 +32,7 @@ export class SplashScreen {
             buttonY,
             GameConfig.BUTTON1_W,
             GameConfig.BUTTON1_H,
-            'PLAY',
+            'TUTORIAL',
         );
         this.button2 = new RectButton(
             p,
@@ -169,7 +169,7 @@ export class SplashScreen {
     }
 
     menuActionAt(mx, my) {
-        if (this.button1.isHovered(mx, my)) return 'play';
+        if (this.button1.isHovered(mx, my)) return 'tutorial';
         if (this.button2.isHovered(mx, my)) return 'settings';
         return null;
     }

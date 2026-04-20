@@ -31,7 +31,6 @@ export class RunState extends State {
             this.ctx.audioManager?.playMusic();
             return;
         }
-
         const { p, gameWidth, gameHeight, players, scoreManager, tiledMap } = this.ctx;
 
         this.coins        = tiledMap.getCoins(this.ctx.placedObstacles);
@@ -44,7 +43,7 @@ export class RunState extends State {
         this._backpackPlayer = 0;
         this._timelineFrozen = false; // dev mode: freeze time
         this._runTime = 0;
-        this._resetRound();
+        this._resetRound(true);
     }
 
     update(deltaTime) {
@@ -206,6 +205,24 @@ export class RunState extends State {
         p.push();
         p.translate(worldView.x, worldView.y);
         p.scale(worldView.scale);
+        const bg = this.ctx.backgroundImage;
+        if (bg) {
+            p.image(
+                bg,
+                0,
+                0,
+                this.ctx.mapPixelWidth ?? gameWidth,
+                this.ctx.mapPixelHeight ?? gameHeight,
+            );
+            p.noStroke();
+            p.fill(8, 14, 24, 110);
+            p.rect(
+                0,
+                0,
+                this.ctx.mapPixelWidth ?? gameWidth,
+                this.ctx.mapPixelHeight ?? gameHeight,
+            );
+        }
         tiledMap.render();
         tiledMap.renderEndpoint(this.ctx.endpointFlag);
 
@@ -226,11 +243,13 @@ export class RunState extends State {
         p.pop();
 
         // HUD — phase label
+        const hudTop = 8;
+        const hudGap = 22;
         p.noStroke();
         p.fill(100, 200, 120);
         p.textAlign(p.CENTER, p.TOP);
         p.textSize(6);
-        p.text('The Run', gameWidth / 2, 8);
+        p.text('The Run', gameWidth / 2, hudTop);
 
         // HUD — timer
         p.fill(255);
@@ -239,7 +258,16 @@ export class RunState extends State {
         p.text(
             `Time: ${Math.ceil(this.timeManager.timeLeft)}s`,
             gameWidth / 2,
-            26,
+            hudTop + hudGap,
+        );
+
+        p.fill(200, 200, 210);
+        p.textSize(6);
+        p.textAlign(p.CENTER, p.TOP);
+        p.text(
+            `Round ${this.ctx.scoreManager.currentRound} / ${this.ctx.scoreManager.maxRounds}`,
+            gameWidth / 2,
+            hudTop + hudGap * 2,
         );
 
         // HUD — per-player coins + wallet + inventory bag
@@ -267,7 +295,7 @@ export class RunState extends State {
         p.fill(160, 160, 180);
         p.textSize(5);
         p.textAlign(p.CENTER, p.TOP);
-        p.text('P1: A/D + W   P2: ←/→ + ↑   ESC: Pause', gameWidth / 2, 52);
+        p.text('P1: A/D + W   P2: ←/→ + ↑   ESC: Pause', gameWidth / 2, hudTop + hudGap * 3);
 
         // Backpack overlay
         if (this._showBackpack) {
@@ -383,7 +411,7 @@ export class RunState extends State {
         if (this.pauseManager.isPaused) {
             this.pauseManager.mousePressed(mx, my,
                 () => this.pauseManager.resume(),
-                () => { this._resetRound(); this.pauseManager.resume(); },
+                () => { this._resetRound(false); this.pauseManager.resume(); },
                 () => {
                     // Store where to return so TutorialState knows to come back
                     this.ctx.tutorialReturnStage = GameStage.RUN;
@@ -468,12 +496,12 @@ export class RunState extends State {
         this.ctx.audioManager?.stopMusic();
     }
 
-    _resetRound() {
+    _resetRound(advanceRound) {
         const { players, scoreManager } = this.ctx;
 
         this.respawnManager.clear();
         this.timeManager.reset();
-        scoreManager.resetRound();
+        scoreManager.resetRound({ advanceRound });
 
         this.coins = this.ctx.tiledMap.getCoins(this.ctx.placedObstacles);
         for (const coin of this.coins) coin.reset();

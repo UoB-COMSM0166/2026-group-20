@@ -25,6 +25,8 @@ export class TiledMapLoader {
 
         this.mapData = null;
         this.tilesetImage = null;
+        this.coinSprite = null;
+        this.endPointSprite = null;
         this.imageLayerAssets = new Map();
         this.visualBlockMap = [];
 
@@ -48,6 +50,14 @@ export class TiledMapLoader {
         this.GID_FLIP_D = 0x20000000;
 
         this._tilesetsSorted = [];
+    }
+
+    setCoinSprite(img) {
+        this.coinSprite = img ?? null;
+    }
+
+    setEndpointSprite(img) {
+        this.endPointSprite = img ?? null;
     }
 
     // preload JSON and tileset image
@@ -137,7 +147,7 @@ export class TiledMapLoader {
         }
     }
 
-    renderEndpoint(flagSprite) {
+    renderEndpoint(flagSprite = this.endPointSprite) {
         if (!flagSprite || !this.endW || !this.endH) return;
 
         const p = this.p;
@@ -148,6 +158,52 @@ export class TiledMapLoader {
         const drawX = this.endX + this.endW / 2 - frameW / 2;
         const drawY = this.endY + this.endH - frameH;
         const srcX = frameIndex * frameW;
+        const pulse = 0.72 + 0.28 * Math.sin(p.frameCount * 0.08);
+        const glowCx = drawX + frameW / 2;
+        const glowCy = drawY + frameH * 0.56;
+        const baseY = drawY + frameH - 6;
+        const markerY = drawY - 16 + Math.sin(p.frameCount * 0.14) * 2.5;
+
+        p.push();
+        p.noStroke();
+        p.fill(120, 220, 255, 24 * pulse);
+        p.rect(glowCx - 7, drawY - 46, 14, frameH + 56, 5);
+        p.fill(120, 220, 255, 14 * pulse);
+        p.rect(glowCx - 14, drawY - 34, 28, frameH + 36, 8);
+        p.fill(255, 230, 110, 72 * pulse);
+        p.ellipse(glowCx, glowCy, frameW * 0.95, frameH * 0.95);
+        p.fill(120, 220, 255, 44 * pulse);
+        p.ellipse(glowCx, glowCy, frameW * 1.3, frameH * 1.18);
+        p.fill(120, 220, 255, 34 * pulse);
+        p.ellipse(glowCx, baseY + 1, frameW * 2.0, 24);
+        p.fill(120, 220, 255, 40 * pulse);
+        p.ellipse(glowCx, baseY, frameW * 1.55, 18);
+        p.fill(255, 230, 110, 65 * pulse);
+        p.ellipse(glowCx, baseY, frameW * 1.1, 10);
+        p.stroke(255, 245, 160, 230);
+        p.strokeWeight(2.5);
+        p.noFill();
+        p.rect(drawX - 5, drawY - 5, frameW + 10, frameH + 10, 6);
+        p.fill(255, 240, 170, 230);
+        p.noStroke();
+        p.triangle(
+            glowCx,
+            markerY,
+            glowCx - 9,
+            markerY + 13,
+            glowCx + 9,
+            markerY + 13,
+        );
+        p.fill(18, 24, 38, 235);
+        p.stroke(255, 245, 160, 220);
+        p.strokeWeight(1.7);
+        p.rect(glowCx - 30, drawY - 35, 60, 18, 4);
+        p.noStroke();
+        p.fill(255, 245, 170);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(5.2);
+        p.text('GOAL', glowCx, drawY - 25.5);
+        p.pop();
 
         p.image(
             flagSprite,
@@ -281,7 +337,15 @@ export class TiledMapLoader {
                     // else: stay in place — count always preserved
                 }
 
-                coins.push(new Coin(this.p, cx, cy, GameConfig.COIN_VALUE));
+                coins.push(
+                    new Coin(
+                        this.p,
+                        cx,
+                        cy,
+                        GameConfig.COIN_VALUE,
+                        this.coinSprite,
+                    ),
+                );
             }
         }
 

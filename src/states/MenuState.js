@@ -64,7 +64,10 @@ export class MenuState extends State {
         }
 
         const action = this.splashScreen.menuActionAt(mx, my);
-        if (action === 'play') {
+        if (action === 'tutorial') {
+            this.ctx.tutorialReturnStage = GameStage.MENU;
+            this.goTo(GameStage.TUTORIAL);
+        } else if (action === 'play') {
             this.goTo(GameStage.CHAR_SELECT);
         } else if (action === 'settings') {
             this._showSettings = true;

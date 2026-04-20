@@ -1,6 +1,7 @@
 import { Obstacle } from '../Obstacle.js';
 import { GameConfig } from '../../config/GameConfig.js';
 import { DeathReason } from '../../config/DeathReason.js';
+import { drawBombIcon } from '../../utils/BombIcon.js';
 
 /**
  * Bomb — proximity explosive that clears placed obstacles.
@@ -95,47 +96,36 @@ export class Bomb extends Obstacle {
         const T  = GameConfig.TILE;
         const cx = this.x + T / 2;
         const cy = this.y + T / 2;
-        const r  = T * 0.38;
 
         // Flash red as fuse burns
         const flash = this._fuse
             ? (Math.sin(this._flashPhase * Math.PI) > 0 ? 1 : 0)
             : 0;
-        const bodyR = flash ? 255 : 60;
-        const bodyG = flash ? 60  : 60;
-        const bodyB = flash ? 60  : 60;
 
-        p.noStroke();
+        if (flash) {
+            p.noStroke();
+            p.fill(255, 80, 80, 90);
+            p.circle(cx, cy, T * 0.9);
+        }
 
-        // Shadow
-        p.fill(0, 0, 0, 60);
-        p.ellipse(cx + 3, cy + r + 4, T * 0.6, T * 0.18);
+        drawBombIcon(p, this.x, this.y, T, T);
 
-        // Body
-        p.fill(bodyR, bodyG, bodyB);
-        p.circle(cx, cy, r * 2);
-
-        // Highlight
-        p.fill(255, 255, 255, 60);
-        p.circle(cx - r * 0.25, cy - r * 0.3, r * 0.6);
-
-        // Fuse cord
         p.stroke(80, 60, 20);
         p.strokeWeight(2);
         p.noFill();
-        p.bezier(cx, cy - r,
-                 cx + 5, cy - r - 6,
-                 cx + 10, cy - r - 4,
-                 cx + 8, cy - r - 10);
+        p.bezier(cx, cy - T * 0.32,
+                 cx + 5, cy - T * 0.32 - 6,
+                 cx + 10, cy - T * 0.32 - 4,
+                 cx + 8, cy - T * 0.32 - 10);
 
         // Fuse spark when lit
         if (this._fuse) {
             const sparkR = 4 + Math.sin(this._age * 0.05) * 2;
             p.noStroke();
             p.fill(255, 200, 50);
-            p.circle(cx + 8, cy - r - 10, sparkR);
+            p.circle(cx + 8, cy - T * 0.32 - 10, sparkR);
             p.fill(255, 255, 150);
-            p.circle(cx + 8, cy - r - 10, sparkR * 0.5);
+            p.circle(cx + 8, cy - T * 0.32 - 10, sparkR * 0.5);
 
             // Countdown text
             const remaining = Math.max(0, (GameConfig.BOMB_FUSE_MS - this._fuseTimer) / 1000);
@@ -155,16 +145,11 @@ export class Bomb extends Obstacle {
     }
 
     static drawGhost(p, x, y) {
-        const T  = GameConfig.TILE;
-        const cx = x + T / 2;
-        const cy = y + T / 2;
-        p.noStroke();
-        p.fill(60, 60, 60, 130);
-        p.circle(cx, cy, T * 0.76);
-        p.fill(200, 200, 200, 160);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(20);
-        p.text('💣', cx, cy + 1);
+        const T = GameConfig.TILE;
+        p.push();
+        p.tint?.(255, 150);
+        drawBombIcon(p, x, y, T, T);
+        p.pop();
     }
 
     // ── Private ───────────────────────────────────────────────────────────

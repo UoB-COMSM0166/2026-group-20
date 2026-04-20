@@ -18,6 +18,8 @@ import { WindZone, WindDir } from '../entities/obstacles/WindZone.js';
 import { Teleporter } from '../entities/obstacles/Teleporter.js';
 import { Bomb } from '../entities/obstacles/Bomb.js';
 import { Shadow } from '../entities/obstacles/Shadow.js';
+import { drawShadowIcon } from '../utils/ShadowIcon.js';
+import { drawBombIcon } from '../utils/BombIcon.js';
 // import { drawMap, MAP } from '../maps/MapLoader.js';
 
 // Map tile characters that cannot be overwritten when placing obstacles
@@ -199,6 +201,12 @@ export class BuildState extends State {
     ];
 
     enter() {
+        this.ctx.mapManager?.refreshBackground?.(this.ctx);
+
+        if (this.ctx.shopHasRun && this.ctx.tiledMap === this.ctx.mapManager?.current) {
+            this.ctx.mapManager?.generateRandomMap?.(this.ctx.mapKey, this.ctx);
+        }
+
         // Round 1: shop has not run yet — skip straight to RUN
         if (!this.ctx.shopHasRun) {
             this.goTo(GameStage.RUN);
@@ -241,12 +249,12 @@ export class BuildState extends State {
         // Add all edge positions to queue
         for (let x = 0; x < cols; x++) {
             // Top edge
-            if (MAP[0][x] !== TileType.SOLID) {
+            if (!this._hasMapTerrain(x, 0)) {
                 queue.push({ x, y: 0 });
                 this._isReachable[0][x] = true;
             }
             // Bottom edge
-            if (MAP[rows - 1][x] !== TileType.SOLID) {
+            if (!this._hasMapTerrain(x, rows - 1)) {
                 queue.push({ x, y: rows - 1 });
                 this._isReachable[rows - 1][x] = true;
             }
@@ -254,12 +262,12 @@ export class BuildState extends State {
         
         for (let y = 0; y < rows; y++) {
             // Left edge
-            if (MAP[y][0] !== TileType.SOLID) {
+            if (!this._hasMapTerrain(0, y)) {
                 queue.push({ x: 0, y });
                 this._isReachable[y][0] = true;
             }
             // Right edge
-            if (MAP[y][cols - 1] !== TileType.SOLID) {
+            if (!this._hasMapTerrain(cols - 1, y)) {
                 queue.push({ x: cols - 1, y });
                 this._isReachable[y][cols - 1] = true;
             }
@@ -282,9 +290,9 @@ export class BuildState extends State {
                     continue;
                 }
                 
-                // Skip if already visited or if it's a solid platform
+                // Skip if already visited or if visible map terrain occupies this tile
                 if (this._isReachable[neighbor.y][neighbor.x] || 
-                    MAP[neighbor.y][neighbor.x] === TileType.SOLID) {
+                    this._hasMapTerrain(neighbor.x, neighbor.y)) {
                     continue;
                 }
                 
@@ -292,6 +300,15 @@ export class BuildState extends State {
                 queue.push(neighbor);
             }
         }
+    }
+
+    _hasMapTerrain(tx, ty) {
+        const { tiledMap } = this.ctx;
+        if (typeof tiledMap?.hasVisibleTerrain === 'function') {
+            return tiledMap.hasVisibleTerrain(tx, ty);
+        }
+        const tile = tiledMap?.MAP?.[ty]?.[tx];
+        return BLOCKED_TILES.has(tile);
     }
 
     update(_dt) {}
@@ -353,6 +370,24 @@ export class BuildState extends State {
         p.push();
         p.translate(worldView.x, worldView.y);
         p.scale(worldView.scale);
+        const bg = this.ctx.backgroundImage;
+        if (bg) {
+            p.image(
+                bg,
+                0,
+                0,
+                this.ctx.mapPixelWidth ?? gameWidth,
+                this.ctx.mapPixelHeight ?? gameHeight,
+            );
+            p.noStroke();
+            p.fill(8, 14, 24, 110);
+            p.rect(
+                0,
+                0,
+                this.ctx.mapPixelWidth ?? gameWidth,
+                this.ctx.mapPixelHeight ?? gameHeight,
+            );
+        }
         tiledMap.render();
         tiledMap.renderEndpoint(this.ctx.endpointFlag);
 
@@ -725,31 +760,15 @@ export class BuildState extends State {
                 p.noStroke();
             }
 
-            const iconX = bx + 4;
-            const iconY = by + 3;
-            const iconS = 16;
+            const iconX = bx + 3;
+            const iconY = by + 2;
+            const iconS = 18;
             p.fill(15, 18, 28);
             p.rect(iconX, iconY, iconS, iconS, 3);
             p.push();
             if (!available) p.tint(120, 120);
             else p.tint(255, 230);
-            if (sprites[item.type]) {
-                if (item.type === ObstacleType.MOVING_PLATFORM) {
-                    p.image(sprites[item.type], iconX + 1, iconY + 5, iconS - 2, 6, 0, 0, 32, 8);
-                } else if (item.type === ObstacleType.WIND_ZONE) {
-                    p.image(sprites[item.type], iconX + 1, iconY + 1, iconS - 2, iconS - 2, 0, 0, 32, 32);
-                } else if (item.type === ObstacleType.TELEPORTER) {
-                    p.image(sprites[item.type], iconX + 1, iconY + 1, iconS - 2, iconS - 2, 0, 0, 40, 40);
-                } else {
-                    p.image(sprites[item.type], iconX + 1, iconY + 1, iconS - 2, iconS - 2);
-                }
-            } else {
-                p.noTint();
-                p.fill(
-                    ...item.color.map((c) => (available ? c : Math.floor(c * 0.3))),
-                );
-                p.rect(iconX + 2, iconY + 2, iconS - 4, iconS - 4, 2);
-            }
+            this._drawPaletteIcon(item.type, iconX, iconY, iconS, iconS, available);
             p.pop();
 
             p.fill(available ? [210, 210, 235] : [65, 65, 75]);
@@ -808,8 +827,8 @@ export class BuildState extends State {
         p.text(nextLabel, gameWidth / 2, actionY + actionH / 2);
 
         if (hoveredItem) {
-            const tipW = 220;
-            const tipH = 44;
+            const tipW = 292;
+            const tipH = 72;
             const tipX = Math.min(mx + 12, gameWidth - tipW - 8);
             const tipY = pY - tipH - 6;
             p.noStroke();
@@ -822,17 +841,159 @@ export class BuildState extends State {
             p.noStroke();
             p.fill(225, 232, 255);
             p.textAlign(p.LEFT, p.TOP);
+            this._drawPaletteIcon(hoveredItem.type, tipX + 8, tipY + 8, 20, 20, true);
             p.textSize(4.8);
-            p.text(hoveredItem.label, tipX + 8, tipY + 7);
+            p.text(hoveredItem.label, tipX + 34, tipY + 8);
             p.fill(170, 178, 205);
-            p.textSize(4.2);
+            p.textSize(4.3);
             p.text(
                 BUILD_ITEM_DESCRIPTIONS[hoveredItem.type] ?? hoveredItem.hint,
                 tipX + 8,
-                tipY + 21,
+                tipY + 32,
                 tipW - 16,
+                tipH - 38,
             );
         }
+    }
+
+    _drawPaletteIcon(type, x, y, w, h, available = true) {
+        const { p, shopIcons } = this.ctx;
+        const img = shopIcons?.[type] ?? null;
+        p.push();
+        p.noSmooth();
+
+        if (img) {
+            const { sx, sy, sw, sh, dx, dy, dw, dh } = this._paletteIconDrawSpec(
+                type,
+                img,
+                x,
+                y,
+                w,
+                h,
+            );
+            p.image(img, dx, dy, dw, dh, sx, sy, sw, sh);
+            p.pop();
+            return;
+        }
+
+        if (type === ObstacleType.BOMB) {
+            drawBombIcon(p, x, y, w, h);
+            p.pop();
+            return;
+        }
+
+        if (type === ObstacleType.SHADOW) {
+            const boost = Math.max(1, Math.floor(Math.min(w, h) * 0.12));
+            drawShadowIcon(
+                p,
+                x - boost,
+                y - boost,
+                w + boost * 2,
+                h + boost * 2,
+            );
+            p.pop();
+            return;
+        }
+
+        const fallbackColour = BuildState.PALETTE.find((item) => item.type === type)?.color ?? [150, 150, 150];
+        p.noStroke();
+        p.fill(
+            ...fallbackColour.map((c) => (available ? c : Math.floor(c * 0.3))),
+        );
+        p.rect(x + 2, y + 2, w - 4, h - 4, 2);
+        p.pop();
+    }
+
+    _fitIconRect(x, y, w, h, sourceW, sourceH, maxW = w, maxH = h) {
+        const scale = Math.min(maxW / sourceW, maxH / sourceH);
+        const dw = sourceW * scale;
+        const dh = sourceH * scale;
+        return {
+            dx: x + (w - dw) / 2,
+            dy: y + (h - dh) / 2,
+            dw,
+            dh,
+        };
+    }
+
+    _paletteIconDrawSpec(type, img, x, y, w, h) {
+        if (type === ObstacleType.MOVING_PLATFORM) {
+            const fit = this._fitIconRect(x, y, w, h, 32, 8, w, h);
+            return {
+                sx: 0, sy: 0, sw: 32, sh: 8,
+                ...fit,
+            };
+        }
+
+        if (type === ObstacleType.FALLING_PLATFORM) {
+            const fit = this._fitIconRect(x, y, w, h, 32, 10, w, h);
+            return {
+                sx: 0, sy: 0, sw: 32, sh: 10,
+                ...fit,
+            };
+        }
+
+        if (type === ObstacleType.BOUNCE_PAD) {
+            const fit = this._fitIconRect(x, y, w, h, 28, 28, w, h);
+            return {
+                sx: 0, sy: 0, sw: 28, sh: 28,
+                ...fit,
+            };
+        }
+
+        if (type === ObstacleType.SAW) {
+            const fit = this._fitIconRect(x, y, w, h, 38, 38, w, h);
+            return {
+                sx: 0, sy: 0, sw: 38, sh: 38,
+                ...fit,
+            };
+        }
+
+        if (type === ObstacleType.CANNON) {
+            const fit = this._fitIconRect(x, y, w, h, 30, 18, w, h);
+            return {
+                sx: 0, sy: 0, sw: 30, sh: 18,
+                ...fit,
+            };
+        }
+
+        if (type === ObstacleType.WIND_ZONE) {
+            const fit = this._fitIconRect(x, y, w, h, 32, 32, w, h);
+            return {
+                sx: 0, sy: 0, sw: 32, sh: 32,
+                ...fit,
+            };
+        }
+
+        if (type === ObstacleType.TELEPORTER) {
+            const fit = this._fitIconRect(x, y, w, h, 40, 40, w, h);
+            return {
+                sx: 0, sy: 0, sw: 40, sh: 40,
+                ...fit,
+            };
+        }
+
+        if (type === ObstacleType.FLAME) {
+            const fit = this._fitIconRect(x, y, w, h, 16, 32, w, h);
+            return {
+                sx: 0, sy: 0, sw: 16, sh: 32,
+                ...fit,
+            };
+        }
+
+        if (type === ObstacleType.SPIKED_BALL) {
+            const fit = this._fitIconRect(x, y, w, h, img.width, img.height, w, h);
+            return {
+                sx: 0, sy: 0, sw: img.width, sh: img.height,
+                ...fit,
+            };
+        }
+
+        const fit = this._fitIconRect(x, y, w, h, img.width, img.height, w, h);
+        return {
+            sx: 0, sy: 0, sw: img.width, sh: img.height,
+            ...fit,
+        };
     }
 
     _handlePaletteClick(mx, my) {
@@ -916,14 +1077,8 @@ export class BuildState extends State {
             return true;
         }
         
-        // If this position is NOT reachable from the map edges, it's inside a platform
-        // Block it to prevent placement
-        if (this._isReachable && !this._isReachable[ty][tx]) {
-            return true;
-        }
-        
-        // Also block if the position itself is a solid platform
-        if (MAP[ty][tx] === TileType.SOLID) {
+        // Also block if visible map terrain occupies this tile
+        if (this._hasMapTerrain(tx, ty)) {
             return true;
         }
         

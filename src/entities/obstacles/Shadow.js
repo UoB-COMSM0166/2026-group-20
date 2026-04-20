@@ -3,6 +3,7 @@ import { Player } from '../Player.js';
 import { GameConfig } from '../../config/GameConfig.js';
 import { PlayerState } from '../../config/PlayerState.js';
 import { getPixelatedSprite } from '../../utils/PixelSprite.js';
+import { drawShadowIcon } from '../../utils/ShadowIcon.js';
 
 export class Shadow extends Obstacle {
     constructor(p, x, y, ctx) {
@@ -115,21 +116,18 @@ export class Shadow extends Obstacle {
         const cx = this.x + T / 2;
         const cy = this.y + T / 2;
         const pulse = 0.78 + Math.sin(this._age * 0.005) * 0.12;
+        const iconBoost = Math.max(2, Math.floor(T * 0.12));
 
         p.noStroke();
-        p.fill(40, 24, 62, 170);
-        p.circle(cx, cy, T * 0.74);
         p.fill(110, 70, 180, 85);
-        p.circle(cx, cy, T * 0.92 * pulse);
-        p.stroke(180, 120, 255, 180);
-        p.strokeWeight(2);
-        p.noFill();
-        p.circle(cx, cy, T * 0.8);
-        p.noStroke();
-        p.fill(235, 220, 255, 220);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(16);
-        p.text('◌', cx, cy + 1);
+        p.circle(cx, cy, T * 1.08 * pulse);
+        drawShadowIcon(
+            p,
+            this.x - iconBoost,
+            this.y - iconBoost,
+            T + iconBoost * 2,
+            T + iconBoost * 2,
+        );
 
         const activeCooldown = this._cooldowns.size > 0;
         if (activeCooldown) {

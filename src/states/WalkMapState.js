@@ -158,23 +158,12 @@ export class WalkMapState extends State {
         // Background
         if (this.ctx.walkMapBg) {
             const bg = this.ctx.walkMapBg;
-            const imgRatio = bg.width / bg.height;
-            const canvasRatio = gW / gH;
-
-            let sx = 0;
-            let sy = 0;
-            let sw = bg.width;
-            let sh = bg.height;
-
-            if (imgRatio > canvasRatio) {
-                sw = bg.height * canvasRatio;
-                sx = (bg.width - sw) / 2;
-            } else {
-                sh = bg.width / canvasRatio;
-                sy = (bg.height - sh) / 2;
-            }
-
-            p.image(bg, 0, 0, gW, gH, sx, sy, sw, sh);
+            const scale = Math.min(gW / bg.width, gH / bg.height);
+            const drawW = bg.width * scale;
+            const drawH = bg.height * scale;
+            const drawX = (gW - drawW) / 2;
+            const drawY = (gH - drawH) / 2;
+            p.image(bg, drawX, drawY, drawW, drawH);
         } else {
             p.background(12, 16, 28);
         }
