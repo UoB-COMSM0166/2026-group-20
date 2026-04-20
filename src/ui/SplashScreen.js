@@ -14,7 +14,7 @@ export class SplashScreen {
      * @param {string} stage - Current game stage
      */
     constructor(p, font) {
-         this.font=font;
+        this.font = font;
         // this.button1 = new RectButton(
         //     p,
         //     GameConfig.BUTTON1_X,
@@ -39,8 +39,8 @@ export class SplashScreen {
     render(p) {
         // placeholder title
         p.textAlign(p.CENTER, p.CENTER);
-         p.stroke(0); 
-         p.strokeWeight(8);
+        p.stroke(0);
+        p.strokeWeight(8);
         p.textFont(this.font, GameConfig.TITLE_FONTSIZE);
         p.fill(
             GameConfig.TITLE_COLOUR.r,
@@ -56,7 +56,7 @@ export class SplashScreen {
         // placeholder "press space to start"
         if (p.frameCount % 120 < 80) {
             p.textFont(this.font, GameConfig.PRESS_FONTSIZE);
-            p.stroke(0); 
+            p.stroke(0);
             p.strokeWeight(8);
             p.fill(
                 GameConfig.PRESS_COLOUR.r,
@@ -64,7 +64,7 @@ export class SplashScreen {
                 GameConfig.PRESS_COLOUR.b,
             );
             p.text(
-                'Press Space to Start', 
+                'Press Space to Start',
                 GameConfig.PRESS_X,
                 GameConfig.PRESS_Y,
             );

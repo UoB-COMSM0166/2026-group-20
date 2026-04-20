@@ -31,7 +31,7 @@ describe('PlayerScore', () => {
         });
 
         it('should format times over 60 seconds with minutes (e.g., 1:05.5)', () => {
-            score.finishTime = 65.5; 
+            score.finishTime = 65.5;
             // 1 min, 5.5 secs. padStart(4, '0') makes "5.5" -> "05.5"
             expect(score.finishTimeFormatted).toBe('1:05.5');
         });

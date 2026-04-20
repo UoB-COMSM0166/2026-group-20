@@ -182,7 +182,7 @@ export class Player {
      */
 
     //move
-    update(allPlayers, respawnManager, obstacles = [], MAP) {
+    update(allPlayers, respawnManager, obstacles = [], MAP, gameHeight) {
         if (this.lifeState !== PlayerState.ALIVE) {
             return;
         }
@@ -197,7 +197,7 @@ export class Player {
             return;
         }
 
-        if (checkFallDeath(this, GameConfig.GAME_HEIGHT)) {
+        if (checkFallDeath(this, gameHeight ?? GameConfig.GAME_HEIGHT)) {
             respawnManager.triggerDeath(this, DeathReason.FALL);
             return;
         }

@@ -30,6 +30,7 @@ import trampoline from './assets/obstacles/Trampoline/Jump (28x28).png';
 import spikedBall from './assets/obstacles/Spiked Ball/Spiked Ball.png';
 import cannon from './assets/obstacles/Cannon/cannon (30x18).png';
 import fallingPlatform from './assets/obstacles/Falling Platforms/On (32x10).png';
+import coinSprite from './assets/obstacles/Coin/coin.png';
 
 import startScreen from './assets/images/background/startscreen-bg.png';
 //import PixelCowboy from './assets/fonts/PixelCowboy.otf';
@@ -64,6 +65,7 @@ export const sketch = (p) => {
     let spikedBallImg;
     let cannonImg;
     let fallingPlatformFrames;
+    let coinImg;
 
     let chickenSheet;
     let bunnySheet;
@@ -85,6 +87,7 @@ export const sketch = (p) => {
         spikedBallImg = p.loadImage(spikedBall);
         cannonImg = p.loadImage(cannon);
         fallingPlatformFrames = p.loadImage(fallingPlatform);
+        coinImg = p.loadImage(coinSprite);
         startScreenBackground = p.loadImage(startScreen);
         startScreenFont = p.loadFont(PixelCowboy);
         mapManager.preloadAll();
@@ -111,11 +114,13 @@ export const sketch = (p) => {
             scoreManager: null,
             mapKey: 'map1',
             selectMap: (mapKey) => mapManager.selectMap(mapKey, ctx),
+            mapManager,
             sprites: {
                 chicken: chickenSheet,
                 bunny: bunnySheet,
                 duck: duckSheet,
                 polar: polarSheet,
+                coin: coinImg,
             },
             placedObstacles: [],
             shopHasRun: false,
@@ -125,10 +130,10 @@ export const sketch = (p) => {
         gameWidth = ctx.gameWidth;
         gameHeight = ctx.gameHeight;
 
-        const goTo = (stage) => {
+        const goTo = async (stage) => {
             activeState?.exit();
             activeState = states[stage];
-            activeState.enter();
+            await activeState.enter();
         };
 
         states = {
