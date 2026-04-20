@@ -318,6 +318,23 @@ export class MapManager {
                 visualBlockMap[row][col] = true;
             }
         }
+        const coinHorizontalOffset = (tx, ty) => {
+            const width = visualBlockMap[0]?.length ?? 0;
+            const height = visualBlockMap.length;
+            const leftBlocked =
+                ty < 0 ||
+                ty >= height ||
+                tx - 1 < 0 ||
+                visualBlockMap[ty][tx - 1];
+            const rightBlocked =
+                ty < 0 ||
+                ty >= height ||
+                tx + 1 >= width ||
+                visualBlockMap[ty][tx + 1];
+            if (leftBlocked && !rightBlocked) return tileW * 0.28;
+            if (rightBlocked && !leftBlocked) return -tileW * 0.28;
+            return 0;
+        };
         const generatedMap = {
             MAP: collisionMap,
             visualBlockMap,
@@ -434,16 +451,76 @@ export class MapManager {
                     frameH,
                 );
             },
+            renderStartpoint() {
+                if (!startPoint) return;
+                const T = tileW;
+                const cx = startPoint.x + T / 2;
+                const cy = startPoint.y + T / 2;
+                const pulse = 0.72 + 0.28 * Math.sin(p.frameCount * 0.08);
+                const markerY = startPoint.y - 10 + Math.sin(p.frameCount * 0.14) * 2.5;
+
+                p.push();
+                p.noStroke();
+                p.fill(90, 255, 190, 22 * pulse);
+                p.rect(cx - 7, startPoint.y - 34, 14, T + 44, 5);
+                p.fill(90, 255, 190, 64 * pulse);
+                p.ellipse(cx, cy, T * 0.92, T * 0.92);
+                p.fill(80, 200, 255, 40 * pulse);
+                p.ellipse(cx, cy, T * 1.28, T * 1.12);
+                p.fill(80, 200, 255, 34 * pulse);
+                p.ellipse(cx, startPoint.y + T - 4, T * 1.75, 18);
+                p.fill(120, 255, 210, 70 * pulse);
+                p.ellipse(cx, startPoint.y + T - 4, T * 1.16, 10);
+
+                p.stroke(120, 255, 210, 230);
+                p.strokeWeight(2.5);
+                p.noFill();
+                p.rect(startPoint.x - 4, startPoint.y - 4, T + 8, T + 8, 6);
+
+                p.noStroke();
+                p.fill(130, 255, 220, 235);
+                p.triangle(
+                    cx,
+                    markerY,
+                    cx - 9,
+                    markerY + 13,
+                    cx + 9,
+                    markerY + 13,
+                );
+
+                p.fill(18, 24, 38, 235);
+                p.stroke(120, 255, 210, 220);
+                p.strokeWeight(1.7);
+                p.rect(cx - 34, startPoint.y - 24, 68, 18, 4);
+                p.noStroke();
+                p.fill(180, 255, 230);
+                p.textAlign(p.CENTER, p.CENTER);
+                p.textSize(5.2);
+                p.text('START', cx, startPoint.y - 14.5);
+
+                p.noStroke();
+                p.fill(180, 255, 230, 210);
+                p.circle(cx, cy, T * 0.22);
+                p.fill(120, 255, 210, 120);
+                p.circle(cx, cy, T * 0.44);
+                p.pop();
+            },
             getCoins() {
                 return coinDefs.map(
-                    (coin) =>
+                    (coin) => {
+                        const tx = Math.floor((coin.x + tileW * 0.25) / tileW);
+                        const ty = Math.floor((coin.y + tileH * 0.25) / tileH);
+                        return (
                         new Coin(
                             p,
                             coin.x,
                             coin.y,
                             GameConfig.COIN_VALUE,
                             coinSprite,
-                        ),
+                            coinHorizontalOffset(tx, ty),
+                        )
+                    );
+                    },
                 );
             },
         };

@@ -218,6 +218,63 @@ export class TiledMapLoader {
         );
     }
 
+    renderStartpoint() {
+        if (this.startX == null || this.startY == null) return;
+
+        const p = this.p;
+        const T = this.tilewidth ?? GameConfig.TILE;
+        const cx = this.startX + T / 2;
+        const cy = this.startY + T / 2;
+        const pulse = 0.72 + 0.28 * Math.sin(p.frameCount * 0.08);
+        const markerY = this.startY - 10 + Math.sin(p.frameCount * 0.14) * 2.5;
+
+        p.push();
+        p.noStroke();
+        p.fill(90, 255, 190, 22 * pulse);
+        p.rect(cx - 7, this.startY - 34, 14, T + 44, 5);
+        p.fill(90, 255, 190, 64 * pulse);
+        p.ellipse(cx, cy, T * 0.92, T * 0.92);
+        p.fill(80, 200, 255, 40 * pulse);
+        p.ellipse(cx, cy, T * 1.28, T * 1.12);
+        p.fill(80, 200, 255, 34 * pulse);
+        p.ellipse(cx, this.startY + T - 4, T * 1.75, 18);
+        p.fill(120, 255, 210, 70 * pulse);
+        p.ellipse(cx, this.startY + T - 4, T * 1.16, 10);
+
+        p.stroke(120, 255, 210, 230);
+        p.strokeWeight(2.5);
+        p.noFill();
+        p.rect(this.startX - 4, this.startY - 4, T + 8, T + 8, 6);
+
+        p.noStroke();
+        p.fill(130, 255, 220, 235);
+        p.triangle(
+            cx,
+            markerY,
+            cx - 9,
+            markerY + 13,
+            cx + 9,
+            markerY + 13,
+        );
+
+        p.fill(18, 24, 38, 235);
+        p.stroke(120, 255, 210, 220);
+        p.strokeWeight(1.7);
+        p.rect(cx - 34, this.startY - 24, 68, 18, 4);
+        p.noStroke();
+        p.fill(180, 255, 230);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(5.2);
+        p.text('START', cx, this.startY - 14.5);
+
+        p.noStroke();
+        p.fill(180, 255, 230, 210);
+        p.circle(cx, cy, T * 0.22);
+        p.fill(120, 255, 210, 120);
+        p.circle(cx, cy, T * 0.44);
+        p.pop();
+    }
+
     /**
      * Returns the tile character at grid position (tx, ty).
      * Out-of-bounds tiles are treated as solid walls.
@@ -336,6 +393,7 @@ export class TiledMapLoader {
                     }
                     // else: stay in place — count always preserved
                 }
+                const visualOffsetX = this._coinHorizontalOffset(coinTx, coinTy);
 
                 coins.push(
                     new Coin(
@@ -344,12 +402,22 @@ export class TiledMapLoader {
                         cy,
                         GameConfig.COIN_VALUE,
                         this.coinSprite,
+                        visualOffsetX,
                     ),
                 );
             }
         }
 
         return coins;
+    }
+
+    _coinHorizontalOffset(tx, ty) {
+        const T = GameConfig.TILE;
+        const leftBlocked = this.hasVisibleTerrain(tx - 1, ty);
+        const rightBlocked = this.hasVisibleTerrain(tx + 1, ty);
+        if (leftBlocked && !rightBlocked) return T * 0.28;
+        if (rightBlocked && !leftBlocked) return -T * 0.28;
+        return 0;
     }
 
     _generateCollisionMap() {

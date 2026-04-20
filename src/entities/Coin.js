@@ -17,7 +17,7 @@ export class Coin {
      * @param {number} value - How many coins this pickup is worth (default 1)
      * @param {p5.Image|null} spriteImage - Optional animated coin spritesheet
      */
-    constructor(p, x, y, value = GameConfig.COIN_VALUE, spriteImage = null) {
+    constructor(p, x, y, value = GameConfig.COIN_VALUE, spriteImage = null, visualOffsetX = 0) {
         this.p = p;
         this.x = x;
         this.y = y;
@@ -26,6 +26,7 @@ export class Coin {
         this.value = value;
         this.collected = false;
         this.spriteImage = spriteImage;
+        this.visualOffsetX = visualOffsetX;
 
         // Randomised offset so coins don't all bob in sync
         this._baseY = y;
@@ -74,6 +75,11 @@ export class Coin {
 
         const p = this.p;
         const bobY = this._baseY + Math.sin(this._age) * 3;
+        const drawW = this.w * 2;
+        const drawH = this.h * 2;
+        const drawX = this.x + (this.w - drawW) / 2 + this.visualOffsetX;
+        const liftY = this.h * 0.75;
+        const drawY = bobY + (this.h - drawH) / 2 - liftY;
 
         if (this.spriteImage) {
             const frameSize = Coin.FRAME_SIZE;
@@ -86,10 +92,10 @@ export class Coin {
             const sx = frameIndex * frameSize;
             p.image(
                 this.spriteImage,
-                this.x,
-                bobY,
-                this.w,
-                this.h,
+                drawX,
+                drawY,
+                drawW,
+                drawH,
                 sx,
                 0,
                 frameSize,
@@ -98,13 +104,13 @@ export class Coin {
             return;
         }
 
-        const cx = this.x + this.w / 2;
-        const cy = bobY + this.h / 2;
+        const cx = drawX + drawW / 2;
+        const cy = drawY + drawH / 2;
         p.noStroke();
         p.fill(255, 200, 0);
-        p.circle(cx, cy, this.w);
+        p.circle(cx, cy, drawW);
         p.fill(255, 240, 120, 200);
-        p.circle(cx - this.w * 0.12, cy - this.h * 0.12, this.w * 0.4);
+        p.circle(cx - drawW * 0.12, cy - drawH * 0.12, drawW * 0.4);
     }
 
     /**

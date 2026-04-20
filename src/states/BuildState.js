@@ -389,6 +389,7 @@ export class BuildState extends State {
             );
         }
         tiledMap.render();
+        tiledMap.renderStartpoint?.();
         tiledMap.renderEndpoint(this.ctx.endpointFlag);
 
         for (const obs of this.ctx.placedObstacles) {
@@ -689,7 +690,7 @@ export class BuildState extends State {
                 Bomb.drawGhost(p, x, y);
                 break;
             case ObstacleType.SHADOW:
-                Shadow.drawGhost(p, x, y);
+                Shadow.drawGhost(p, x, y, sprites.SHADOW);
                 break;
         }
 
@@ -1161,7 +1162,7 @@ export class BuildState extends State {
             case ObstacleType.WIND_ZONE:         obs = new WindZone(p, x, y, this._windDir, sprites.WIND_ZONE); break;
             case ObstacleType.TELEPORTER:        obs = new Teleporter(p, x, y, sprites.TELEPORTER); break;
             case ObstacleType.BOMB:              obs = new Bomb(p, x, y, this.ctx); break;
-            case ObstacleType.SHADOW:            obs = new Shadow(p, x, y, this.ctx); break;
+            case ObstacleType.SHADOW:            obs = new Shadow(p, x, y, this.ctx, sprites.SHADOW); break;
             default: return null;
         }
         if (obs) obs.type = type; // stamp type so undo/refund can read it back

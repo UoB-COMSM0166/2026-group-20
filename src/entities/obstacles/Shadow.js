@@ -6,8 +6,8 @@ import { getPixelatedSprite } from '../../utils/PixelSprite.js';
 import { drawShadowIcon } from '../../utils/ShadowIcon.js';
 
 export class Shadow extends Obstacle {
-    constructor(p, x, y, ctx) {
-        super(p, x, y);
+    constructor(p, x, y, ctx, sprite = null) {
+        super(p, x, y, sprite);
         this._ctx = ctx;
         this._age = 0;
         this._frameCounter = 0;
@@ -121,13 +121,23 @@ export class Shadow extends Obstacle {
         p.noStroke();
         p.fill(110, 70, 180, 85);
         p.circle(cx, cy, T * 1.08 * pulse);
-        drawShadowIcon(
-            p,
-            this.x - iconBoost,
-            this.y - iconBoost,
-            T + iconBoost * 2,
-            T + iconBoost * 2,
-        );
+        if (this.obstacleSheet) {
+            p.image(
+                this.obstacleSheet,
+                this.x - iconBoost,
+                this.y - iconBoost,
+                T + iconBoost * 2,
+                T + iconBoost * 2,
+            );
+        } else {
+            drawShadowIcon(
+                p,
+                this.x - iconBoost,
+                this.y - iconBoost,
+                T + iconBoost * 2,
+                T + iconBoost * 2,
+            );
+        }
 
         const activeCooldown = this._cooldowns.size > 0;
         if (activeCooldown) {
@@ -350,8 +360,15 @@ export class Shadow extends Obstacle {
         return active;
     }
 
-    static drawGhost(p, x, y) {
+    static drawGhost(p, x, y, sprite = null) {
         const T = GameConfig.TILE;
+        if (sprite) {
+            p.push();
+            p.tint(255, 150);
+            p.image(sprite, x - 2, y - 2, T + 4, T + 4);
+            p.pop();
+            return;
+        }
         const cx = x + T / 2;
         const cy = y + T / 2;
         p.noStroke();

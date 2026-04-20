@@ -40,6 +40,7 @@ import teleporter from './assets/obstacles/Teleporter/teleporter (40x40).png';
 import windZone from './assets/obstacles/Wind Zone/wind zone (32x32).png';
 import iceBlock from './assets/obstacles/Ice Block/ice block (40x40).png';
 import endpointFlag from './assets/obstacles/endpoint/Checkpoint(FlagIdle)(64x64).png';
+import shadowIcon from './assets/obstacles/Shadow/shadow-icon.svg';
 import map1Preview from './assets/maps/map1/background.png';
 import map2Preview from './assets/maps/map2/background.png';
 import startScreen from './assets/images/background/startscreen-bg.png';
@@ -81,6 +82,7 @@ export const sketch = (p) => {
     let windZoneImg;
     let iceBlockImg;
     let endpointFlagImg;
+    let shadowIconImg;
     let map1PreviewImg;
     let map2PreviewImg;
     let startScreenBackground;
@@ -113,6 +115,7 @@ export const sketch = (p) => {
         windZoneImg = p.loadImage(windZone);
         iceBlockImg = p.loadImage(iceBlock);
         endpointFlagImg = p.loadImage(endpointFlag);
+        shadowIconImg = p.loadImage(shadowIcon);
         map1PreviewImg = p.loadImage(map1Preview);
         map2PreviewImg = p.loadImage(map2Preview);
         startScreenBackground = p.loadImage(startScreen);
@@ -167,7 +170,7 @@ export const sketch = (p) => {
                 WIND_ZONE: windZoneImg,
                 TELEPORTER: teleporterImg,
                 BOMB: null,
-                SHADOW: null,
+                SHADOW: shadowIconImg,
             },
             endpointFlag: endpointFlagImg,
             placedObstacles: [],
