@@ -18,7 +18,8 @@
         "prepare": "[ -n $CI ] && husky || true"
     },
     "dependencies": {
-        "p5": "^1.11.11"
+        "p5": "^1.11.13",
+        "p5.sound": "^0.3.0"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
