@@ -58,8 +58,8 @@ export class AIMapGenerator {
           }
           
           data = this.scaleMap(data);
-          console.log(data);
-          
+          // console.log(data);
+
           let startPoint = -1;
           let endPoint = -1;
           
@@ -76,7 +76,7 @@ export class AIMapGenerator {
           });
 
           data = this.processSolidBlocks(data);
-          console.log(data);
+          // console.log(data);
           return {
               map: data,
               startPoint: startPoint,

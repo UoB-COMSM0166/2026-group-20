@@ -5,6 +5,7 @@ import { GameConfig } from '../config/GameConfig.js';
 import { ChunkMapGenerator } from './ChunkMapGenerator.js';
 import { Coin } from '../entities/Coin.js';
 import { TileType } from '../config/TileType.js';
+import { AIMapGenerator } from './AIMapGenerator.js';
 
 import { AnimationConfigChick } from '../config/AnimationConfigChick.js';
 import { AnimationConfigBunny } from '../config/AnimationConfigBunny.js';
@@ -41,8 +42,10 @@ export class MapManager {
         map2: 'I',
     };
 
-    constructor(p) {
+    constructor(p, aiMapFlag = 1) {
         this.p = p;
+        this.aiMapFlag = aiMapFlag;
+        this.aiGenerator = new AIMapGenerator();
 
         this.mapLoaders = {
             map1: new TiledMapLoader(
@@ -138,6 +141,9 @@ export class MapManager {
     }
 
     async generateRandomMap(mapKey, ctx) {
+        if (this.aiMapFlag === 0) {
+            return await this._generateAIMap(mapKey, ctx);
+        }
         const theme = MapManager.THEME_MAP[mapKey];
         if (!theme) return;
 
@@ -522,6 +528,206 @@ export class MapManager {
                     );
                     },
                 );
+            },
+        };
+
+        ctx.mapPixelWidth = generatedMap.gameWidth;
+        ctx.mapPixelHeight = generatedMap.gameHeight;
+        ctx.tiledMap = generatedMap;
+        ctx.mapKey = mapKey;
+        ctx.backgroundImage = this._pickBackgroundFor(mapKey);
+
+        for (const player of ctx.players) {
+            player.x = generatedMap.startX;
+            player.y = generatedMap.startY;
+            player.spawnX = generatedMap.startX;
+            player.spawnY = generatedMap.startY;
+        }
+    }
+
+    async _generateAIMap(mapKey, ctx) {
+        const aiResult = await this.aiGenerator.generateMap();
+        const loader = this.mapLoaders[mapKey];
+        const tilesetImage = loader.tilesetImage;
+        const tileW = GameConfig.TILE;
+        const tileH = GameConfig.TILE;
+        const p = this.p;
+
+        const cols = 60;
+        const rows = 34;
+
+        const collisionMap = [];
+        for (let r = 0; r < rows; r++) {
+            const rowArray = [];
+            for (let c = 0; c < cols; c++) {
+                const val = aiResult.map[r * cols + c];
+                if (val === 2 || val === 12) {
+                    rowArray.push(TileType.SOLID);
+                } else {
+                    rowArray.push(TileType.EMPTY);
+                }
+            }
+            collisionMap.push(rowArray);
+        }
+
+        const startX = (aiResult.startPoint % cols) * tileW;
+        const startY = Math.floor(aiResult.startPoint / cols) * tileH;
+        const endX = (aiResult.endPoint % cols) * tileW;
+        const endY = Math.floor(aiResult.endPoint / cols) * tileH;
+
+        const sr = Math.floor(endY / tileH);
+        const sc = Math.floor(endX / tileW);
+        if (collisionMap[sr] && collisionMap[sr][sc] !== undefined) {
+            collisionMap[sr][sc] = TileType.ENDPOINT;
+        }
+
+        const visualBlockMap = Array.from(
+            { length: rows },
+            (_, r) => Array.from({ length: cols }, (_, c) => {
+                const val = aiResult.map[r * cols + c];
+                return val === 2 || val === 12;
+            })
+        );
+
+        const coinSprite = this._coinSprite;
+        const endpointSprite = this._endPointSprite;
+
+        const generatedMap = {
+            MAP: collisionMap,
+            visualBlockMap,
+            startX,
+            startY,
+            endX,
+            endY,
+            endW: tileW,
+            endH: tileH,
+            tilewidth: tileW,
+            tileheight: tileH,
+            gameWidth: cols * tileW,
+            gameHeight: rows * tileH,
+            hasVisibleTerrain(tx, ty) {
+                if (ty < 0 || ty >= visualBlockMap.length || tx < 0 || tx >= (visualBlockMap[0]?.length ?? 0)) {
+                    return true;
+                }
+                return visualBlockMap[ty][tx];
+            },
+            render() {
+                if (!tilesetImage) return;
+                const tilesetCols = Math.floor(tilesetImage.width / tileW);
+                for (let i = 0; i < aiResult.map.length; i++) {
+                    const gid = aiResult.map[i];
+                    if (gid === 0) continue;
+                    const localId = gid - 1;
+                    const col = i % cols;
+                    const row = Math.floor(i / cols);
+                    const srcX = (localId % tilesetCols) * tileW;
+                    const srcY = Math.floor(localId / tilesetCols) * tileH;
+                    p.image(
+                        tilesetImage,
+                        col * tileW,
+                        row * tileH,
+                        tileW,
+                        tileH,
+                        srcX,
+                        srcY,
+                        tileW,
+                        tileH,
+                    );
+                }
+            },
+            renderEndpoint(flagSprite = endpointSprite) {
+                if (!flagSprite) return;
+                const frameW = 64;
+                const frameH = 64;
+                const frames = Math.max(1, Math.floor(flagSprite.width / frameW));
+                const frameIdx = Math.floor(p.frameCount / 8) % frames;
+                const drawX = endX + tileW / 2 - frameW / 2;
+                const drawY = endY + tileH - frameH;
+                const pulse = 0.72 + 0.28 * Math.sin(p.frameCount * 0.08);
+                const glowCx = drawX + frameW / 2;
+                const glowCy = drawY + frameH * 0.56;
+                const baseY = drawY + frameH - 6;
+                const markerY = drawY - 16 + Math.sin(p.frameCount * 0.14) * 2.5;
+
+                p.push();
+                p.noStroke();
+                p.fill(120, 220, 255, 24 * pulse);
+                p.rect(glowCx - 7, drawY - 46, 14, frameH + 56, 5);
+                p.fill(120, 220, 255, 14 * pulse);
+                p.rect(glowCx - 14, drawY - 34, 28, frameH + 36, 8);
+                p.fill(255, 230, 110, 72 * pulse);
+                p.ellipse(glowCx, glowCy, frameW * 0.95, frameH * 0.95);
+                p.fill(120, 220, 255, 44 * pulse);
+                p.ellipse(glowCx, glowCy, frameW * 1.3, frameH * 1.18);
+                p.fill(120, 220, 255, 34 * pulse);
+                p.ellipse(glowCx, baseY + 1, frameW * 2.0, 24);
+                p.fill(120, 220, 255, 40 * pulse);
+                p.ellipse(glowCx, baseY, frameW * 1.55, 18);
+                p.fill(255, 230, 110, 65 * pulse);
+                p.ellipse(glowCx, baseY, frameW * 1.1, 10);
+                p.stroke(255, 245, 160, 230);
+                p.strokeWeight(2.5);
+                p.noFill();
+                p.rect(drawX - 5, drawY - 5, frameW + 10, frameH + 10, 6);
+                p.fill(255, 240, 170, 230);
+                p.noStroke();
+                p.triangle(glowCx, markerY, glowCx - 9, markerY + 13, glowCx + 9, markerY + 13);
+                p.fill(18, 24, 38, 235);
+                p.stroke(255, 245, 160, 220);
+                p.strokeWeight(1.7);
+                p.rect(glowCx - 30, drawY - 35, 60, 18, 4);
+                p.noStroke();
+                p.fill(255, 245, 170);
+                p.textAlign(p.CENTER, p.CENTER);
+                p.textSize(5.2);
+                p.text('GOAL', glowCx, drawY - 25.5);
+                p.pop();
+                p.image(flagSprite, drawX, drawY, frameW, frameH, frameIdx * frameW, 0, frameW, frameH);
+            },
+            renderStartpoint() {
+                const T = tileW;
+                const cx = startX + T / 2;
+                const cy = startY + T / 2;
+                const pulse = 0.72 + 0.28 * Math.sin(p.frameCount * 0.08);
+                const markerY = startY - 10 + Math.sin(p.frameCount * 0.14) * 2.5;
+
+                p.push();
+                p.noStroke();
+                p.fill(90, 255, 190, 22 * pulse);
+                p.rect(cx - 7, startY - 34, 14, T + 44, 5);
+                p.fill(90, 255, 190, 64 * pulse);
+                p.ellipse(cx, cy, T * 0.92, T * 0.92);
+                p.fill(80, 200, 255, 40 * pulse);
+                p.ellipse(cx, cy, T * 1.28, T * 1.12);
+                p.fill(80, 200, 255, 34 * pulse);
+                p.ellipse(cx, startY + T - 4, T * 1.75, 18);
+                p.fill(120, 255, 210, 70 * pulse);
+                p.ellipse(cx, startY + T - 4, T * 1.16, 10);
+                p.stroke(120, 255, 210, 230);
+                p.strokeWeight(2.5);
+                p.noFill();
+                p.rect(startX - 4, startY - 4, T + 8, T + 8, 6);
+                p.noStroke();
+                p.fill(130, 255, 220, 235);
+                p.triangle(cx, markerY, cx - 9, markerY + 13, cx + 9, markerY + 13);
+                p.fill(18, 24, 38, 235);
+                p.stroke(120, 255, 210, 220);
+                p.strokeWeight(1.7);
+                p.rect(cx - 34, startY - 24, 68, 18, 4);
+                p.noStroke();
+                p.fill(180, 255, 230);
+                p.textAlign(p.CENTER, p.CENTER);
+                p.textSize(5.2);
+                p.text('START', cx, startY - 14.5);
+                p.noStroke();
+                p.fill(180, 255, 230, 210);
+                p.circle(cx, cy, T * 0.22);
+                p.fill(120, 255, 210, 120);
+                p.circle(cx, cy, T * 0.44);
+                p.pop();
+            },
+            getCoins() {
+                return [];
             },
         };
 

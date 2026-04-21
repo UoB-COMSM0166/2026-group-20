@@ -66,7 +66,8 @@ export const sketch = (p) => {
     let gameWidth = GameConfig.GAME_WIDTH;
     let gameHeight = GameConfig.GAME_HEIGHT;
 
-    const mapManager   = new MapManager(p);
+    const aiMapFlag    = 0; // 0 for AI map generator, 1 for procedural
+    const mapManager   = new MapManager(p, aiMapFlag);
     const audioManager = new AudioManager();
 
     let sawFrames;
