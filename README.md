@@ -5,7 +5,7 @@
 </h3>
 
 <p align="center">
-An exciting multiplayer platformer where players design obstacles and race to reach the goal.
+The Incredible ChickenBunny: an exciting multiplayer platformer where players select map obstacles and race to reach the goal.
 </p>
 
 <h3 align="center"> Click <a href="https://uob-comsm0166.github.io/2026-group-20/main-game/"> HERE</a> to play the game (v0.1.0)</h3>
@@ -29,16 +29,15 @@ https://github.com/user-attachments/assets/4d740826-4f04-4a33-90aa-97b0868dfc5b
 <h3>Group Members</h3>
 
 GROUP PHOTO. Add a group photo here.
-//Detailed responsibilities each member had to be added  
 
-| Name       | Email                              |
-| ---------- | ---------------------------------- |
-| Megi       | jd25841@bristol.ac.uk              |
-| Maran      | ilamaran.magesh.2025@bristol.ac.uk |
-| Jacqueline | oz25232@bristol.ac.uk              |
-| Jinwang    | ut25234@bristol.ac.uk              |
-| Mengxiao   | dh25275@bristol.ac.uk              |
-| Eira       | xz25553@bristol.ac.uk              |
+| Name       | Email                              | Role                                                     | GitHub Account 
+| ---------- | ---------------------------------- | -------------------------------------------------------- | ----------------
+| Megi       | jd25841@bristol.ac.uk              | Developer, Graphics Designer, UI Designer, Audio Curator | <a href= "https://github.com/mgbego"> mgbego
+| Maran      | ilamaran.magesh.2025@bristol.ac.uk | Developer, AI Engineer, Build Engineer                   | <a href= "https://github.com/IlamaranMagesh"> IlamaranMagesh
+| Jacqueline | oz25232@bristol.ac.uk              | Developer, Graphics Designer, UI Designer, Audio Curator | <a href= "https://github.com/liilee111"> liilee111
+| Jinwang    | ut25234@bristol.ac.uk              | Developer, UX Designer, Audio Designer                   | <a href= "https://github.com/Arupin-uk"> Arupin-uk
+| Mengxiao   | dh25275@bristol.ac.uk              | Developer, UI Designer, Level Designer                   | <a href= "https://github.com/MengW7"> MengW7
+| Eira       | xz25553@bristol.ac.uk              | Developer, UX Designer, Audio Designer                   | <a href= "https://github.com/Libing42024"> Libing42024
 
 
 <h3>Project Management</h3>
@@ -93,6 +92,17 @@ GROUP PHOTO. Add a group photo here.
 - 5% ~250 words
 - Describe your game, what is based on, what makes it novel? (what's the "twist"?)
 
+<p>
+<i>The Incredible ChickenBunny</i> is a newly developed and enhanced adaptation of the multiplayer platformer game <i>Ultimate Chicken Horse</i>. The original game was chosen as inspiration due to its distinctive multiplayer mechanics, in which players strategically select obstacles from an in-game shop and place them on the map in order to gain an advantage while simultaneously making the course more difficult for their opponents. This unique gameplay mechanism creates a dynamic balance between cooperation and competition, making the game very engaging. The original game also features colourful cartoon-style character sprites that contribute to a visually appealing aesthetic suitable for players of all age groups.
+
+During our game development, these core elements were preserved, while introducing several new gameplay and visual design enhancing features.
+
+To enhance immersion and variety, two themed environments were designed: a forest and an ice theme, each with their unique set of characters; a chicken and a bunny for the forest, and a polar bear and a penguin for the ice map.
+Furthermore, a coin and wallet system was implemented to increase competitiveness and player engagement. During each run, players can collect coins placed throughout the level, which can then be used to purchase better and more expensive obstacles in subsequent rounds. A compulsory timer was also introduced, replacing the optional timer in the original game, in order to increase tension and make the game more high-stakes. Finally, each game run generates a new skeleton map and resets all previously placed obstacles. This procedural variation prevents players from predicting the layout and encourages creative strategies when placing obstacles.
+</p>
+
+
+
 
 
 
@@ -104,15 +114,15 @@ Our team began by brainstorming various game ideas and collectively selected the
 
 ### 2.1 Ideation and Game Selection
 
-Each member of the team brainstormed 5-9 games of their faviourite games and brought their ideas to the meeting. During the meeting, everyone presented the core game mechanics of their proposed games.
+Each member of the team brainstormed 5-9 of their faviourite games and brought their ideas to the meeting. During the meeting, everyone presented the core game mechanics of their proposed games.
 
 ![Ideathon](docs/assets/gif/ideation.gif)
 
-As numerous ideas were proposed, our team decided to first identify the two key challenges: **concurrency** and **AI**. Based on these challenges, each member selected a game that either aligned with or could be adapted to fit the challenges. This process narrowed the selection down to six games.
+As numerous ideas were proposed, our team decided to first decide on the two key challenges: **concurrency** and **AI**. Based on the alignment with these challenges, the top six games were selected. 
 
-The team then evaluated which of these games would best support the implementation of chosen challenges. As a result, two games were reduced to two games: **The Ultimate Chicken Horse** and **Among US**.
+From there, **Ultimate Chicken Horse** and **Among US** were voted as the best potential choices.
 
-Both games were analysed to identify the most suitable base for the project. To account for time constraints, our selection involved a trade-off: a feature-rich base game would require fewer technical challenges, whereas a simpler base game would demand more complex implementations to maintain the project's level of difficulty.
+Both games were analysed to identify the most suitable base for the project. To account for time constraints, our selection involved a trade-off: a feature-rich base game would require fewer technical challenges, whereas a simpler game would demand more complex challenges, but have more straightforward rules and design. Based on this comparison, **Ultimate Chicken Horse** was selected as the winner as it was concluded it would allow for a more well-rounded, enjoyable gameplay for the users.
 
 |  | <div align="center">Ultimate Chicken Horse<div> | <div align="center">Among Us<div> |
 | :---: | :--- | :--- |
@@ -120,7 +130,9 @@ Both games were analysed to identify the most suitable base for the project. To 
 | **Concurrency** | • Concurrent player movement <br> • Obstacle placement  | • Concurrent player movement <br> • Task execution |
 | **AI Concept**  | AI solver that can be purchased with coins recommends obstacle placement  | AI imposter that decides whom, where and how to attack |
 
-Based on this comparison, **The Ultimate Chicken Horse** was selected as the base game due to its feature-rich design. This ensures that even if time constraints limit the implementation of the planned technical challenges, the project will still remain functional and cohesive as a playable game.
+<div align="center">
+<p><em>Table 1: Ultimate Chicken Horse and Among Us Comparison Table. </em></p>
+</div>
 
 
 ### 2.2 Stakeholders 
@@ -131,30 +143,35 @@ To begin our game design process, we identified all relevant stakeholders includ
   <img src="docs/assets/images/onion-model.png" alt="Onion Model" width="700">
 </div>
 
-<p><em>Figure ?: Onion model of the game stakeholders. (Presntation of the table was adapted from [10]) </em></p>
+<div align="center">
+<p><em>Figure 1: Onion model of the game stakeholders. (Presntation of the table was adapted from [<a href="#reference">10</a>]) </em></p>
 </div>
 
-Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users to whom we had direct access. We categorised the most relevant stakeholders into three groups: gamers, lecturers, and other students, to better identify the qualities each group would expect in a game.
+Given the academic context of our game, we did not need to account for legal or commercial stakeholders, enabling us to focus on the end users who are directly implicated. We categorised the most relevant stakeholders into three groups: gamers, lecturers, and other students, to better identify the qualities each group would expect in a game.
 
 - **Gamers**: As primary users, they interact directly with the system. They expect an engaging and enjoyable gameplay experience.
 
 - **Lecturers**: As primary assessors, they evaluate the design process, technical implementation and whether the project meets academic requirements.
 
-- **Other students**: As peer testers, they provide critical feedbacks on bugs and playability.
+- **Other students**: As peer testers, they provide critical feedback on bugs and usability.
 
 ### 2.3 Epics
 
-Building on our stakeholder analysis, we defined a set of epics (high-level requirements). These requirements were designed to satisfy the expectations of each stakeholder group, as the goal of the project was to develop a game aligns with user expectations.
+Building on our stakeholder analysis, a set of epics (high-level requirements) were defined. These requirements are meant to satisfy the expectations of each stakeholder group, as the goal of the project is to develop a game aligns with user expectations.
 
 
 | <div align="center">Stakeholder Group<div> | <div align="center">Epics<div>|
 | :---: | :--- |
-|  **Gamers** | • Retro / Nostalgic visuals <br> • Twists or added gameplay features <br> • Visually stimulating design <br> • Background audio and sound effects <br> • Game lore <br> • Core features (wallet system, scoreboard, intro tutorial) <br> • Good UX <br> • Cross-browser compatibility |
-| **Lecturers** | • Learning concept integration and application <br> • Clear demonstration of technical challenges <br> • Achievable within the project timeline <br> • Collaborative work <br> • Continuous progress updates <br> • Originality  |
+|  **Gamers** | • Retro / Nostalgic visuals <br> • Twists or added gameplay features <br> • Visually engaging design <br> • Background audio and sound effects <br> • Core features (wallet system, scoreboard, intro tutorial) <br> • Good UX |
+| **Lecturers** | • Learning concept integration and application <br> • Clear demonstration of technical challenges <br> • Achievable within the project timeline <br> • Effective collaborative work <br> • Continuous progress updates <br> • Originality  |
 | **Students** | • Social features <br> • Easy to pick up <br> • Short game sessions |
 
+<div align="center">
+<p><em>Table 2: Summary of Stakeholder groups and game Epics</em></p>
+</div>
+
 ### 2.4 System Requirements
-After defining the epics, we created a set of system requirements to describe what the game should do and how it should perform. The following table outlines the key requirements for the development.
+After defining the epics, we created a set of system requirements to describe what the game should do and how it should perform. The following table outlines the key functional and non-functional requirements.
 
 **Functional Requirements**
 | <div align="center">ID<div> | <div align="center"> Category<div> | <div align="center"> Requirement<div>| 
@@ -164,11 +181,14 @@ After defining the epics, we created a set of system requirements to describe wh
 | FR-3 | Economy | The game shall implement a wallet system to track coins collected by each player. | 
 | FR-4 | Scoreboard | The game shall display a scoreboard to track player progress. | 
 | FR-5 | Shop | The game shall provide a shop where players can purchase obstacles using in-game coins. | 
-| FR-6 | Respawn | The system shall reset the player to the starting position when the player collides with an obstacle. | 
-| FR-7 | Inventory | The game shall allow players to select obstacles from their inventory during gameplay. | 
+| FR-6 | Respawn | The system shall reset the player to the starting position when the player dies. | 
+| FR-7 | Inventory | The game shall allow players to select obstacles from their inventory during the build phase. | 
 | FR-8 | Map | The game shall include multiple maps for players to navigate. | 
 | FR-9 | Tutorial | The game shall provide a tutorial to introduce new players to the basic gameplay mechanics. | 
-| FR-10 | Narrative | The game shall include a lore section to provide background information about the game world and characters. | 
+ 
+ <div align="center">
+<p><em>Table 3: Functional System Requirements</em></p>
+</div>
 
 **Non-Functional Requirements**
 | <div align="center">ID<div> | <div align="center"> Category<div> | <div align="center"> Requirement<div>| 
@@ -178,6 +198,10 @@ After defining the epics, we created a set of system requirements to describe wh
 | NFR-3 | Usability | The game interface shall be easy to understand for new players. | 
 | NFR-4 | Performance | The game shall maintain smooth gameplay without noticeable lag during play. | 
 
+<div align="center">
+<p><em>Table 4: Non-functional System Requirements</em></p>
+</div>
+
 ### 2.5 User Stories
 
 We deconstructed epics into a set of user stories to describe the specific features and functionalities of the game from the perspective of the identified stakeholders.
@@ -186,12 +210,12 @@ We deconstructed epics into a set of user stories to describe the specific featu
 
 - As a student, I want the game to have a multiplayer mode, so that I can play with my friends.
 - As a student, I want the game to have intuitive controls/mechanics, so that I can start playing right away.
-- As a student, I want a game run/level to be short enough so that I can play between class breaks.
+- As a student, I want a game run to be short enough so that I can play between lecture breaks.
 
 ### Lecturers
 
 - As a lecturer, I want the game to clearly demonstrate applied programming concepts (e.g., OOP, game logic, UI handling), so that learning outcomes are achieved.
-- As a lecturer, I want the game to include defined challenges with measurable outcomes, so that student understanding can be evaluated.
+- As a lecturer, I want the game to include defined challenges with measurable outcomes, so that student performance can be evaluated.
 - As a lecturer, I want clear evidence of teamwork (shared commits, divided responsibilities, group meeting notes etc.), so that collaboration skills are demonstrated.
 
 ### Gamers
@@ -203,9 +227,9 @@ We deconstructed epics into a set of user stories to describe the specific featu
 
 ### 2.6 Use Case Diagram
 
-Based on the requirements identified in the previous section, the system design was developed to support the key gameplay interactions. The following use case diagram illustrates the interactions between the player and the game system. 
+Based on the requirements identified in the previous section, the system design was developed to support the key gameplay interactions, illustrated in Figure 2. 
 
-The primary actor is the **Player**. The player can perform core actions such as starting the game, joining a session, viewing the tutorial, moving the character, placing obstacles and montinoring their progression via the scoreboard. During the game, the player may also collect coins, reach the goal and end the round. Additionally, the play can optionally use coins collected during the game to purchase new obstacles or request an AI-generated obstacle recommendation.
+The primary actor is the **Player**. The player can perform core actions such as starting the game, viewing the tutorial, moving the character, placing obstacles and montinoring their progression via the scoreboard. During the game, the player may also collect coins and end the round by reaching the goal. Additionally, the player can optionally use the coins collected during the game to purchase new obstacles.
 
 The **AI solver** acts as a secondary actor responsible for generating obstacle recommendations when requested by the player. 
 
@@ -214,7 +238,6 @@ flowchart LR
  subgraph TheGame["The Game"]
     direction TB
         UC_Start(["Start Game"])
-        UC_Join(["Join Session"])
         UC_Tutorial(["View Tutorial"])
         UC_Move(["Move Character"])
         UC_Coins(["Collect Coins"])
@@ -222,25 +245,23 @@ flowchart LR
         UC_End(["End Round"])
         UC_Place(["Place Obstacles"])
         UC_Purchase(["Purchase Obstacles"])
-        UC_PurchaseRec(["Purchase AI Obstacle Recommendation"])
-        UC_Generate(["Generate Obstacle Recommendation"])
+        UC_Generate(["Generate Map Design"])
         UC_Score(["View Scoreboard"])
+        UC_Inv(["View Inventory"])
   end
     UC_Start --- Player(["Player"])
-    UC_Join --- Player
     UC_Tutorial --- Player
     UC_Move --- Player
     UC_Place --- Player
     UC_Score --- Player
-    AISolver(["AI Solver"]) --- UC_Generate
+    UC_Inv --- Player
+    AISolver(["AI Helper"]) --- UC_Generate
+    UC_Generate -. &lt;&lt;extend&gt;&gt; .-> UC_Start
     UC_Coins -. &lt;&lt;extend&gt;&gt; .-> UC_Move
     UC_Goal -. &lt;&lt;extend&gt;&gt; .-> UC_Move & UC_End
-    UC_PurchaseRec -. &lt;&lt;extend&gt;&gt; .-> UC_Purchase
-    UC_PurchaseRec -. &lt;&lt;include&gt;&gt; .-> UC_Generate
     UC_Purchase -. &lt;&lt;include&gt;&gt; .-> UC_Place
 
     style UC_Start fill:#BBDEFB,stroke:#000000
-    style UC_Join fill:#BBDEFB,stroke:#000000
     style UC_Tutorial fill:#BBDEFB,stroke:#000000
     style UC_Move fill:#BBDEFB,stroke:#000000
     style UC_Coins fill:#BBDEFB,stroke:#000000
@@ -248,15 +269,16 @@ flowchart LR
     style UC_End fill:#BBDEFB,stroke:#000000
     style UC_Place fill:#BBDEFB,stroke:#000000
     style UC_Purchase fill:#BBDEFB,stroke:#000000
-    style UC_PurchaseRec fill:#BBDEFB,stroke:#000000
     style UC_Generate fill:#C8E6C9,stroke:#000000
     style UC_Score fill:#BBDEFB,stroke:#000000
+    style UC_Inv fill:#BBDEFB,stroke:#000000
     style Player fill:#FFCDD2,stroke:#000000
     style AISolver fill:#FFCDD2,stroke:#000000
     style TheGame fill:#ffffff,stroke:#000000
+
 ```
 <div align="center">
-<p><em>Figure ?: Use case diagram of the game system. (re edit we don't have AI solver now)</em></p>
+<p><em>Figure 2: Use case diagram of the game system.</em></p>
 </div>
 
 ## 3. Design
@@ -483,7 +505,7 @@ direction TB
   classDef Ash fill:#EEEEEE,stroke:#888888,color:#000000,stroke-width:2px
 ```
 <div align="center">
-<p><em>Figure ?: Class diagram of the system architecture. Colours indicate different class groups: entities (amber), states (blue), systems (green), resource manager (red) and UI (grey).</em></p>
+<p><em>Figure 3: Class diagram of the system architecture. Colours indicate different class groups: entities (amber), states (blue), systems (green), resource manager (red) and UI (grey).</em></p>
 </div>
 
 
