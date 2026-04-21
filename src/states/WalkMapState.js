@@ -132,7 +132,10 @@ export class WalkMapState extends State {
                 w.vy = -JMP;
                 w.onG = false;
                 w.jumpsLeft -= 1;
-                this.ctx.audioManager?.playSound('jump');
+
+                if (!this._selectedMap[w.idx]) {
+                    this.ctx.audioManager?.playSound('jump');
+                }
             }
             w.jumpHeld = w.inp.jump;
 
@@ -142,8 +145,10 @@ export class WalkMapState extends State {
                 const oy = w.y + w.h / 2;
                 if (ox > portal.x && ox < portal.x + portal.w &&
                     oy > portal.y && oy < portal.y + portal.h) {
-                    this._selectedMap[w.idx] = portal.key;
-                    this.ctx.audioManager?.playSound('finish');
+                    if (this._selectedMap[w.idx] !== portal.key) {
+                        this._selectedMap[w.idx] = portal.key;
+                        this.ctx.audioManager?.playSound('finish');
+                    }
                 }
             }
         }

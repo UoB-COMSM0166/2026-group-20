@@ -47,6 +47,7 @@ import startScreen from './assets/images/background/startscreen-bg.png';
 import mapBackground from './assets/images/background/map-selection-bg.png';
 import panasChillFont from './assets/fonts/PanasChill.ttf';
 
+import backgroundMusic from './assets/audio/music-bg.mp3';
 /**
  * Root p5 sketch.
  *
@@ -94,6 +95,8 @@ export const sketch = (p) => {
     let duckSheet;
     let polarSheet;
 
+    let music; 
+
     let ctx;
 
     p.preload = function () {
@@ -121,6 +124,7 @@ export const sketch = (p) => {
         startScreenBackground = p.loadImage(startScreen);
         mapMenuBackgroundImg = p.loadImage(mapBackground);
         menuFont = p.loadFont(panasChillFont);
+        music = p.loadSound(backgroundMusic);
         mapManager.preloadAll();
     };
 
@@ -187,6 +191,7 @@ export const sketch = (p) => {
         mapManager.initialize(ctx);
         gameWidth = ctx.gameWidth;
         gameHeight = ctx.gameHeight;
+        audioManager.setMusicTrack(music);
 
         const goTo = (stage) => {
             activeState?.exit();
