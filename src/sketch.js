@@ -19,6 +19,7 @@ import { WalkMapState }  from './states/WalkMapState.js';
 import { GameConfig } from './config/GameConfig.js';
 import { AnimationConfigChick } from './config/AnimationConfigChick.js';
 import { AnimationConfigBunny } from './config/AnimationConfigBunny.js';
+import { AIMapGenerator } from './systems/AIMapGenerator.js'
 
 // import images
 import chickenSprite from './assets/sprites/chicken_all_frames.png';
@@ -128,6 +129,8 @@ export const sketch = (p) => {
 
     p.setup = function () {
         p.createCanvas(p.windowWidth, p.windowHeight);
+
+        window.ai = new AIMapGenerator()
 
         /**
          * Shared session context.

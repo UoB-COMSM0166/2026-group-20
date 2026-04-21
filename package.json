@@ -18,7 +18,9 @@
         "prepare": "[ -n $CI ] && husky || true"
     },
     "dependencies": {
-        "p5": "^1.11.11"
+        "@google/genai": "^1.50.1",
+        "p5": "^1.11.11",
+        "zod": "^4.3.6"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
