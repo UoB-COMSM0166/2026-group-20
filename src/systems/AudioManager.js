@@ -23,7 +23,7 @@ export class AudioManager {
         //this._musicTimer = null; 
         this._musicTrack = null;
         this._sfxEnabled   = true;
-        this._musicEnabled = false;
+        this._musicEnabled = true;
         this._musicPlaying = false;
     }
 
@@ -61,11 +61,11 @@ export class AudioManager {
             const t  = ac.currentTime;
 
             switch (name) {
-                case 'coin':    this._tone(ac, t, 1500, 0.05, 'sine',     0.15, [[0, 0.15],[0.05, 0.0]], 2000); break;
-                case 'jump':    this._tone(ac, t, 800,  0.1,  'sawtooth', 0.08, [[0, 0.08],[0.1, 0.0]], 1200); break;
-                case 'bounce':  this._tone(ac, t, 1200, 0.06, 'sine',     0.12, [[0, 0.12],[0.06, 0.0]], 600);  break;
-                case 'death':   this._tone(ac, t, 800,  0.3,  'sine',     0.25, [[0, 0.25],[0.3, 0.0]], 100);  break;
-                case 'finish':  this._chord(ac, t, [880, 1108, 1318, 1760], 0.4); break;
+                case 'coin':    this._tone(ac, t, 1500, 0.05, 'sine',     0.7, [[0, 0.7],[0.05, 0.0]], 2000); break;
+                case 'jump':    this._tone(ac, t, 800,  0.1,  'sawtooth', 0.6, [[0, 0.6],[0.1, 0.0]], 1200); break;
+                case 'bounce':  this._tone(ac, t, 1200, 0.06, 'sine',     0.6, [[0, 0.6],[0.06, 0.0]], 600);  break;
+                case 'death':   this._tone(ac, t, 800,  0.3,  'sine',     0.7, [[0, 0.7],[0.3, 0.0]], 100);  break;
+                case 'finish':  this._chord(ac, t, [880, 1108, 1318, 1760], 0.9); break;
             }
         } catch(e) { }
     }
@@ -83,7 +83,7 @@ export class AudioManager {
         try {
             if (!this._musicTrack.isPlaying()) {
                 this._musicTrack.setLoop(true);
-                this._musicTrack.setVolume(0.4);
+                this._musicTrack.setVolume(0.25);
                 this._musicTrack.play();
             }
             this._musicPlaying = true;
@@ -155,11 +155,12 @@ export class AudioManager {
      * Play a short ascending chord (victory / finish sound).
      * @private
      */
-    _chord(ac, t, freqs, duration) {
+    _chord(ac, t, freqs, vol) {
         freqs.forEach((freq, i) => {
             const delay = i * 0.08;
+            const duration = 0.4;
             this._tone(ac, t + delay, freq, duration,
-                'sine', 0.18,
+                'sine', vol,
                 [[0, 0.18], [duration * 0.8, 0.0]]
             );
         });
