@@ -93,7 +93,7 @@ GROUP PHOTO. Add a group photo here.
 - Describe your game, what is based on, what makes it novel? (what's the "twist"?)
 
 <p>
-<i>The Incredible ChickenBunny</i> is a newly developed and enhanced adaptation of the multiplayer platformer game <i>Ultimate Chicken Horse</i>. The original game was chosen as inspiration due to its distinctive multiplayer mechanics, in which players strategically select obstacles from an in-game shop and place them on the map in order to gain an advantage while simultaneously making the course more difficult for their opponents. This unique gameplay mechanism creates a dynamic balance between cooperation and competition, making the game very engaging. The original game also features colourful cartoon-style character sprites that contribute to a visually appealing aesthetic suitable for players of all age groups.
+<strong><i>The Incredible ChickenBunny</i></strong> is a newly developed and enhanced adaptation of the multiplayer platformer game <strong><i>Ultimate Chicken Horse</i></strong>. The original game was chosen as inspiration due to its distinctive multiplayer mechanics, in which players strategically select obstacles from an in-game shop and place them on the map in order to gain an advantage while simultaneously making the course more difficult for their opponents. This unique gameplay mechanism creates a dynamic balance between cooperation and competition, making the game very engaging. The original game also features colourful cartoon-style character sprites that contribute to a visually appealing aesthetic suitable for players of all age groups.
 
 During our game development, these core elements were preserved, while introducing several new gameplay and visual design enhancing features.
 
@@ -289,9 +289,11 @@ flowchart LR
 
 ### 3.1 System Architecture Overview
 
-The project adopts a modular game architecture that combines **Entity–Component–System (ECS)** architecture[5] and **object-oriented design**[9]. In a typical object-oriented design, a game object contains both its data and the logic that operates on that data. For example, a **Player** class may store data such as position and velocity while also containing functions that control movement and detect collisions. 
+The project adopts a modular game architecture that combines **Entity–Component–System (ECS)** architecture[5] and **Object-Oriented Design**[9]. 
+An ECS architecture separates data from logic. Entities mainly store data, while systems contain all the logic that processes this data. For instance, a **Player** entity may only store position and velocity data, while the **Physics System** is responsible for updating movement or detecting collisions for multiple entities (see Figure ). 
+In contrast, in typical Object-Oriented Design, a game object contains both its data and the logic that operates on that data. For example, a **Player** class may store data such as position and velocity while also containing functions that control movement and detect collisions. 
 
-In contrast, an ECS architecture separates data from logic. Entities mainly store data, while systems contain all the logic that processes this data. For instance, a **player** entity may only store position and velocity data, while a **physics system** is responsible for updating movement or detecting collisions for multiple entities (see Figure ). 
+ 
 
 #### OOP approach 
 ```
@@ -312,14 +314,16 @@ PhysicsSystem
  └─ updates movement and collision
 ```
 <div align="center">
-<p><em>Figure ?: Conceptual comparison between object-oriented design and ECS architecture.</em></p>
+<p><em>Figure 3: Conceptual comparison between object-oriented design and ECS architecture.</em></p>
 </div>
 
-Both architectures have advantages and limitations. Object-oriented design is easier to understand and implement as data and behaviour are encapsulated within the same class. This structure suits smaller projects where logic is organised around individual objects. However, as systems become more complex, tightly coupling logic within objects can reduce flexibility and limit code reuse[9, p.113]. In contrast, ECS architecture improves modularity by separating data from behaviour, allowing systems to process multiple entities using shared logic. This can improve scalability and maintainability, but it may introduce additional design complexity[6]. 
+Both architectures have advantages and limitations. Object-Oriented Design is easier to understand and implement as data and behaviour are encapsulated within the same class. This structure suits smaller projects where logic is organised around individual objects. However, as systems become more complex, tightly coupling logic within objects can reduce flexibility and limit code reusability [9, p.113]. In contrast, ECS architecture improves modularity by separating data from behaviour, allowing systems to process multiple entities using shared logic. This can improve scalability and maintainability, but it may introduce additional design complexity[6]. 
 
 Based on these considerations, the system architecture in this project follows a **hybrid approach**, which combines aspects of both ECS and object-oriented design. The player is represented as an **entity** that stores data such as position and movement speed, while certain gameplay behaviours are handled by independent systems. For instance, the PhysicsSystem processes collision detection between the player and obstacles, and the RespawnManager handles resetting the player when the character collides with a hazard. However, some game logic, such as the player movement, remains implemented within the player object itself.
 
-This hybrid architectural approach is reflected in the organisation of the project’s codebase. The codebase is organised into several folders: `entities`, `systems`, `state`, `config`, `UI` and `resource manager`, each responsible for a specific aspect of the game. These categories correspond to the coloured groups in the class diagram (Figure ?). 
+The project was initially planned to follow a strictly object-oriented approach. However, during development, this resulted in increased coupling between components, making the system more difficult to modify and extend (e.g., changes to collision logic required updates across multiple object classes). To address this limitation, elements of the ECS architecture were introduced to separate data from behaviour and reduce these dependencies. This led to the adoption of a hybrid approach, combining the organisational clarity of object-oriented design with the improved modularity and scalability of ECS.
+
+This hybrid architectural approach is reflected in the organisation of the project’s codebase. The codebase is divided into several folders: `entities`, `systems`, `state`, `config`, `UI` and `resource manager`, each responsible for a specific aspect of the game. These categories correspond to the coloured groups in the class diagram (Figure 4). 
 
 ```mermaid
 ---
@@ -505,28 +509,31 @@ direction TB
   classDef Ash fill:#EEEEEE,stroke:#888888,color:#000000,stroke-width:2px
 ```
 <div align="center">
-<p><em>Figure 3: Class diagram of the system architecture. Colours indicate different class groups: entities (amber), states (blue), systems (green), resource manager (red) and UI (grey).</em></p>
+<p><em>Figure 4: Class diagram of the system architecture. Colours indicate different class groups: entities (amber), states (blue), systems (green), resource manager (red) and UI (grey).</em></p>
 </div>
 
 
 ### 3.2 Entities 
 
-**Entities** represent the main objects within the game world, such as players, coins and obstacles. These entities store important state information, such as position, velocity and status, and also implement some logic. This structure follows a data-driven design approach [5, p1024], where specific parameters such as movement speed and initial jump velocity are defined in configuration files in the `config` folder.
+**Entities** represent the main objects within the game world, such as players, coins and obstacles. These entities store important state information, such as position, velocity and phase (e.g., lifeState, movementState and gameState), and also implement some game logic. This structure adheres to a data-driven design approach [5, p1024], where specific parameters such as movement speed and initial jump velocity are defined in configuration files in the `config` folder rather than hardcoded.
 
-During runtime, entities are updated through the **game loop**. All entities are stored in a list, and the `update()` function iterates through this list during each frame to update the state of each entity sequentially. This mechanism ensures that all entities are updated consistently during each iteration of the simulation[5, p1088].
+During runtime, entities are updated through the **game loop** (`draw()`). All entities are stored in a list, and the `update()` function iterates through this list during each frame to update the state of each entity sequentially. This approach ensures a consistent and accurate update of the entities during the game run [5, p1088].
+
 
 ### 3.3 Systems
-**Systems** are responsible for processing behaviours associated with different enities and implementing core gameplay mechanics. While **entities** mainly store data, **systems** contain the logic that operates on this data during each iteration of the game loop. These systems are implemented within the `system` directory. 
+**Systems** are responsible for processing behaviours associated with different enities and implementing core gameplay mechanics. While **Entities** mainly store data, **Systems** contain most of the logic that operates on this data during each iteration of the game loop, which is contained within the `system` directory. 
 
-Example of system include: 
+Core gameplay behaviour is therefore driven by these systems, which manage interactions between entities. For example, a collision or physics system detects when the player intersects with a coin, triggering its collection and removal, while collisions with deadly obstacles initiate a respawn, and reaching the flag signals level completion. In this way, systems update entity states and ensure consistent game progression during runtime.
 
-- `Physics System` - detects collisions between the player and other entities (e.g. coins or obstacles)
+Examples of **Systems** include: 
 
-- `Respawn Manager` - manager the respawning of the players and ensures they are correctly repositioned at the starting point.
+- `Physics System` - detects collisions between the player and other entities (e.g. coins, platforms, spikes etc.)
 
-- `Time Manager` - manager gameplay timing during a round.
+- `Respawn Manager` - manages the respawning of the players and ensures they are correctly repositioned at the starting point.
 
-Figure ? displays how the player interact with these systems during gameplay.
+- `Time Manager` - manages gameplay timing during a round.
+
+Figure 5 displays how the player interact with these systems during gameplay.
 ```mermaid
 ---
 config:
@@ -566,15 +573,17 @@ sequenceDiagram
     Timer->>Timer: record finish
 ```
 <div align="center">
-<p><em>Figure ?: Sequence diagram of the gameplay update process.</em></p>
+<p><em>Figure 5: Sequence diagram of the gameplay update process.</em></p>
 </div>
 
 ### 3.4 States
-The overall flow of the game is controlled using a **Finite State Machine** implemented in `state` folder. Each state represents a different phase of the game, and only one state can be active at any given time. This ensures that the game transitions between different phases in a predictable manner. 
+The overall flow of the game is controlled using a **Finite State Machine** logic implemented in the `state` folder. Each state represents a different phase of the game, and only one state can be active at any given time. This ensures that the game transitions between different phases in a predictable and consistent manner.
 
-The main states include `Boot`, which loads the initial game briefing, followed by `StartMenu`, `CharacterSelection` and `MapSelection`. The game then progresses to `Tutorial`. After this, the game moves to `ObstacleSelection`, which allows players to choose obstacles before starting the main `Gameplay` phase. Once the gameplay ends, either by reaching the goal or when the time limit is reached, the game transitions to `GameEnd` to display the results. Finally, it enters the `Shop` state for the players to purchase new obstacles before the next round begins. (keep this or change to the name corresponding to Jinwang)
+The main states include `Boot` (`BootState`), which loads the initial game briefing, followed by `StartMenu` (`MentuState`), `CharacterSelection` (`CharSelectState`)and `MapSelection` (`WalkMapState`). Subsequently, `Tutorial` (`TutorialState`) is shown, demonstrating the base rules of the game to the player. After this, the player is asked to choose and place obstacles during `ObstacleSelection` (`BuildState`), before starting the main `Gameplay` phase (`RunState`). Once the gameplay ends, either by reaching the goal or when the time limit is reached, the game transitions to `GameEnd` (`ResultsState`) to display the results. Finally, it enters the `Shop` (`ShopState`) state for the players to purchase new obstacles before the next round begins. 
 
-The following diagram (Figure ?) illustrates the transitions between different game states.
+Overall, this structured state system ensures a clear and controlled progression between different phases of gameplay, preventing overlap between game modes and maintaining consistent game flow.
+
+The following diagram (Figure 6) illustrates the transitions between different game states.
 
 ```mermaid
 ---
@@ -614,26 +623,32 @@ stateDiagram
   style Shop fill:#E2EBFF
 ```
 <div align="center">
-<p><em>Figure ?: State diagram for the game flow.</em></p>
+<p><em>Figure 6: State diagram for the game flow.</em></p>
 </div>
 
 ### 3.5 User Interface
-The user interface is responsible for managing the presentation layer of the game. These components include elements such as the heads-up display (HUD), score indicators and timers. The UI layer is separated from gameplay logic to maintain a clear separation between presentation and game mechanics.
+The user interface is responsible for managing the presentation layer of the game. These components include elements such as the heads-up display (HUD), score indicators and timers. The UI layer is separated from gameplay logic to maintain a clear separation between presentation and game mechanics. 
+
+This separation allows for a clearer distinction between gameplay logic and visual presentation, enabling more flexible and maintainable design of interface elements such as buttons, the scoreboard, and other in-game displays. In addition, external graphical assets (e.g. the splashscreen PNG) can be integrated independently of the codebase, supporting more refined and visually consistent presentation without being constrained by in-code rendering.
 
 ### 3.6 Rescource Manager 
-The game implements a **Resource Manager** to handle game assets. A resource manager prepares assets and ensuring they are loaded into memory when needed and released when no longer required[5, p571]. 
+The game implements a **Resource Manager** to handle game assets. A resource manager prepares assets and ensures they are loaded into memory when needed and released when no longer required [5, p571]. //released?
 
-In this project, map assests are managed by `MapLoader`, which reads map configuration files and generates game objects such as obstacles and  coins.
- 
+//better segue
+In this project, map assests are managed by `MapLoader`, which reads map configuration files and generates game objects such as obstacles and  coins. This approach decouples level design from the core game logic, allowing maps to be modified or extended without changes to the underlying codebase.
+
 
 ### 3.7 Assets
 The game utilises various asset types. Each asset type is managed by a corresponding resource manager to handle the loading and management of game resources during runtime. The main asset categories are:
 
 - **Visual Assets**: Sprite sheets (PNG) for players, obstacles and other entities.
 
-- **Audio Assets**: ??? 
+- **Audio Assets**: MP3 
 
-- **Data Assets**: configuration files (JSON) that define gameplay parameters for map titles.
+- **Data Assets**: configuration files (JSON) that define gameplay parameters for map tiles.
+
+
+Overall, our system architecture integrates multiple components, including entities, systems, states, and resource managers to form a modular and extensible game structure. By combining Object-Oriented principles with ECS separation paradigm, a balance between clarity with flexibility is achieved. 
 
 ## 4. Implementation
 
@@ -663,10 +678,10 @@ The `main.js` creates a `new p5()` instance that serves as the main entry point 
 - One quantitative evaluation (of your choice)
 - Description of how code was tested.
 
-Evaluating the game’s usability and user experience is essential for identifying design issues and improving future iterations. In this project, we adopted a mixed-methods approach consisting of the **think-aloud method**, **heuristic evaluation**, **the System Usability Scale** and **NASA-TLX**. These methods allowed us to identify usability issues and measure user satisfaction so that we could improve later versions of the game. 
+Evaluating the game’s usability and user experience is essential for identifying design issues and improving future iterations. In this project, we adopted a mixed-methods approach consisting of the **Think-Aloud Method**, **Heuristic Evaluation**, **The System Usability Scale** and **NASA-TLX**. These methods allowed us to identify usability issues and measure user satisfaction so that we could improve later versions of the game. 
 
 ### 5.1 Qualitative Evaluation
-The qualitative evaluation aimed to identify usability problems and understand how players interact with the game. Twenty participants, including classmates and attendees of the Testathon event, were recruited to play the game while verbalising their thoughts using the think-aloud method. During the evaluation, participants were instructed to complete the game by reaching the goal while avoiding obstacles. Their verbal feedback and in-game behaviours were recorded and analysed to identify common usability issues. To complement these findings, a heuristic evaluation based on Nielsen’s usability heuristics was conducted to provide a systematic assessment of interface design flaws and the overall user experience.
+The qualitative evaluation aimed to identify usability problems and understand how players interact with the game. Twenty participants, including classmates and attendees of the Testathon event, were recruited to play the game while verbalising their thoughts using the Think-Aloud Method. During the evaluation, participants were instructed to complete the game by reaching the goal as quickly as possible. Their verbal feedback and in-game behaviours were recorded and analysed to identify common usability issues. To complement these findings, a Heuristic evaluation based on Nielsen’s usability Heuristics [3] was conducted to provide a systematic assessment of interface design flaws and the overall user experience.
 
 <div align="center">
 <img src="docs/assets/gif/v0.1.0.gif" alt="Basic version" width="400">
@@ -722,9 +737,9 @@ According to Brooke[7], usability does not exist in any absolute sense but must 
 
 SUS provides a quick and reliable measure of overall usability, allowing comparison with established benchmarks. NASA-TLX measures perceived workload across several dimensions, including mental demand, effort, and frustration. Using both metrics allows the evaluation to capture not only usability but also the cognitive effort required to play the game.
 
-To perform this evaluation, we recruited ten participants to play both the basic version and the harder version of the game (see Figure ?). After playing each version, participants were asked to completed the SUS and NASA-TLX questionnaires to assess the usability of the game and the workload experienced during gameplay.
+To perform this evaluation, we recruited ten participants to play both the basic version and the harder version of the game (see Figure ?). After playing each version, participants were asked to complete the SUS and NASA-TLX questionnaires to assess the usability of the game and the workload experienced during gameplay.
 
-The collected responses were then converted into numerical scores according to the standard scoring procedures for SUS and NASA-TLX.
+The collected responses were then converted into numerical scores according to the standard scoring procedures for both frameworks.
 
 <table align="center">
   <tr>
@@ -741,12 +756,12 @@ The collected responses were then converted into numerical scores according to t
 </div>
 
 
-To analyse the data, Wilcoxon signed-rank tests were conducted to compare the perceived workload between the basic and harder versions of the game. This non-parametric test was chosen because NASA-TLX responses are measured on ordinal scales. Statistical significance was determined with a threshold of $p < 0.05$.  
+To analyse the data, Wilcoxon signed-rank tests were conducted to compare the perceived workload between the basic and harder versions of the game. This non-parametric test was chosen because NASA-TLX responses are measured in ordinal scales. Statistical significance was determined with a threshold of $p < 0.05$.  
 
 
 **A. NASA-TLX**
 
-The results are summarised in Table ? and plotted in Figure ? and ?. The results indicate that participants experienced a significantly higher workload when playing the harder version of the game compared to the basic version (p = 0.032). This increase in perceived workload was primarily driven by higher ratings in mental demand (p = 0.002), effort (p = 0.003), and frustration (p = 0.046). These findings suggest that the harder version required greater cognitive effort from players and led to increased frustration during gameplay compared to the basic version. This outcome is consistent with the intended design goal of creating a more challenging gameplay experience.
+The results are summarised in Table ? and plotted in Figure ? and ?. The results indicate that participants experienced a significantly higher workload when playing the harder version of the game compared to the basic version (p = 0.032). This increase in perceived workload was primarily driven by higher ratings in mental demand (p = 0.002), effort (p = 0.003), and frustration (p = 0.046). Such findings suggest that the harder version required greater cognitive effort from players and led to increased frustration during gameplay compared to the basic version. This outcome is consistent with the intended design goal of creating a more challenging gameplay experience.
 
 <div align="center">
 
@@ -776,10 +791,9 @@ The results are summarised in Table ? and plotted in Figure ? and ?. The results
 
 **B. System Usability Scale (SUS)**
 
-Our SUS results showed no significant difference in usability between the two versions of the game ($p > 0.05$). A SUS score of approximately 68 is generally considered average usability, while scores above 80 indicate excellent usability. The SUS scores obtained in this evaluation (Basic: 70.75, Hard: 64.25) suggest that the usability of the game is currently around the average level. This indicates that the increase in difficulty did not negatively affect the usability of the game, as players were still able to understand and interact with the game mechanics in both versions.
+Our SUS results show no significant difference in usability between the two versions of the game ($p > 0.05$). An SUS score of approximately 68 is generally considered average usability, while scores above 80 indicate excellent usability. The SUS scores obtained in this evaluation (Basic: 70.75, Hard: 64.25) suggest that the usability of the game is currently around the average level. This indicates that the increase in difficulty did not meaningfully affect the usability of the game in a negative manner, as players were still able to understand and interact with the game mechanics in both versions.
 
-However, while the usability is acceptable at this stage, the results also suggest that there is room for improvement to achieve a higher SUS score (e.g. above 80). In particular, feedback from testers suggested that the game could benefit from more intuitive keyboard controls and improved game stage management. For example, a tester reported that they could not undo or adjust obstacles if they were placed incorrectly. Therefore, this feedback will be considered in future iterations of the game in order to improve the overall usability.
-
+However, while the usability  score is acceptable at this stage, the results also suggest that there is room for improvement to achieve a higher SUS score (e.g. above 80). In particular, feedback from testers suggested that the game could benefit from more intuitive keyboard controls and improved game stage management. For example, a tester reported that they could not undo or adjust obstacles if they were placed incorrectly. Therefore, this feedback will be considered in future iterations of the game in order to improve the overall usability.
 
 <div align="center">
 
@@ -810,12 +824,25 @@ However, while the usability is acceptable at this stage, the results also sugge
     <p><em>Figure ?: Average SUS usability scores for the basic and harder versions of the game.</em></p>
 </div>
 
-add Appendix B
-
 
 ### 5.3 Testing 
 
-add testing 
+To ensure the reliability and correctness of the system, a series of structured tests were conducted using a white-box testing approach. White-box testing  involves examining the internal logic and code structure, ensuring that all branches, conditions and control flows are explicitly verified. In contrast, black-box testing evaluates the system based solely on observable inputs and outputs, without reference to internal implementation.
+
+Although black-box testing is effective for validating user-interaction reliant behaviour, it was not adopted in this project as our focus was on verifying internal logic within classes such as physics processing, state management, and input handling. For our game, correctness heavily depends on the behaviour of internal operations, which may not always be fully reflected through external outputs alone.
+
+Thus, white-box testing was used to directly examine and validate internal functionality, allowing more precise and thorough verification of individual units. A summary of the main test areas covered is presented in Table?.
+
+
+| <div align="center">Test File</div>| <div align="center">Purpose of Test</div>| <div align="center">Type of Check</div> | 
+| ---------------------------------- | ---------------------------------------- | --------------------------------------- | 
+| Input Handling                     | Validates correct processing of user inputs       | Condition & branch testing     |  
+| Physics System                     | Ensures accuracy of movement and collision logic  | Path and logic testing         |                                              
+| Score Management                   | Verifies score updates and calculations           | Functional & boundary testing  | 
+| Time Management                    | Confirms correct timing and event triggering      | State and condition testing    | 
+| Respawn Manager                    | Tests object/player respawn behaviour             | Edge case testing              |
+| Collision Detection                | Validates intersection and collision calculations | Logical Path Testing           |                 
+
 
 ## 6. Process
 
@@ -825,35 +852,40 @@ add testing
 
 
 ### 6.1 Team Organisation 
-Our team operated under a flat and collaborative structure where responsibilities were shared among all members. We did not assign fixed roles for individual team members. Instead, everyone contributed to implementing gameplay systems and programming tasks, while also participating in testing and project management. 
+Our team operated under a flat and collaborative structure where responsibilities were shared among all members. We did not assign fixed roles for individual team members. Instead, everyone contributed to implementing gameplay systems and programming tasks, while also participating in testing and project management. To ensure the quality of the codebase, the six members were organised into three pairs (Megi and Jacqueline, Maran and Mengxiao, and Jinwang and Eira), adopting a pair programming approach. This enabled continuous peer review during development, allowing design and implementation decisions to be discussed in real time and leading to more robust solutions. As a result, fewer issues were identified during later review stages, and development proceeded more efficiently due to reduced overhead in cross-team code checking.
 
-The team adopted a rotating Scrum Master role to support sprint coordination. At the beginning of each sprint, a different team member was selected to act as the Scrum Master. The Scrum Master was responsible for facilitating sprint planning, prioritising tasks in the backlog and monitoring overall progress. Every team member took turns contributing to sprint planning and coordinating overall progress. 
+The team adopted a rotating Scrum Master role to support sprint coordination. At the beginning of each sprint, which lasted two weeks, a different team member was selected to act as the Scrum Master. The Scrum Master was responsible for facilitating sprint planning, prioritising tasks in the backlog and monitoring overall progress. Additionally, daily standups were integrated into our development process to ensure everyone is on track and be able to help members who may be struggling as quickly as possible. All team members took turns contributing to sprint planning and coordinating overall progress. 
 
 ### 6.2 Tools and Communication 
-- **Github**: used for version control and mandatory pull request reviews. 
+- **Github**: used for managing the codebase, version control and mandatory pull request reviews. 
 
 - **WhatsApp**: primarily channel for day-to-day discussion and coordination. 
 
+- **Microsoft Team**: platform for our weekly online meetings
+
 - **Lucidspark**: used as a central hub for meeting minutes, brainstorming and the team’s Kanban board.
 
-We held informal daily stand-up meetings while on campus and formal weekly meeting to review overall progress. Additional meetings were arranged when necessary. 
+- **In-person Meetings**: used for quick questions, and sharing/asking for opinions on features in progress
+
+Additional meetings (either online or in-person) were arranged when necessary. 
 
 ### 6.3 Development Methodology
 The development of this game followed an Agile methodology, organised into two-week sprints to continuously build, test and refine core systems.
 
 **6.3.1. The Product Backlog and Sprint Planning**
 
-The product backlog contained all requirements for the game. These requirements were proposed by team members and agreed upon during the planning phase. 
+//change
+The product backlog contained all requirements for the game. These requirements were collectively defined by the team during the initial planning phase and were continuously refined and prioritised to reflect development needs and project constraints. 
 
-At the start of each sprint, a sprint planning meeting was conducted by the Scrum Master. After this meeting, team members selected tasks from the prioritised backlog for the upcoming sprint.
+At the beginning of each sprint, a sprint planning meeting was led by the Scrum Master to review and reorganise the backlog. Following this, team members selected tasks based on priority and complexity, ensuring an even distribution of workload and alignment with sprint objectives.
 
-During each sprint, the team worked collaboratively to implement features, test functionality and integrate new systems into the existing game framework. Progress was monitored throughout the sprint, and completed tasks were reviewed before moving into the next development cycle.
+Throughout each sprint, development was carried out collaboratively, focusing on feature implementation, system testing, and integration with the existing game framework. Progress was monitored on an ongoing basis, with completed tasks undergoing review to ensure correctness and consistency before being incorporated into subsequent development cycles.
 
 **6.3.2 Horizontal Development Strategy**
 
-Our team adopted a horizontal development approach to support iterative development. Instead of completing individual systems sequentially, we implemented simplified versions of multiple core systems early in the development process. For example, the player movement system, map layout, obstacle mechanics and wallet system were developed simultaneously using placeholder assets.
+A horizontal development approach was adopted to support iterative development. Instead of completing individual features sequentially, we implemented simplified versions of multiple core features early in the development process. For example, the player movement system, map layout, obstacle mechanics and wallet system were developed simultaneously using placeholder assets.
 
-This approach was chosen because the gameplay relies heavily on interactions between multiple systems. Mechanics such as player movement must integrate correctly with collision detection and environmental obstacles. Developing these systems independently could delay the discovery of integration issues. For instance, the behaviour of the player movement system can only be properly evaluated when interacting with platforms, obstacles, and other game objects. If such issues are discovered at a later stage of development, the team may have needed to perform refactoring, which could significantly increase development time and complexity.
+This approach was chosen because the gameplay relies heavily on interactions between multiple systems. Mechanics such as player movement must integrate correctly with collision detection and environmental obstacles. Developing these systems independently could delay the discovery of integration issues. For instance, the behaviour of the player movement class can only be properly evaluated when interacting with platforms, obstacles, and other game objects. If such issues are discovered at a later stage of development, the team may have needed to perform refactoring, which could significantly increase development time and complexity.
 
 Additionally, we wanted users to experience the core gameplay at an early stage so that we could gather feedback and identify areas for improvement. For this reason, the team developed basic versions of key systems to produce a Minimum Viable Product (MVP) as early as possible. The game was then progressively refined through subsequent sprint cycles, with placeholder assets replaced and mechanics polished iteratively.
 
@@ -890,6 +922,10 @@ flowchart LR
     D1 --> D2
     D2 --> D3
 ```
+<div align="center">
+    <p><em>Figure ?: Horizontal Development Strategy</em></p>
+</div>
+
 
 ### 6.3. Sprint Workflow  
 
@@ -897,9 +933,9 @@ flowchart LR
 |:---:|:---:|:---:|:---:|:--- |:---:| 
 | Sprint 1 | 15 Feb-1 Mar | Initial game prototype | Megi | • Project file structure setup <br> • CI/CD pipeline setup <br> • Basic player movement <br> • Win/Lose detection <br> • Platform detection and Hitbox system <br> • Start screen <br> • Death/Respawn system | Initial playable prototype (v0.1.0) completed |
 | Sprint 2 | 2 Mar-16 Mar | Core gameplay systems | Maran | • HUD Overlay and Scoreboard <br> • Reward Algorithm <br> • Character animation <br> • Character sprites and animation <br> • Map data structure and map design <br> • Coin entity and wallet system <br> • State manager | Core gameplay mechanics implemented | 
-| Sprint 3 | 17 Mar-30 Mar | Feature expansion | Jacqueline | • Ice and forest maps <br> • Global configuration system <br> • Shop system and player inventory <br> • Audio implementation <br> • Return buttons and UI improvements <br> • AI obstacle placement <br> • Obstacle animation <br> • Lore  <br> • Tutorial <br> • Lobby <br> • Pause Manager | - | 
-| Sprint 4 | 31 Mar-13 Apr | Testing and gameplay refinement | - | • Bug fixing <br> • UI improvement (add) | - |  
-| Sprint 5 | 14 Apr-24 Apr | Final polishing and deployment preparation | - | • Final bug fixing <br> • Final testing <br> • Deployment preparation | - |  
+| Sprint 3 | 17 Mar-30 Mar | Feature expansion | Jacqueline | • Ice and forest maps <br> • Global configuration system <br> • Shop system and player inventory <br> • Audio implementation <br> • Return buttons and UI improvements <br> • Obstacle animation <br> • Lobby <br> • Pause Manager | Added obstacle animation, game shop and inventory | 
+| Sprint 4 | 31 Mar-13 Apr | Testing and gameplay refinement | Jinwang | • Bug fixing <br> • UI improvement  <br> • AI map generation <br> • Tutorial  <br> | Improved graphics, and added game tutorial |  
+| Sprint 5 | 14 Apr-24 Apr | Final polishing and deployment preparation | Mengxiao | • Final bug fixing <br> • Final testing <br> • Deployment preparation | Added sound effects, improved map desigm, final polished game |  
 
 
 ### 6.4. Branching Strategy
@@ -909,9 +945,9 @@ Our repository follows a structured branching strategy to ensure code quality an
 
 - **Development branch** - The `dev` branch is an integration branch. All new features and fixes are merged here first. Code in  `dev` must be carefully tested and validated before it is promoted to the `main` branch. 
 
-- **Feature branches** - The `feature` branches are used to develop individual features in isolation. These branches are created from `dev`. Merging a feature branch back to `dev` also require a PR. 
+- **Feature branches** - The `feature` branches are used to develop individual features in isolation. These branches are created from `dev`. Merging a feature branch back to `dev` also requires a PR. 
 
-**Approval**: Every PR must be reviewed and approved by at least one other team member. 
+**Approval**: Every PR must be reviewed and approved by at least one other team member from another pair. 
 
 Our branch structure:
 
@@ -925,34 +961,35 @@ main
       ...
 ```
 
-### 6.5. Build and Deployment Pipeline 
+### 6.5. Build and Deployment Pipeline (?)
  
+ //TO BE ADDED AFTER MARAN'S REFLECTION
 
 ### 6.6. Reflection on Teamwork 
+//do today
 
 ## 7. Subtainability, Ethics and Accessibility
-(~250 words) 
+(~750 words) 
 Environmental + 2 of the following: Social, Enconimic, Technical and Individual 
 
-
-## 7. Conclusion
+## 8. Conclusion
 
 (10% ~500 words)
 
 - Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
 
 
-## 8. Contribution Statement
+## 9. Contribution Statement
 
 - Provide a table of everyone's contribution, which _may_ be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
 
-## AI Statement 
+## 10. AI Statement 
 (~250 words) 
 summerise your team'suse of AI so we know where to give you credit for work done 
 charater animation 
 
 
-### Reference
+### References
 [1]J. Joe, S. Chaudhuri, T. Le, H. Thompson, and G. Demiris, “The use of think-aloud and instant data analysis in evaluation research: Exemplar and lessons learned,” Journal of Biomedical Informatics, vol. 56, pp. 284–291, Aug. 2015, doi: 10.1016/j.jbi.2015.06.001. (add to why choose think aloud)
 
 [2]“A comparison of heuristics applied for studying the usability of websites,” Procedia Computer Science, vol. 176, pp. 3571–3580, doi: 10.1016/j.procs.2020.09.029. (add to why we choose heuristics)
@@ -980,7 +1017,8 @@ https://zjnu2017.github.io/OOAD/reading/Object.Oriented.Analysis.and.Design.with
 
 [10] I. F. Alexander, “A taxonomy of stakeholders: Human roles in system development,”
 Int. J. Technol. Human Interact., vol. 1, no. 1, pp. 23–59, 2005.
-doi: 10.4018/jthi.2005010102. (onion model)
+doi: 10.4018/jthi.2005010102. 
+
 ### Appendix
 
 You can delete this section in your own repo, it's just here for information. in addition to the marks above, we will be marking you on the following two points:
