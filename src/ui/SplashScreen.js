@@ -45,14 +45,14 @@ export class SplashScreen {
 
         this.settingsPanel = {
             w: 380,
-            h: 328,
+            h: 540,
             x: gameWidth / 2 - 190,
-            y: gameHeight / 2 - 98,
+            y: gameHeight / 2 - 270,
         };
         this.displayFitButton = new RectButton(
             p,
             this.settingsPanel.x + 32,
-            this.settingsPanel.y + 96,
+            this.settingsPanel.y + 80,
             140,
             42,
             'CLASSIC FIT',
@@ -60,7 +60,7 @@ export class SplashScreen {
         this.displayStretchButton = new RectButton(
             p,
             this.settingsPanel.x + this.settingsPanel.w - 32 - 140,
-            this.settingsPanel.y + 96,
+            this.settingsPanel.y + 80,
             140,
             42,
             'FULL WINDOW',
@@ -68,7 +68,7 @@ export class SplashScreen {
         this.fontPressStartButton = new RectButton(
             p,
             this.settingsPanel.x + this.settingsPanel.w - 32 - 140,
-            this.settingsPanel.y + 214,
+            this.settingsPanel.y + 190,
             140,
             42,
             'PRESS START',
@@ -76,10 +76,34 @@ export class SplashScreen {
         this.fontPanasChillButton = new RectButton(
             p,
             this.settingsPanel.x + 32,
-            this.settingsPanel.y + 214,
+            this.settingsPanel.y + 190,
             140,
             42,
             'PANAS CHILL',
+        );
+        this.aiOnButton = new RectButton(
+            p,
+            this.settingsPanel.x + 32,
+            this.settingsPanel.y + 310,
+            140,
+            42,
+            'AI ON',
+        );
+        this.aiOffButton = new RectButton(
+            p,
+            this.settingsPanel.x + this.settingsPanel.w - 32 - 140,
+            this.settingsPanel.y + 310,
+            140,
+            42,
+            'AI OFF',
+        );
+        this.apiKeyInputButton = new RectButton(
+            p,
+            this.settingsPanel.x + 32,
+            this.settingsPanel.y + 420,
+            this.settingsPanel.w - 64,
+            42,
+            '',
         );
         this.closeButton = new RoundButton(
             p,
@@ -95,7 +119,7 @@ export class SplashScreen {
      * @param {number} mx - Mouse X position
      * @param {number} my - Mouse Y position
      */
-    render(p, mx, my, showSettings = false, displayMode = 'fit', fontMode = 'press_start_2p') {
+    render(p, mx, my, showSettings = false, displayMode = 'fit', fontMode = 'press_start_2p', aiMapFlag = 1, apiKey = '', apiKeyFocused = false) {
         const scale = Math.min(this.gameWidth / 1920, this.gameHeight / 1080);
         const titleBaseX = 500 * (this.gameWidth / 1920);
         const titleX =
@@ -164,7 +188,7 @@ export class SplashScreen {
         this.button2.updateCursor(mx, my);
 
         if (showSettings) {
-            this._drawSettingsPanel(p, mx, my, displayMode, fontMode);
+            this._drawSettingsPanel(p, mx, my, displayMode, fontMode, aiMapFlag, apiKey, apiKeyFocused);
         }
     }
 
@@ -180,10 +204,13 @@ export class SplashScreen {
         if (this.displayStretchButton.isHovered(mx, my)) return 'stretch';
         if (this.fontPressStartButton.isHovered(mx, my)) return 'font_press_start_2p';
         if (this.fontPanasChillButton.isHovered(mx, my)) return 'font_panas_chill';
+        if (this.aiOnButton.isHovered(mx, my)) return 'ai_on';
+        if (this.aiOffButton.isHovered(mx, my)) return 'ai_off';
+        if (this.apiKeyInputButton.isHovered(mx, my)) return 'focus_api_key';
         return null;
     }
 
-    _drawSettingsPanel(p, mx, my, displayMode, fontMode) {
+    _drawSettingsPanel(p, mx, my, displayMode, fontMode, aiMapFlag, apiKey, apiKeyFocused) {
         const panel = this.settingsPanel;
         const uiTextScale = this._menuTextScale(fontMode);
         p.noStroke();
@@ -203,9 +230,10 @@ export class SplashScreen {
         p.textFont(GameConfig.FONT, 9.2 * uiTextScale);
         p.text('SETTINGS', panel.x + panel.w / 2, panel.y + 16);
 
+        // --- DISPLAY MODE ---
         p.fill(120, 144, 188);
         p.textFont(GameConfig.FONT, 5.8 * uiTextScale);
-        p.text('DISPLAY MODE', panel.x + panel.w / 2, panel.y + 48);
+        p.text('DISPLAY MODE', panel.x + panel.w / 2, panel.y + 42);
 
         this.displayFitButton.textSize = 7.4 * uiTextScale;
         this.displayStretchButton.textSize = 7.4 * uiTextScale;
@@ -220,16 +248,12 @@ export class SplashScreen {
                 : 'Current: Classic Fit';
         p.fill(180, 208, 255);
         p.textFont(GameConfig.FONT, 5.1 * uiTextScale);
-        p.text(activeText, panel.x + panel.w / 2, panel.y + 160);
+        p.text(activeText, panel.x + panel.w / 2, panel.y + 130);
 
-        p.fill(120, 144, 188);
-        p.textFont(GameConfig.FONT, 4.9 * uiTextScale);
-        p.text('Classic Fit keeps the old letterboxed pixel view.', panel.x + panel.w / 2, panel.y + 180);
-        p.text('Full Window stretches like releases/v0.2.0.', panel.x + panel.w / 2, panel.y + 194);
-
+        // --- FONT ---
         p.fill(120, 144, 188);
         p.textFont(GameConfig.FONT, 5.8 * uiTextScale);
-        p.text('FONT', panel.x + panel.w / 2, panel.y + 264);
+        p.text('FONT', panel.x + panel.w / 2, panel.y + 158);
 
         this.fontPressStartButton.textSize = 6.8 * uiTextScale;
         this.fontPanasChillButton.textSize = 6.8 * uiTextScale;
@@ -240,11 +264,68 @@ export class SplashScreen {
 
         const activeFontText =
             fontMode === 'panas_chill'
-                ? 'Current: PanasChill from releases/v0.2.0'
+                ? 'Current: PanasChill'
                 : 'Current: Press Start 2P';
         p.fill(180, 208, 255);
         p.textFont(GameConfig.FONT, 5 * uiTextScale);
-        p.text(activeFontText, panel.x + panel.w / 2, panel.y + 294);
+        p.text(activeFontText, panel.x + panel.w / 2, panel.y + 240);
+
+        // --- AI MAP GENERATION ---
+        p.fill(120, 144, 188);
+        p.textFont(GameConfig.FONT, 5.8 * uiTextScale);
+        p.text('AI MAP GENERATION', panel.x + panel.w / 2, panel.y + 270);
+
+        const hasApiKey = apiKey && apiKey.trim().length > 0;
+        
+        // Buttons
+        this.aiOnButton.textSize = 7.4 * uiTextScale;
+        this.aiOffButton.textSize = 7.4 * uiTextScale;
+        
+        // Style buttons based on state
+        if (!hasApiKey) {
+            this.aiOnButton.defaultColour = { r: 80, g: 80, b: 80 };
+            this.aiOnButton.changedColour = { r: 80, g: 80, b: 80 };
+        } else {
+            this.aiOnButton.defaultColour = { r: 80, g: 220, b: 120 };
+            this.aiOnButton.changedColour = { r: 50, g: 180, b: 90 };
+        }
+        this.aiOffButton.defaultColour = { r: 255, g: 100, b: 100 };
+        this.aiOffButton.changedColour = { r: 200, g: 70, b: 70 };
+
+        this.aiOnButton.drawButton(p, mx, my);
+        this.aiOffButton.drawButton(p, mx, my);
+        if (hasApiKey) this.aiOnButton.updateCursor(mx, my);
+        this.aiOffButton.updateCursor(mx, my);
+
+        const activeAIText = aiMapFlag === 0 ? 'Current: AI Enabled' : 'Current: Procedural';
+        p.fill(180, 208, 255);
+        p.textFont(GameConfig.FONT, 5.1 * uiTextScale);
+        p.text(activeAIText, panel.x + panel.w / 2, panel.y + 360);
+
+        // --- API KEY ---
+        p.fill(120, 144, 188);
+        p.textFont(GameConfig.FONT, 5.8 * uiTextScale);
+        p.text('GEMINI API KEY', panel.x + panel.w / 2, panel.y + 390);
+
+        this.apiKeyInputButton.textSize = 5.5 * uiTextScale;
+        this.apiKeyInputButton.drawButton(p, mx, my);
+        this.apiKeyInputButton.updateCursor(mx, my);
+
+        // Draw current API key or placeholder
+        const displayKey = apiKeyFocused 
+            ? apiKey + (p.frameCount % 60 < 30 ? '|' : '')
+            : (apiKey ? '*'.repeat(Math.min(apiKey.length, 15)) : "CLICK TO TYPE");
+        
+        p.fill(255);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textFont(GameConfig.FONT, 5 * uiTextScale);
+        p.text(displayKey, panel.x + panel.w / 2, this.apiKeyInputButton.y + this.apiKeyInputButton.h / 2);
+
+        if (!hasApiKey && aiMapFlag === 0) {
+            p.fill(255, 100, 100);
+            p.textSize(4 * uiTextScale);
+            p.text('API KEY REQUIRED FOR AI MAPS', panel.x + panel.w / 2, panel.y + 480);
+        }
 
         this.closeButton.textSize = 7.2 * uiTextScale;
         this.closeButton.drawButton(p, mx, my);

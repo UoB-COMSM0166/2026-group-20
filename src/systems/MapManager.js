@@ -42,10 +42,10 @@ export class MapManager {
         map2: 'I',
     };
 
-    constructor(p, aiMapFlag = 1) {
+    constructor(p, aiMapFlag = 1, apiKey = null) {
         this.p = p;
         this.aiMapFlag = aiMapFlag;
-        this.aiGenerator = new AIMapGenerator();
+        this.aiGenerator = new AIMapGenerator(apiKey);
         this.preloadedAIMap = null;
         this._preloadPromise = null;
 

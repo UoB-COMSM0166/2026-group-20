@@ -2,9 +2,9 @@ import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 
 export class AIMapGenerator {
-  constructor() {
+  constructor(apiKey) {
     this.ai = new GoogleGenAI({
-        apiKey: import.meta.env.VITE_GEMINI_API_KEY
+        apiKey: apiKey || import.meta.env.VITE_GEMINI_API_KEY
     });
     this.systemPrompt = `
         You are a 2D platformer game map designer. Your role is to generate a random complex map for a 2D platformer game along with the original "Start_Point" and "End_Point"

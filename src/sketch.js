@@ -66,8 +66,9 @@ export const sketch = (p) => {
     let gameWidth = GameConfig.GAME_WIDTH;
     let gameHeight = GameConfig.GAME_HEIGHT;
 
-    const aiMapFlag    = 0; // 0 for AI map generator, 1 for procedural
-    const mapManager   = new MapManager(p, aiMapFlag);
+    let aiMapFlag = 1; // 0 for AI map generator, 1 for procedural
+    let apiKey = '';
+    const mapManager   = new MapManager(p, aiMapFlag, apiKey);
     const audioManager = new AudioManager();
 
     let sawFrames;
@@ -131,7 +132,7 @@ export const sketch = (p) => {
     p.setup = function () {
         p.createCanvas(p.windowWidth, p.windowHeight);
 
-        window.ai = new AIMapGenerator()
+        window.ai = new AIMapGenerator(apiKey)
 
         /**
          * Shared session context.
@@ -184,6 +185,9 @@ export const sketch = (p) => {
             resumeRunState: false,
             displayMode: 'fit',
             fontMode: 'panas_chill',
+            aiMapFlag,
+            apiKey,
+            mapManager,
         };
 
         document.body.style.fontFamily = "'PanasChill', monospace";
