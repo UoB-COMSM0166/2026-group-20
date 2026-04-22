@@ -4,12 +4,6 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: 'Press Start 2P';
-  src: url('./assets/fonts/PressStart2P.ttf') format('truetype');
-  font-display: swap;
-}
-
 html, body {
   margin: 0;
   padding: 0;

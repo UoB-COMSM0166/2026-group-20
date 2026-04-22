@@ -327,7 +327,7 @@ export class CharSelectState extends State {
                 }
             }
         } else if (p.keyCode === p.ESCAPE) {
-            this.goTo(GameStage.MENU);
+            this._stepBackSelectionFlow();
         }
     }
 
@@ -374,15 +374,34 @@ export class CharSelectState extends State {
 
     _cancelCurrentSelection() {
         const playerIdx = this._currentTurn;
+        this._pendingNameFor = null;
+        this._resetPlayerSelection(playerIdx);
+    }
+
+    _stepBackSelectionFlow() {
+        if (this._pendingNameFor) {
+            this._cancelCurrentSelection();
+            return;
+        }
+
+        if (this._currentTurn <= 0) {
+            return;
+        }
+
+        const previousPlayerIdx = this._currentTurn - 1;
+        this._resetPlayerSelection(previousPlayerIdx);
+        this._currentTurn = previousPlayerIdx;
+    }
+
+    _resetPlayerSelection(playerIdx) {
         this._chosen[playerIdx] = null;
         this._nicknames[playerIdx] = '';
-        this._pendingNameFor = null;
 
         const player = this.ctx.players[playerIdx];
-        if (player) {
-            player.character = null;
-            player.nickname = `Player ${playerIdx + 1}`;
-        }
+        if (!player) return;
+
+        player.character = null;
+        player.nickname = `Player ${playerIdx + 1}`;
     }
 
     /**

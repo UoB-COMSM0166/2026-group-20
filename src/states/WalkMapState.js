@@ -196,12 +196,14 @@ export class WalkMapState extends State {
         p.textSize(5);
         p.text('ESC TO GO BACK', gW / 2, 70);
         
+        const p1Id = this._playerIdLabel(players[0], 0);
+        const p2Id = this._playerIdLabel(players[1], 1);
         const p1Char = players[0]?.character?.displayName || 'Character';
         const p2Char = players[1]?.character?.displayName || 'Character';
         p.textAlign(p.LEFT, p.TOP);
-        p.text(`P1: ${p1Char}`, 20, 72);
+        p.text(`${p1Id}: ${p1Char}`, 20, 72);
         p.textAlign(p.RIGHT, p.TOP);
-        p.text(`${p2Char} :P2`, gW - 20, 72);
+        p.text(`${p2Char} :${p2Id}`, gW - 20, 72);
 
         // Map cards
         for (const portal of this._portals) {
@@ -311,7 +313,7 @@ export class WalkMapState extends State {
             p.fill(...w.col);
             p.textAlign(p.CENTER, p.BOTTOM);
             p.textSize(5.5);
-            p.text(`P${w.idx + 1}`, w.x + w.w / 2, w.y - 4);
+            p.text(this._playerIdLabel(pl, w.idx), w.x + w.w / 2, w.y - 4);
 
             this._drawControlHint(p, w);
         }
@@ -347,6 +349,14 @@ export class WalkMapState extends State {
         p.noSmooth();
         p.image(preview, x, y, w, h);
         p.pop();
+    }
+
+    _playerIdLabel(player, index) {
+        const fallback = `P${index + 1}`;
+        const nickname = player?.nickname?.trim();
+        if (!nickname) return fallback;
+        if (nickname === `Player ${index + 1}`) return fallback;
+        return nickname;
     }
 
     _drawControlHint(p, walker) {

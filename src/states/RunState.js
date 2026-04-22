@@ -528,13 +528,33 @@ export class RunState extends State {
     }
 
     _bagButtonRects() {
-        const { gameWidth } = this.ctx;
-        const bagW = 42;
-        const bagH = 10;
+        const { gameWidth, p, players, scoreManager } = this.ctx;
         const topY = 10;
+        const bagH = 18;
+        const paddingX = 4;
+        const makeBagLabel = (player) =>
+            `🎒 ${this._showBackpack && this._backpackPlayer === player.playerNo ? 'OPEN' : 'BAG'}`;
+
+        p.push();
+        p.textFont(GameConfig.FONT);
+        p.textSize(18);
+
+        const p1Prefix = `P1  🪙 ${scoreManager.getRoundCoins(players[0])}  💰 ${scoreManager.getWallet(players[0])}  `;
+        const p1BagLabel = makeBagLabel(players[0]);
+        const p1X = 10 + p.textWidth(p1Prefix) - paddingX;
+        const p1W = p.textWidth(p1BagLabel) + paddingX * 2;
+
+        const p2Prefix = `P2  🪙 ${scoreManager.getRoundCoins(players[1])}  💰 ${scoreManager.getWallet(players[1])}  `;
+        const p2BagLabel = makeBagLabel(players[1]);
+        const p2TextRight = gameWidth - 10;
+        const p2X = p2TextRight - p.textWidth(p2Prefix) - p.textWidth(p2BagLabel) - paddingX;
+        const p2W = p.textWidth(p2BagLabel) + paddingX * 2;
+
+        p.pop();
+
         return [
-            { x: 138, y: topY, w: bagW, h: bagH },
-            { x: gameWidth - 178, y: topY, w: bagW, h: bagH },
+            { x: p1X, y: topY, w: p1W, h: bagH },
+            { x: p2X, y: topY, w: p2W, h: bagH },
         ];
     }
 

@@ -45,9 +45,9 @@ export class SplashScreen {
 
         this.settingsPanel = {
             w: 380,
-            h: 328,
+            h: 224,
             x: gameWidth / 2 - 190,
-            y: gameHeight / 2 - 98,
+            y: gameHeight / 2 - 76,
         };
         this.displayFitButton = new RectButton(
             p,
@@ -55,7 +55,7 @@ export class SplashScreen {
             this.settingsPanel.y + 96,
             140,
             42,
-            'CLASSIC FIT',
+            'STANDARD VIEW',
         );
         this.displayStretchButton = new RectButton(
             p,
@@ -63,23 +63,7 @@ export class SplashScreen {
             this.settingsPanel.y + 96,
             140,
             42,
-            'FULL WINDOW',
-        );
-        this.fontPressStartButton = new RectButton(
-            p,
-            this.settingsPanel.x + this.settingsPanel.w - 32 - 140,
-            this.settingsPanel.y + 214,
-            140,
-            42,
-            'PRESS START',
-        );
-        this.fontPanasChillButton = new RectButton(
-            p,
-            this.settingsPanel.x + 32,
-            this.settingsPanel.y + 214,
-            140,
-            42,
-            'PANAS CHILL',
+            'MAX VIEW',
         );
         this.closeButton = new RoundButton(
             p,
@@ -95,28 +79,16 @@ export class SplashScreen {
      * @param {number} mx - Mouse X position
      * @param {number} my - Mouse Y position
      */
-    render(p, mx, my, showSettings = false, displayMode = 'fit', fontMode = 'press_start_2p') {
+    render(p, mx, my, showSettings = false, displayMode = 'stretch') {
         const scale = Math.min(this.gameWidth / 1920, this.gameHeight / 1080);
         const titleBaseX = 500 * (this.gameWidth / 1920);
-        const titleX =
-            fontMode === 'press_start_2p'
-                ? titleBaseX + 180 * (this.gameWidth / 1920)
-                : titleBaseX;
+        const titleX = titleBaseX;
         const titleY = 230 * (this.gameHeight / 1080);
         const promptX = 1050 * (this.gameWidth / 1920);
         const promptY = 650 * (this.gameHeight / 1080);
-        const homepageFont =
-            fontMode === 'panas_chill'
-                ? (this.menuFont ?? 'PanasChill')
-                : 'Press Start 2P';
-        const titleFontSize =
-            fontMode === 'press_start_2p'
-                ? Math.max(34, (140 * scale) / 1.5)
-                : Math.max(34, 140 * scale);
-        const titleText =
-            fontMode === 'press_start_2p'
-                ? 'The\nIncredible\nChickenBunny'
-                : 'The Incredible\n ChickenBunny';
+        const homepageFont = this.menuFont ?? 'PanasChill';
+        const titleFontSize = Math.max(34, 140 * scale);
+        const titleText = 'The Incredible\n ChickenBunny';
 
         // Branch-faithful title treatment
         p.textAlign(p.CENTER, p.CENTER);
@@ -154,8 +126,8 @@ export class SplashScreen {
         this.button1.changedColour = { r: 220, g: 170, b: 55 };
         this.button2.defaultColour = { r: 255, g: 160, b: 200 };
         this.button2.changedColour = { r: 220, g: 120, b: 175 };
-        this.button1.textSize = 10 * this._menuTextScale(fontMode);
-        this.button2.textSize = 10 * this._menuTextScale(fontMode);
+        this.button1.textSize = 30;
+        this.button2.textSize = 30;
 
         this.button1.drawButton(p, mx, my);
         this.button2.drawButton(p, mx, my);
@@ -164,7 +136,7 @@ export class SplashScreen {
         this.button2.updateCursor(mx, my);
 
         if (showSettings) {
-            this._drawSettingsPanel(p, mx, my, displayMode, fontMode);
+            this._drawSettingsPanel(p, mx, my, displayMode);
         }
     }
 
@@ -178,14 +150,11 @@ export class SplashScreen {
         if (this.closeButton.isHovered(mx, my)) return 'close';
         if (this.displayFitButton.isHovered(mx, my)) return 'fit';
         if (this.displayStretchButton.isHovered(mx, my)) return 'stretch';
-        if (this.fontPressStartButton.isHovered(mx, my)) return 'font_press_start_2p';
-        if (this.fontPanasChillButton.isHovered(mx, my)) return 'font_panas_chill';
         return null;
     }
 
-    _drawSettingsPanel(p, mx, my, displayMode, fontMode) {
+    _drawSettingsPanel(p, mx, my, displayMode) {
         const panel = this.settingsPanel;
-        const uiTextScale = this._menuTextScale(fontMode);
         p.noStroke();
         p.fill(0, 0, 0, 170);
         p.rect(0, 0, this.gameWidth, this.gameHeight);
@@ -200,15 +169,15 @@ export class SplashScreen {
 
         p.fill(220, 232, 255);
         p.textAlign(p.CENTER, p.TOP);
-        p.textFont(GameConfig.FONT, 9.2 * uiTextScale);
+        p.textFont(GameConfig.FONT, 27.6);
         p.text('SETTINGS', panel.x + panel.w / 2, panel.y + 16);
 
         p.fill(120, 144, 188);
-        p.textFont(GameConfig.FONT, 5.8 * uiTextScale);
+        p.textFont(GameConfig.FONT, 17.4);
         p.text('DISPLAY MODE', panel.x + panel.w / 2, panel.y + 48);
 
-        this.displayFitButton.textSize = 7.4 * uiTextScale;
-        this.displayStretchButton.textSize = 7.4 * uiTextScale;
+        this.displayFitButton.textSize = 22.2;
+        this.displayStretchButton.textSize = 22.2;
         this.displayFitButton.drawButton(p, mx, my);
         this.displayStretchButton.drawButton(p, mx, my);
         this.displayFitButton.updateCursor(mx, my);
@@ -216,42 +185,19 @@ export class SplashScreen {
 
         const activeText =
             displayMode === 'stretch'
-                ? 'Current: Full Window Stretch'
-                : 'Current: Classic Fit';
+                ? 'Current: Max View'
+                : 'Current: Standard View';
         p.fill(180, 208, 255);
-        p.textFont(GameConfig.FONT, 5.1 * uiTextScale);
+        p.textFont(GameConfig.FONT, 15.3);
         p.text(activeText, panel.x + panel.w / 2, panel.y + 160);
 
         p.fill(120, 144, 188);
-        p.textFont(GameConfig.FONT, 4.9 * uiTextScale);
-        p.text('Classic Fit keeps the old letterboxed pixel view.', panel.x + panel.w / 2, panel.y + 180);
-        p.text('Full Window stretches like releases/v0.2.0.', panel.x + panel.w / 2, panel.y + 194);
+        p.textFont(GameConfig.FONT, 14.7);
+        p.text('Standard View keeps the original fitted framing.', panel.x + panel.w / 2, panel.y + 180);
+        p.text('Max View fills the whole window by stretching the scene.', panel.x + panel.w / 2, panel.y + 194);
 
-        p.fill(120, 144, 188);
-        p.textFont(GameConfig.FONT, 5.8 * uiTextScale);
-        p.text('FONT', panel.x + panel.w / 2, panel.y + 264);
-
-        this.fontPressStartButton.textSize = 6.8 * uiTextScale;
-        this.fontPanasChillButton.textSize = 6.8 * uiTextScale;
-        this.fontPressStartButton.drawButton(p, mx, my);
-        this.fontPanasChillButton.drawButton(p, mx, my);
-        this.fontPressStartButton.updateCursor(mx, my);
-        this.fontPanasChillButton.updateCursor(mx, my);
-
-        const activeFontText =
-            fontMode === 'panas_chill'
-                ? 'Current: PanasChill from releases/v0.2.0'
-                : 'Current: Press Start 2P';
-        p.fill(180, 208, 255);
-        p.textFont(GameConfig.FONT, 5 * uiTextScale);
-        p.text(activeFontText, panel.x + panel.w / 2, panel.y + 294);
-
-        this.closeButton.textSize = 7.2 * uiTextScale;
+        this.closeButton.textSize = 21.6;
         this.closeButton.drawButton(p, mx, my);
         this.closeButton.updateCursor(mx, my);
-    }
-
-    _menuTextScale(fontMode) {
-        return fontMode === 'press_start_2p' ? 1.5 : 3;
     }
 }

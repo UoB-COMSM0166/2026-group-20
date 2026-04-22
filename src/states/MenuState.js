@@ -1,7 +1,6 @@
 import { State } from './State.js';
 import { SplashScreen } from '../ui/SplashScreen.js';
 import { GameStage } from '../config/GameStage.js';
-import { GameConfig } from '../config/GameConfig.js';
 
 /**
  * MenuState — the main splash / title screen.
@@ -40,8 +39,7 @@ export class MenuState extends State {
             mx,
             my,
             this._showSettings,
-            this.ctx.displayMode ?? 'fit',
-            this.ctx.fontMode ?? 'press_start_2p',
+            this.ctx.displayMode ?? 'stretch',
         );
     }
 
@@ -51,15 +49,6 @@ export class MenuState extends State {
             if (action === 'close') this._showSettings = false;
             else if (action === 'fit') this.ctx.displayMode = 'fit';
             else if (action === 'stretch') this.ctx.displayMode = 'stretch';
-            else if (action === 'font_press_start_2p') {
-                this.ctx.fontMode = 'press_start_2p';
-                GameConfig.FONT = 'Press Start 2P';
-                document.body.style.fontFamily = "'Press Start 2P', monospace";
-            } else if (action === 'font_panas_chill') {
-                this.ctx.fontMode = 'panas_chill';
-                GameConfig.FONT = 'PanasChill';
-                document.body.style.fontFamily = "'PanasChill', monospace";
-            }
             return;
         }
 

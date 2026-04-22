@@ -182,8 +182,7 @@ export const sketch = (p) => {
             audioManager,
             devMode: false,
             resumeRunState: false,
-            displayMode: 'fit',
-            fontMode: 'panas_chill',
+            displayMode: 'stretch',
         };
 
         document.body.style.fontFamily = "'PanasChill', monospace";
@@ -293,7 +292,7 @@ export const sketch = (p) => {
 
     function _getFontSizeScale() {
         if (activeState === states?.[GameStage.MENU]) return 1;
-        return ctx?.fontMode === 'press_start_2p' ? 1.5 : 3;
+        return 3;
     }
 
     function _withFontScale(multiplier, drawFn) {
