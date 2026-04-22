@@ -594,8 +594,6 @@ export class BuildState extends State {
         const { p } = this.ctx;
         if (p.keyCode === p.ENTER || p.keyCode === 13) {
             this._advanceTurn();
-        } else if (p.keyCode === p.ESCAPE) {
-            this.goTo(this.ctx.shopHasRun ? GameStage.SHOP : GameStage.TUTORIAL);
         } else if (p.key === 'r' || p.key === 'R') {
             this._rotateDirection();
         } else if (p.key === 'd' || p.key === 'D') {
@@ -663,7 +661,7 @@ export class BuildState extends State {
                 BouncePad.drawGhost(p, x, y, this.trampolineBouncing);
                 break;
             case ObstacleType.SPIKE:
-                SpikeObstacle.drawGhost(p, x, y);
+                SpikeObstacle.drawGhost(p, x, y, sprites.SPIKE);
                 break;
             case ObstacleType.CANNON:
                 Cannon.drawGhost(p, x, y, this._cannonDir, this.cannonImg);
@@ -959,10 +957,16 @@ export class BuildState extends State {
         }
 
         if (type === ObstacleType.WIND_ZONE) {
-            const fit = this._fitIconRect(x, y, w, h, 32, 32, w, h);
             return {
-                sx: 0, sy: 0, sw: 32, sh: 32,
-                ...fit,
+                sx: 32 * 2 + 6, sy: 9, sw: 22, sh: 14,
+                dx: x, dy: y, dw: w, dh: h,
+            };
+        }
+
+        if (type === ObstacleType.SPIKE) {
+            return {
+                sx: 41, sy: 0, sw: 38, sh: 40,
+                dx: x, dy: y, dw: w, dh: h,
             };
         }
 
@@ -1153,7 +1157,7 @@ export class BuildState extends State {
             case ObstacleType.FALLING_PLATFORM:  obs = new FallingPlatform(p, x, y, this.fallingPlatformFrames); break;
             case ObstacleType.ICE_PLATFORM:      obs = new IcePlatform(p, x, y, sprites.ICE_PLATFORM); break;
             case ObstacleType.BOUNCE_PAD:        obs = new BouncePad(p, x, y, this.trampolineBouncing); break;
-            case ObstacleType.SPIKE:             obs = new SpikeObstacle(p, x, y); break;
+            case ObstacleType.SPIKE:             obs = new SpikeObstacle(p, x, y, sprites.SPIKE); break;
             case ObstacleType.CANNON:            obs = new Cannon(p, x, y, this._cannonDir, this.cannonImg); break;
             case ObstacleType.SAW:               obs = new Saw(p, x, y, this.sawFrames); break;
             case ObstacleType.FLAME:             obs = new Flame(p, x, y, this.fireFrames); break;

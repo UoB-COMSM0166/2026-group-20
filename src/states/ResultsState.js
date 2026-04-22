@@ -131,8 +131,6 @@ export class ResultsState extends State {
             this._showLB = !this._showLB;
         } else if (p.keyCode === p.ENTER || p.keyCode === 13) {
             this.goTo(this._isFinalRound ? GameStage.MENU : GameStage.SHOP);
-        } else if (p.keyCode === p.ESCAPE) {
-            this.goTo(GameStage.MENU);
         }
     }
 

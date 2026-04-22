@@ -123,16 +123,16 @@ export class ShopState extends State {
         p.noStroke();
         p.fill(...col);
         p.textAlign(p.CENTER, p.TOP);
-        p.textSize(9);
+        p.textSize(8);
         p.text(`P${this._currentTurn + 1} PIXEL SHOP`, gameWidth / 2, 10);
 
         p.fill(160, 160, 190);
-        p.textSize(5.5);
+        p.textSize(5);
         p.textAlign(p.CENTER, p.TOP);
         p.text(
             'Hover icon to inspect. Buy traps with wallet coins.',
             gameWidth / 2,
-            28,
+            36,
         );
 
         this._hoveredItem = null;
@@ -356,8 +356,6 @@ export class ShopState extends State {
             this._doneTurn();
         } else if (p.key === 's' || p.key === 'S') {
             this._doneTurn();
-        } else if (p.keyCode === p.ESCAPE) {
-            this.goTo(GameStage.RESULTS);
         }
     }
 
@@ -511,10 +509,16 @@ export class ShopState extends State {
         }
 
         if (type === ObstacleType.WIND_ZONE) {
-            const fit = this._fitIconRect(x, y, w, h, 32, 32, w, h);
             return {
-                sx: 0, sy: 0, sw: 32, sh: 32,
-                ...fit,
+                sx: 32 * 2 + 6, sy: 9, sw: 22, sh: 14,
+                dx: x, dy: y, dw: w, dh: h,
+            };
+        }
+
+        if (type === ObstacleType.SPIKE) {
+            return {
+                sx: 41, sy: 0, sw: 38, sh: 40,
+                dx: x, dy: y, dw: w, dh: h,
             };
         }
 

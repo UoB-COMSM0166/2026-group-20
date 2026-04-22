@@ -385,6 +385,7 @@ export class CharSelectState extends State {
         }
 
         if (this._currentTurn <= 0) {
+            this.goTo(GameStage.MENU);
             return;
         }
 

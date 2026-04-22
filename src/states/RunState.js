@@ -243,31 +243,27 @@ export class RunState extends State {
         p.pop();
 
         // HUD — phase label
-        const hudTop = 8;
-        const hudGap = 22;
-        p.noStroke();
-        p.fill(100, 200, 120);
-        p.textAlign(p.CENTER, p.TOP);
-        p.textSize(6);
-        p.text('The Run', gameWidth / 2, hudTop);
+        const hudTop = 10;
+        const timerY = hudTop;
+        const roundY = 34;
 
         // HUD — timer
         p.fill(255);
-        p.textSize(10);
+        p.textSize(8.8);
         p.textAlign(p.CENTER, p.TOP);
         p.text(
             `Time: ${Math.ceil(this.timeManager.timeLeft)}s`,
             gameWidth / 2,
-            hudTop + hudGap,
+            timerY,
         );
 
-        p.fill(200, 200, 210);
-        p.textSize(6);
+        p.fill(180, 190, 210);
+        p.textSize(5.2);
         p.textAlign(p.CENTER, p.TOP);
         p.text(
             `Round ${this.ctx.scoreManager.currentRound} / ${this.ctx.scoreManager.maxRounds}`,
             gameWidth / 2,
-            hudTop + hudGap * 2,
+            roundY,
         );
 
         // HUD — per-player coins + wallet + inventory bag
@@ -290,12 +286,6 @@ export class RunState extends State {
                 10,
             );
         }
-
-        // Controls hint
-        p.fill(160, 160, 180);
-        p.textSize(5);
-        p.textAlign(p.CENTER, p.TOP);
-        p.text('P1: A/D + W   P2: ←/→ + ↑   ESC: Pause', gameWidth / 2, hudTop + hudGap * 3);
 
         // Backpack overlay
         if (this._showBackpack) {
@@ -544,17 +534,15 @@ export class RunState extends State {
         const p1X = 10 + p.textWidth(p1Prefix) - paddingX;
         const p1W = p.textWidth(p1BagLabel) + paddingX * 2;
 
-        const p2Prefix = `P2  🪙 ${scoreManager.getRoundCoins(players[1])}  💰 ${scoreManager.getWallet(players[1])}  `;
         const p2BagLabel = makeBagLabel(players[1]);
-        const p2TextRight = gameWidth - 10;
-        const p2X = p2TextRight - p.textWidth(p2Prefix) - p.textWidth(p2BagLabel) - paddingX;
         const p2W = p.textWidth(p2BagLabel) + paddingX * 2;
+        const p2RightEdge = gameWidth - 10;
 
         p.pop();
 
         return [
             { x: p1X, y: topY, w: p1W, h: bagH },
-            { x: p2X, y: topY, w: p2W, h: bagH },
+            { x: p2RightEdge - p2W - paddingX, y: topY, w: p2W, h: bagH },
         ];
     }
 
@@ -698,8 +686,15 @@ export class RunState extends State {
 
         if (type === ObstacleType.WIND_ZONE) {
             return {
-                sx: 0, sy: 0, sw: 32, sh: 32,
-                dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+                sx: 32 * 2 + 6, sy: 9, sw: 22, sh: 14,
+                dx: x, dy: y, dw: w, dh: h,
+            };
+        }
+
+        if (type === ObstacleType.SPIKE) {
+            return {
+                sx: 41, sy: 0, sw: 38, sh: 40,
+                dx: x, dy: y, dw: w, dh: h,
             };
         }
 

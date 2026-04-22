@@ -35,7 +35,7 @@ import fallingPlatform from './assets/obstacles/Falling Platforms/On (32x10).png
 import platform from './assets/obstacles/Platforms/platform (40x40).png';
 import movingPlatform from './assets/obstacles/Moving Platforms/Brown On (32x8).png';
 import icePlatform from './assets/obstacles/Ice Platforms/ice platform (40x40).png';
-import spikePlatform from './assets/obstacles/Spike Platforms/spike platform (40x40).png';
+import spikePlatform from './assets/obstacles/Spike Platforms/spike platform2 (40x40).png';
 import teleporter from './assets/obstacles/Teleporter/teleporter (40x40).png';
 import windZone from './assets/obstacles/Wind Zone/wind zone (32x32).png';
 import iceBlock from './assets/obstacles/Ice Block/ice block (40x40).png';

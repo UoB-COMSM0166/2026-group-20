@@ -34,4 +34,11 @@ export class MapMenuState extends State {
             this.goTo(GameStage.WALK_MAP);
         }
     }
+
+    keyPressed() {
+        const { p } = this.ctx;
+        if (p.keyCode === p.ESCAPE) {
+            this.goTo(GameStage.MENU);
+        }
+    }
 }
