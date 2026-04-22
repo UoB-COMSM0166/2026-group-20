@@ -93,7 +93,7 @@ GROUP PHOTO. Add a group photo here.
 - Describe your game, what is based on, what makes it novel? (what's the "twist"?)
 
 <p>
-<i>The Incredible ChickenBunny</i> is a newly developed and enhanced adaptation of the multiplayer platformer game <i>Ultimate Chicken Horse</i>. The original game was chosen as inspiration due to its distinctive multiplayer mechanics, in which players strategically select obstacles from an in-game shop and place them on the map in order to gain an advantage while simultaneously making the course more difficult for their opponents. This unique gameplay mechanism creates a dynamic balance between cooperation and competition, making the game very engaging. The original game also features colourful cartoon-style character sprites that contribute to a visually appealing aesthetic suitable for players of all age groups.
+**<i>The Incredible ChickenBunny</i>** is a newly developed and enhanced adaptation of the multiplayer platformer game <i>Ultimate Chicken Horse</i>. The original game was chosen as inspiration due to its distinctive multiplayer mechanics, in which players strategically select obstacles from an in-game shop and place them on the map in order to gain an advantage while simultaneously making the course more difficult for their opponents. This unique gameplay mechanism creates a dynamic balance between cooperation and competition, making the game very engaging. The original game also features colourful cartoon-style character sprites that contribute to a visually appealing aesthetic suitable for players of all age groups.
 
 During our game development, these core elements were preserved, while introducing several new gameplay and visual design enhancing features.
 
