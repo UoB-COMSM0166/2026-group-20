@@ -25,7 +25,7 @@ export class AIMapGenerator {
         - You use "Solid Block" to generate random structure in Map.
         - Place a 3-block horizontal platform immediately beneath the "Start_Point"
         - First index in the array is top left block and last index in the array is bottom right block in the map.
-        - The map has 30 columns and 20 rows. You have in total 600 indices.
+        - The map has 30 columns and 17 rows. You have in total 510 indices.
         - "Start_Point" is where a character spawns
         - "End_Point" is where a character needs to reach to finish
         - Do not change "Start_Point" and "End_Point".
@@ -130,9 +130,14 @@ export class AIMapGenerator {
             //         ]
             //     })
             // });
+            //
+            // const datab = await response.json();
+            //
+            // console.log(datab.choices[0].message.content.Map);
 
-            // const data = await response.json();
-            // console.log(data.choices[0].message.content);
+            await new Promise((resolve) => setTimeout(resolve, 30000));
+            console.log("Generated AI Map");
+
             let data = [
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

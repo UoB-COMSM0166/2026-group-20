@@ -46,6 +46,8 @@ export class MapManager {
         this.p = p;
         this.aiMapFlag = aiMapFlag;
         this.aiGenerator = new AIMapGenerator();
+        this.preloadedAIMap = null;
+        this._preloadPromise = null;
 
         this.mapLoaders = {
             map1: new TiledMapLoader(
@@ -114,6 +116,25 @@ export class MapManager {
     initialize(ctx) {
         ctx.mapManager = this;
         this._applySelectedMap(ctx);
+        if (this.aiMapFlag === 0) {
+            this.preloadNextAIMap();
+        }
+    }
+
+    preloadNextAIMap() {
+        if (this.aiMapFlag !== 0) return null;
+        if (this._preloadPromise) return this._preloadPromise;
+
+        this._preloadPromise = (async () => {
+            try {
+                this.preloadedAIMap = await this.aiGenerator.generateMap();
+            } catch (e) {
+                console.error('AI Map Preload failed:', e);
+            } finally {
+                this._preloadPromise = null;
+            }
+        })();
+        return this._preloadPromise;
     }
 
     selectMap(mapKey, ctx) {
@@ -142,7 +163,23 @@ export class MapManager {
 
     async generateRandomMap(mapKey, ctx) {
         if (this.aiMapFlag === 0) {
-            return await this._generateAIMap(mapKey, ctx);
+            if (this._preloadPromise) {
+                this._preloadPromise;
+            }
+
+            let aiResult = this.preloadedAIMap;
+            // if (!aiResult) {
+            //     aiResult = await this.aiGenerator.generateMap();
+            // }
+
+            this.preloadedAIMap = null;
+            this.preloadNextAIMap();
+
+            if (aiResult) {
+                this._applyAIMapResult(aiResult, mapKey, ctx);
+                return;
+            }
+
         }
         const theme = MapManager.THEME_MAP[mapKey];
         if (!theme) return;
@@ -545,8 +582,7 @@ export class MapManager {
         }
     }
 
-    async _generateAIMap(mapKey, ctx) {
-        const aiResult = await this.aiGenerator.generateMap();
+    _applyAIMapResult(aiResult, mapKey, ctx) {
         const loader = this.mapLoaders[mapKey];
         const tilesetImage = loader.tilesetImage;
         const tileW = GameConfig.TILE;
