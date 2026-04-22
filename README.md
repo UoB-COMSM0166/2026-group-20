@@ -98,7 +98,7 @@ GROUP PHOTO. Add a group photo here.
 During our game development, these core elements were preserved, while introducing several new gameplay and visual design enhancing features.
 
 To enhance immersion and variety, two themed environments were designed: a forest and an ice theme, each with their unique set of characters; a chicken and a bunny for the forest, and a polar bear and a penguin for the ice map.
-Furthermore, a coin and wallet system was implemented to increase competitiveness and player engagement. During each run, players can collect coins placed throughout the level, which can then be used to purchase better and more expensive obstacles in subsequent rounds. A compulsory timer was also introduced, replacing the optional timer in the original game, in order to increase tension and make the game more high-stakes. Finally, each game run generates a new skeleton map and resets all previously placed obstacles. This procedural variation prevents players from predicting the layout and encourages creative strategies when placing obstacles.
+Furthermore, a coin and wallet system was implemented to increase competitiveness and player engagement. During each run, players can collect coins placed throughout the level, which can then be used to purchase better and more expensive obstacles in subsequent rounds. A compulsory timer was also introduced, replacing the optional timer in the original game, in order to increase tension and make the game more high-stakes. Finally, each game run generates a new skeleton map and resets all previously placed obstacles. This procedural variation differs from the original, preventing players from predicting the layout and encouraging creative strategies when placing obstacles.
 </p>
 
 
