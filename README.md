@@ -1000,7 +1000,7 @@ At the **Individual** level, we recognise that the game’s short, repeatable lo
 Overall, while we have taken some initial steps to address sustainability concerns, a more critical and proactive approach, grounded in continuous evaluation and responsible design choices, will be necessary to ensure the system remains sustainable as it evolves.
 
 <div align="center">
-   <img src= "docs/assets/images/spider-diagram.png" alt= "Sustainability Framework Spider Chart" width= "700">
+   <img src= "docs/assets/images/spider-diagram.png" alt= "Sustainability Framework Spider Chart" width= "400">
 </div>
 
 <div align="center">
