@@ -1,7 +1,6 @@
 import { State } from './State.js';
 import { SplashScreen } from '../ui/SplashScreen.js';
 import { GameStage } from '../config/GameStage.js';
-import { GameConfig } from '../config/GameConfig.js';
 import { AIMapGenerator } from '../systems/AIMapGenerator.js';
 
 /**
@@ -32,11 +31,14 @@ export class MenuState extends State {
         this._handlePaste = (e) => {
             if (this._showSettings && this._apiKeyFocused) {
                 e.preventDefault();
-                const text = (e.clipboardData || window.clipboardData).getData('text');
+                const text = (e.clipboardData || window.clipboardData).getData(
+                    'text',
+                );
                 if (text) {
                     this.ctx.apiKey = (this.ctx.apiKey || '') + text;
                     if (this.ctx.mapManager.aiGenerator) {
-                        this.ctx.mapManager.aiGenerator.apiKey = this.ctx.apiKey;
+                        this.ctx.mapManager.aiGenerator.apiKey =
+                            this.ctx.apiKey;
                     }
                 }
             }
@@ -70,11 +72,10 @@ export class MenuState extends State {
             mx,
             my,
             this._showSettings,
-            this.ctx.displayMode ?? 'fit',
-            this.ctx.fontMode ?? 'press_start_2p',
+            this.ctx.displayMode ?? 'stretch',
             this.ctx.aiMapFlag ?? 1,
             this.ctx.apiKey ?? '',
-            this._apiKeyFocused
+            this._apiKeyFocused,
         );
     }
 
@@ -84,19 +85,11 @@ export class MenuState extends State {
             if (action === 'close') {
                 this._showSettings = false;
                 this._apiKeyFocused = false;
-            }
-            else if (action === 'fit') this.ctx.displayMode = 'fit';
+            } else if (action === 'fit') this.ctx.displayMode = 'fit';
             else if (action === 'stretch') this.ctx.displayMode = 'stretch';
-            else if (action === 'font_press_start_2p') {
-                this.ctx.fontMode = 'press_start_2p';
-                GameConfig.FONT = 'Press Start 2P';
-                document.body.style.fontFamily = "'Press Start 2P', monospace";
-            } else if (action === 'font_panas_chill') {
-                this.ctx.fontMode = 'panas_chill';
-                GameConfig.FONT = 'PanasChill';
-                document.body.style.fontFamily = "'PanasChill', monospace";
-            } else if (action === 'ai_on') {
-                const hasApiKey = this.ctx.apiKey && this.ctx.apiKey.trim().length > 0;
+            else if (action === 'ai_on') {
+                const hasApiKey =
+                    this.ctx.apiKey && this.ctx.apiKey.trim().length > 0;
                 if (hasApiKey) {
                     this.ctx.aiMapFlag = 0;
                     this.ctx.mapManager.aiMapFlag = 0;
@@ -137,7 +130,8 @@ export class MenuState extends State {
                     this._apiKeyFocused = false;
                     // Update MapManager with the new API Key
                     if (this.ctx.apiKey && this.ctx.mapManager.aiGenerator) {
-                        this.ctx.mapManager.aiGenerator.apiKey = this.ctx.apiKey;
+                        this.ctx.mapManager.aiGenerator.apiKey =
+                            this.ctx.apiKey;
                     }
                 } else if (p.keyCode === p.BACKSPACE) {
                     this.ctx.apiKey = this.ctx.apiKey.slice(0, -1);
@@ -147,7 +141,10 @@ export class MenuState extends State {
                     }
                 } else if (p.key && p.key.length === 1) {
                     // Ignore character if Control or Command is held (shortcuts like Ctrl+V)
-                    const isShortcut = p.keyIsDown(p.CONTROL) || p.keyIsDown(91) || p.keyIsDown(93);
+                    const isShortcut =
+                        p.keyIsDown(p.CONTROL) ||
+                        p.keyIsDown(91) ||
+                        p.keyIsDown(93);
                     if (!isShortcut) {
                         this.ctx.apiKey += p.key;
                     }

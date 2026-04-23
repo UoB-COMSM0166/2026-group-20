@@ -15,26 +15,25 @@
  * Wire into ctx in sketch.js and call from game states.
  */
 export class AudioManager {
-
     constructor() {
-        // Lazily create AudioContext on first interaction (browser autoplay policy)
-        this._ctx       = null;
-        this._musicGain = null;
-        this._musicNodes = [];   // currently playing music oscillators
-        this._musicTimer = null; // setInterval handle
-
-        this._sfxEnabled   = true;
-        this._musicEnabled = false;
+        this._ctx = null;
+        //this._musicGain = null;
+        //this._musicNodes = [];
+        //this._musicTimer = null;
+        this._musicTrack = null;
+        this._sfxEnabled = true;
+        this._musicEnabled = true;
         this._musicPlaying = false;
-
-        // Beat index for the music sequencer
-        this._beat = 0;
     }
 
     // ── Public getters ────────────────────────────────────────────────────
 
-    get sfxEnabled()   { return this._sfxEnabled;   }
-    get musicEnabled() { return this._musicEnabled; }
+    get sfxEnabled() {
+        return this._sfxEnabled;
+    }
+    get musicEnabled() {
+        return this._musicEnabled;
+    }
 
     // ── Initialise ────────────────────────────────────────────────────────
 
@@ -48,31 +47,94 @@ export class AudioManager {
         this._musicGain.connect(this._ctx.destination);
     }
 
-    // ── SFX ──────────────────────────────────────────────────────────────
-
     /**
      * Play a one-shot synthesised sound effect.
      * @param {'coin'|'death'|'finish'|'jump'|'bounce'} name
      */
     playSound(name) {
         if (!this._sfxEnabled) return;
+        const now = performance.now();
+        if (!this._lastSfxTime) this._lastSfxTime = {};
+        if (this._lastSfxTime[name] && now - this._lastSfxTime[name] < 80)
+            return;
+        this._lastSfxTime[name] = now;
+
         try {
             this._ensureCtx();
             const ac = this._ctx;
-            const t  = ac.currentTime;
+            const t = ac.currentTime;
 
             switch (name) {
-                case 'coin':    this._tone(ac, t, 880, 0.08, 'sine',     0.15, [[0, 0.18],[0.05, 0.0]]); break;
-                case 'jump':    this._tone(ac, t, 300, 0.06, 'square',   0.12, [[0, 0.12],[0.1,  0.0]], 600); break;
-                case 'bounce':  this._tone(ac, t, 500, 0.05, 'sine',     0.14, [[0, 0.14],[0.08, 0.0]], 800); break;
-                case 'death':   this._tone(ac, t, 220, 0.25, 'sawtooth', 0.25, [[0, 0.20],[0.2,  0.0]], 80);  break;
-                case 'finish':  this._chord(ac, t, [523, 659, 784, 1047], 0.5); break;
-                default: break;
+                case 'coin':
+                    this._tone(
+                        ac,
+                        t,
+                        1500,
+                        0.05,
+                        'sine',
+                        0.7,
+                        [
+                            [0, 0.7],
+                            [0.05, 0.0],
+                        ],
+                        2000,
+                    );
+                    break;
+                case 'jump':
+                    this._tone(
+                        ac,
+                        t,
+                        800,
+                        0.1,
+                        'sawtooth',
+                        0.6,
+                        [
+                            [0, 0.6],
+                            [0.1, 0.0],
+                        ],
+                        1200,
+                    );
+                    break;
+                case 'bounce':
+                    this._tone(
+                        ac,
+                        t,
+                        1200,
+                        0.06,
+                        'sine',
+                        0.6,
+                        [
+                            [0, 0.6],
+                            [0.06, 0.0],
+                        ],
+                        600,
+                    );
+                    break;
+                case 'death':
+                    this._tone(
+                        ac,
+                        t,
+                        800,
+                        0.3,
+                        'sine',
+                        0.7,
+                        [
+                            [0, 0.7],
+                            [0.3, 0.0],
+                        ],
+                        100,
+                    );
+                    break;
+                case 'finish':
+                    this._chord(ac, t, [880, 1108, 1318, 1760], 0.9);
+                    break;
             }
-        } catch(e) { /* silently ignore audio errors */ }
+        } catch (e) {}
     }
 
-    // ── Music ─────────────────────────────────────────────────────────────
+    setMusicTrack(track) {
+        this._musicTrack = track;
+    }
 
     /**
      * Start the background music loop (simple 8-bit style melody).
@@ -81,22 +143,24 @@ export class AudioManager {
     playMusic() {
         if (!this._musicEnabled || this._musicPlaying) return;
         try {
-            this._ensureCtx();
+            if (!this._musicTrack.isPlaying()) {
+                this._musicTrack.setLoop(true);
+                this._musicTrack.setVolume(0.25);
+                this._musicTrack.play();
+            }
             this._musicPlaying = true;
-            this._beat = 0;
-            this._scheduleMusicBeat();
-        } catch(e) {}
+        } catch (e) {}
     }
 
     /** Stop background music. */
     stopMusic() {
         this._musicPlaying = false;
-        clearTimeout(this._musicTimer);
-        this._musicNodes.forEach(n => { try { n.stop(); } catch(e){} });
-        this._musicNodes = [];
+        try {
+            if (this._musicTrack?.isPlaying()) {
+                this._musicTrack.stop();
+            }
+        } catch (e) {}
     }
-
-    // ── Toggle controls ───────────────────────────────────────────────────
 
     /**
      * Toggle a specific audio type.
@@ -111,64 +175,10 @@ export class AudioManager {
             if (!this._musicEnabled) {
                 this.stopMusic();
             } else if (this._musicPlaying === false) {
-                // Re-start music if it was playing before
                 this.playMusic();
             }
         }
     }
-
-    // ── Private ───────────────────────────────────────────────────────────
-
-    /**
-     * Schedule a single beat of the background melody.
-     * Uses a simple pentatonic loop.
-     * @private
-     */
-    _scheduleMusicBeat() {
-        if (!this._musicPlaying || !this._musicEnabled) return;
-        try {
-            this._ensureCtx();
-            const ac = this._ctx;
-
-            // Simple pentatonic melody — repeating 16-note pattern
-            const MELODY = [
-                523, 659, 784, 659,  523, 440, 392, 440,
-                523, 659, 784, 880,  784, 659, 523, 392
-            ];
-            const BPM    = 120;
-            const beatMs = (60 / BPM / 2) * 1000; // eighth notes
-
-            const freq = MELODY[this._beat % MELODY.length];
-            const t    = ac.currentTime;
-
-            const osc  = ac.createOscillator();
-            const gain = ac.createGain();
-
-            osc.type      = 'square';
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.0, t);
-            gain.gain.linearRampToValueAtTime(1.0, t + 0.01);
-            gain.gain.linearRampToValueAtTime(0.0, t + (beatMs / 1000) * 0.8);
-
-            osc.connect(gain);
-            gain.connect(this._musicGain);
-            osc.start(t);
-            osc.stop(t + beatMs / 1000);
-
-            this._musicNodes.push(osc);
-            // Clean up old stopped nodes
-            if (this._musicNodes.length > 8) {
-                this._musicNodes = this._musicNodes.slice(-8);
-            }
-
-            this._beat++;
-            this._musicTimer = setTimeout(
-                () => this._scheduleMusicBeat(),
-                beatMs * 0.95  // slight overlap prevents gaps
-            );
-        } catch(e) { this._musicPlaying = false; }
-    }
-
     /**
      * Play a single synthesised tone.
      * @param {AudioContext} ac
@@ -182,7 +192,7 @@ export class AudioManager {
      * @private
      */
     _tone(ac, t, freq, duration, type, volume, env, endFreq) {
-        const osc  = ac.createOscillator();
+        const osc = ac.createOscillator();
         const gain = ac.createGain();
 
         osc.type = type;
@@ -206,13 +216,14 @@ export class AudioManager {
      * Play a short ascending chord (victory / finish sound).
      * @private
      */
-    _chord(ac, t, freqs, duration) {
+    _chord(ac, t, freqs, vol) {
         freqs.forEach((freq, i) => {
             const delay = i * 0.08;
-            this._tone(ac, t + delay, freq, duration,
-                'sine', 0.18,
-                [[0, 0.18], [duration * 0.8, 0.0]]
-            );
+            const duration = 0.4;
+            this._tone(ac, t + delay, freq, duration, 'sine', vol, [
+                [0, 0.18],
+                [duration * 0.8, 0.0],
+            ]);
         });
     }
 }

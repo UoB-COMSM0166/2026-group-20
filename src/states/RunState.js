@@ -31,12 +31,18 @@ export class RunState extends State {
             this.ctx.audioManager?.playMusic();
             return;
         }
-        const { p, gameWidth, gameHeight, players, scoreManager, tiledMap } = this.ctx;
+        const { p, gameWidth, gameHeight, players, scoreManager, tiledMap } =
+            this.ctx;
 
-        this.coins        = tiledMap.getCoins(this.ctx.placedObstacles);
+        this.coins = tiledMap.getCoins(this.ctx.placedObstacles);
         this.respawnManager = new RespawnManager(scoreManager);
-        this.timeManager  = new TimeManager(players, scoreManager);
-        this.pauseManager = new PauseManager(p, gameWidth, gameHeight, this.ctx.audioManager);
+        this.timeManager = new TimeManager(players, scoreManager);
+        this.pauseManager = new PauseManager(
+            p,
+            gameWidth,
+            gameHeight,
+            this.ctx.audioManager,
+        );
 
         this.ctx.audioManager?.playMusic();
         this._showBackpack = false;
@@ -160,14 +166,16 @@ export class RunState extends State {
                 if (player.gameState !== PlayerGameState.PLAYING) continue;
                 const px = player.x + player.w / 2;
                 const py = player.y + player.h / 2;
-                const d  = Math.sqrt((px - obs._explosionX) ** 2 + (py - obs._explosionY) ** 2);
+                const d = Math.sqrt(
+                    (px - obs._explosionX) ** 2 + (py - obs._explosionY) ** 2,
+                );
                 if (d <= obs._killRadius) {
                     this.respawnManager.triggerDeath(player, DeathReason.TRAP);
                     this.ctx.audioManager?.playSound('death');
                 }
             }
         }
-        
+
         // Check if any players have fallen off the map
         const mapHeight = tiledMap?.gameHeight ?? gameHeight;
         for (const player of players) {
@@ -176,11 +184,14 @@ export class RunState extends State {
                 this.respawnManager.triggerDeath(player, DeathReason.TRAP);
             }
         }
-        
+
         // Remove exploded bombs
         // Keep exploded bombs alive until the blast-ring animation finishes
         this.ctx.placedObstacles = this.ctx.placedObstacles.filter(
-            o => !o._exploded || (o._blastTimer !== undefined && o._blastTimer < o._blastDuration)
+            (o) =>
+                !o._exploded ||
+                (o._blastTimer !== undefined &&
+                    o._blastTimer < o._blastDuration),
         );
 
         for (const player of players) {
@@ -190,228 +201,258 @@ export class RunState extends State {
 
     render(mx, my) {
         try {
-        const {
-            p,
-            players,
-            scoreManager,
-            gameWidth,
-            gameHeight,
-            placedObstacles,
-            tiledMap,
-        } = this.ctx;
-        const worldView = this._worldView();
+            const {
+                p,
+                players,
+                scoreManager,
+                gameWidth,
+                gameHeight,
+                placedObstacles,
+                tiledMap,
+            } = this.ctx;
+            const worldView = this._worldView();
 
-        p.background(25);
-        p.push();
-        p.translate(worldView.x, worldView.y);
-        p.scale(worldView.scale);
-        const bg = this.ctx.backgroundImage;
-        if (bg) {
-            p.image(
-                bg,
-                0,
-                0,
-                this.ctx.mapPixelWidth ?? gameWidth,
-                this.ctx.mapPixelHeight ?? gameHeight,
-            );
-            p.noStroke();
-            p.fill(8, 14, 24, 110);
-            p.rect(
-                0,
-                0,
-                this.ctx.mapPixelWidth ?? gameWidth,
-                this.ctx.mapPixelHeight ?? gameHeight,
-            );
-        }
-        tiledMap.render();
-        tiledMap.renderEndpoint(this.ctx.endpointFlag);
+            p.background(25);
+            p.push();
+            p.translate(worldView.x, worldView.y);
+            p.scale(worldView.scale);
+            const bg = this.ctx.backgroundImage;
+            if (bg) {
+                p.image(
+                    bg,
+                    0,
+                    0,
+                    this.ctx.mapPixelWidth ?? gameWidth,
+                    this.ctx.mapPixelHeight ?? gameHeight,
+                );
+                p.noStroke();
+                p.fill(8, 14, 24, 110);
+                p.rect(
+                    0,
+                    0,
+                    this.ctx.mapPixelWidth ?? gameWidth,
+                    this.ctx.mapPixelHeight ?? gameHeight,
+                );
+            }
+            tiledMap.render();
+            tiledMap.renderEndpoint(this.ctx.endpointFlag);
 
-        // Draw placed obstacles
-        for (const obs of placedObstacles) {
-            obs.draw();
-        }
+            // Draw placed obstacles
+            for (const obs of placedObstacles) {
+                obs.draw();
+            }
 
-        // Draw coins
-        for (const coin of this.coins) {
-            coin.draw();
-        }
+            // Draw coins
+            for (const coin of this.coins) {
+                coin.draw();
+            }
 
-        // Draw players
-        for (const player of players) {
-            DrawPlayer(player);
-        }
-        p.pop();
+            // Draw players
+            for (const player of players) {
+                DrawPlayer(player);
+            }
+            p.pop();
 
-        // HUD — phase label
-        const hudTop = 8;
-        const hudGap = 22;
-        p.noStroke();
-        p.fill(100, 200, 120);
-        p.textAlign(p.CENTER, p.TOP);
-        p.textSize(6);
-        p.text('The Run', gameWidth / 2, hudTop);
+            // HUD — phase label
+            const hudTop = 10;
+            const timerY = hudTop;
+            const roundY = 34;
 
-        // HUD — timer
-        p.fill(255);
-        p.textSize(10);
-        p.textAlign(p.CENTER, p.TOP);
-        p.text(
-            `Time: ${Math.ceil(this.timeManager.timeLeft)}s`,
-            gameWidth / 2,
-            hudTop + hudGap,
-        );
-
-        p.fill(200, 200, 210);
-        p.textSize(6);
-        p.textAlign(p.CENTER, p.TOP);
-        p.text(
-            `Round ${this.ctx.scoreManager.currentRound} / ${this.ctx.scoreManager.maxRounds}`,
-            gameWidth / 2,
-            hudTop + hudGap * 2,
-        );
-
-        // HUD — per-player coins + wallet + inventory bag
-        p.textSize(6);
-        const bagRects = this._bagButtonRects();
-        for (const player of players) {
-            const side = player.playerNo === 0 ? p.LEFT : p.RIGHT;
-            const hx = player.playerNo === 0 ? 10 : gameWidth - 10;
-            const bag = bagRects[player.playerNo];
-            const bagLabel = `🎒 ${this._showBackpack && this._backpackPlayer === player.playerNo ? 'OPEN' : 'BAG'}`;
-            p.textAlign(side, p.TOP);
-            p.fill(
-                player.playerNo === 0
-                    ? p.color(90, 170, 255)
-                    : p.color(255, 200, 80),
-            );
+            // HUD — timer
+            p.fill(255);
+            p.textSize(8.8);
+            p.textAlign(p.CENTER, p.TOP);
             p.text(
-                `P${player.playerNo + 1}  🪙 ${scoreManager.getRoundCoins(player)}  💰 ${scoreManager.getWallet(player)}  ${bagLabel}`,
-                hx,
-                10,
+                `Time: ${Math.ceil(this.timeManager.timeLeft)}s`,
+                gameWidth / 2,
+                timerY,
             );
-        }
 
-        // Controls hint
-        p.fill(160, 160, 180);
-        p.textSize(5);
-        p.textAlign(p.CENTER, p.TOP);
-        p.text('P1: A/D + W   P2: ←/→ + ↑   ESC: Pause', gameWidth / 2, hudTop + hudGap * 3);
-
-        // Backpack overlay
-        if (this._showBackpack) {
-            const player = players[this._backpackPlayer];
-            const pcol = this._backpackPlayer === 0 ? [90, 170, 255] : [255, 200, 80];
-            const bpPanW = 364, bpPanH = 272;
-            const bpPanX = gameWidth / 2 - bpPanW / 2;
-            const bpPanY = gameHeight / 2 - bpPanH / 2;
-            p.noStroke();
-            p.fill(0, 0, 0, 150);
-            p.rect(0, 0, gameWidth, gameHeight);
-            p.fill(16, 20, 36);
-            p.rect(bpPanX, bpPanY, bpPanW, bpPanH, 10);
-            p.stroke(...pcol);
-            p.strokeWeight(1.5);
-            p.noFill();
-            p.rect(bpPanX, bpPanY, bpPanW, bpPanH, 10);
-            p.noStroke();
-            p.fill(...pcol);
+            p.fill(180, 190, 210);
+            p.textSize(5.2);
             p.textAlign(p.CENTER, p.TOP);
-            p.textSize(8);
-            p.text(`P${this._backpackPlayer + 1} Inventory`, gameWidth / 2, bpPanY + 14);
-            p.stroke(45, 60, 110);
-            p.strokeWeight(1);
-            p.line(bpPanX + 20, bpPanY + 38, bpPanX + bpPanW - 20, bpPanY + 38);
-            p.noStroke();
-            const inv = [...player.inventory.entries()].filter(([t, c]) => typeof t === 'string' && c > 0);
-            if (inv.length === 0) {
-                p.fill(90, 90, 110);
-                p.textSize(5);
-                p.textAlign(p.CENTER, p.CENTER);
-                p.text('No items in inventory', gameWidth / 2, bpPanY + bpPanH / 2);
-            } else {
-                const cols = 3;
-                const cardW = 100;
-                const cardH = 78;
-                const gapX = 12;
-                const gapY = 10;
-                const startX = bpPanX + 20;
-                const startY = bpPanY + 52;
-                inv.forEach(([type, count], i) => {
-                    const colIdx = i % cols;
-                    const rowIdx = Math.floor(i / cols);
-                    const cardX = startX + colIdx * (cardW + gapX);
-                    const cardY = startY + rowIdx * (cardH + gapY);
+            p.text(
+                `Round ${this.ctx.scoreManager.currentRound} / ${this.ctx.scoreManager.maxRounds}`,
+                gameWidth / 2,
+                roundY,
+            );
 
-                    p.noStroke();
-                    p.fill(26, 32, 52);
-                    p.rect(cardX, cardY, cardW, cardH, 8);
-                    p.stroke(...this._itemColor(type), 180);
-                    p.strokeWeight(1.2);
-                    p.noFill();
-                    p.rect(cardX, cardY, cardW, cardH, 8);
-                    p.noStroke();
-
-                    p.fill(36, 44, 70);
-                    p.rect(cardX, cardY, cardW, 18, 8, 8, 0, 0);
-                    p.fill(220, 228, 255);
-                    p.textAlign(p.LEFT, p.CENTER);
-                    p.textSize(4.2);
-                    p.text(this._labelFor(type), cardX + 8, cardY + 10);
-
-                    p.fill(16, 20, 34);
-                    p.rect(cardX + 8, cardY + 24, 46, 46, 6);
-                    p.stroke(66, 78, 120);
-                    p.strokeWeight(1);
-                    p.noFill();
-                    p.rect(cardX + 8, cardY + 24, 46, 46, 6);
-                    p.noStroke();
-                    this._drawInventoryIcon(type, cardX + 8, cardY + 24, 46, 46);
-
-                    p.fill(110, 205, 135);
-                    p.textAlign(p.LEFT, p.TOP);
-                    p.textSize(5.2);
-                    p.text(`x${count}`, cardX + 62, cardY + 32);
-
-                    p.fill(150, 162, 196);
-                    p.textSize(3.8);
-                    p.text('Stored', cardX + 62, cardY + 50);
-                });
+            // HUD — per-player coins + wallet + inventory bag
+            p.textSize(6);
+            const bagRects = this._bagButtonRects();
+            for (const player of players) {
+                const side = player.playerNo === 0 ? p.LEFT : p.RIGHT;
+                const hx = player.playerNo === 0 ? 10 : gameWidth - 10;
+                const bag = bagRects[player.playerNo];
+                const bagLabel = `🎒 ${this._showBackpack && this._backpackPlayer === player.playerNo ? 'OPEN' : 'BAG'}`;
+                p.textAlign(side, p.TOP);
+                p.fill(
+                    player.playerNo === 0
+                        ? p.color(90, 170, 255)
+                        : p.color(255, 200, 80),
+                );
+                p.text(
+                    `P${player.playerNo + 1}  🪙 ${scoreManager.getRoundCoins(player)}  💰 ${scoreManager.getWallet(player)}  ${bagLabel}`,
+                    hx,
+                    10,
+                );
             }
-            p.fill(70, 85, 130);
-            p.textAlign(p.CENTER, p.BOTTOM);
-            p.textSize(5);
-            p.text('Click 🎒 again or press ESC to close', gameWidth / 2, bpPanY + bpPanH - 8);
-        }
 
-        // Developer mode indicator and shortcuts
-        if (this.ctx.devMode) {
-            p.noStroke();
-            p.fill(255, 60, 60, 180);
-            p.rect(0, 0, gameWidth, 24);
-            p.fill(255, 255, 255);
-            p.textAlign(p.CENTER, p.TOP);
-            p.textSize(5);
-            p.text('🛠 DEV MODE: K=Kill  E=Teleport  T=Freeze time', gameWidth / 2, 6);
-            
-            // Show frozen time indicator
-            if (this._timelineFrozen) {
-                p.fill(255, 150, 0);
+            // Backpack overlay
+            if (this._showBackpack) {
+                const player = players[this._backpackPlayer];
+                const pcol =
+                    this._backpackPlayer === 0
+                        ? [90, 170, 255]
+                        : [255, 200, 80];
+                const bpPanW = 364,
+                    bpPanH = 272;
+                const bpPanX = gameWidth / 2 - bpPanW / 2;
+                const bpPanY = gameHeight / 2 - bpPanH / 2;
+                p.noStroke();
+                p.fill(0, 0, 0, 150);
+                p.rect(0, 0, gameWidth, gameHeight);
+                p.fill(16, 20, 36);
+                p.rect(bpPanX, bpPanY, bpPanW, bpPanH, 10);
+                p.stroke(...pcol);
+                p.strokeWeight(1.5);
+                p.noFill();
+                p.rect(bpPanX, bpPanY, bpPanW, bpPanH, 10);
+                p.noStroke();
+                p.fill(...pcol);
+                p.textAlign(p.CENTER, p.TOP);
+                p.textSize(8);
+                p.text(
+                    `P${this._backpackPlayer + 1} Inventory`,
+                    gameWidth / 2,
+                    bpPanY + 14,
+                );
+                p.stroke(45, 60, 110);
+                p.strokeWeight(1);
+                p.line(
+                    bpPanX + 20,
+                    bpPanY + 38,
+                    bpPanX + bpPanW - 20,
+                    bpPanY + 38,
+                );
+                p.noStroke();
+                const inv = [...player.inventory.entries()].filter(
+                    ([t, c]) => typeof t === 'string' && c > 0,
+                );
+                if (inv.length === 0) {
+                    p.fill(90, 90, 110);
+                    p.textSize(5);
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.text(
+                        'No items in inventory',
+                        gameWidth / 2,
+                        bpPanY + bpPanH / 2,
+                    );
+                } else {
+                    const cols = 3;
+                    const cardW = 100;
+                    const cardH = 78;
+                    const gapX = 12;
+                    const gapY = 10;
+                    const startX = bpPanX + 20;
+                    const startY = bpPanY + 52;
+                    inv.forEach(([type, count], i) => {
+                        const colIdx = i % cols;
+                        const rowIdx = Math.floor(i / cols);
+                        const cardX = startX + colIdx * (cardW + gapX);
+                        const cardY = startY + rowIdx * (cardH + gapY);
+
+                        p.noStroke();
+                        p.fill(26, 32, 52);
+                        p.rect(cardX, cardY, cardW, cardH, 8);
+                        p.stroke(...this._itemColor(type), 180);
+                        p.strokeWeight(1.2);
+                        p.noFill();
+                        p.rect(cardX, cardY, cardW, cardH, 8);
+                        p.noStroke();
+
+                        p.fill(36, 44, 70);
+                        p.rect(cardX, cardY, cardW, 18, 8, 8, 0, 0);
+                        p.fill(220, 228, 255);
+                        p.textAlign(p.LEFT, p.CENTER);
+                        p.textSize(4.2);
+                        p.text(this._labelFor(type), cardX + 8, cardY + 10);
+
+                        p.fill(16, 20, 34);
+                        p.rect(cardX + 8, cardY + 24, 46, 46, 6);
+                        p.stroke(66, 78, 120);
+                        p.strokeWeight(1);
+                        p.noFill();
+                        p.rect(cardX + 8, cardY + 24, 46, 46, 6);
+                        p.noStroke();
+                        this._drawInventoryIcon(
+                            type,
+                            cardX + 8,
+                            cardY + 24,
+                            46,
+                            46,
+                        );
+
+                        p.fill(110, 205, 135);
+                        p.textAlign(p.LEFT, p.TOP);
+                        p.textSize(5.2);
+                        p.text(`x${count}`, cardX + 62, cardY + 32);
+
+                        p.fill(150, 162, 196);
+                        p.textSize(3.8);
+                        p.text('Stored', cardX + 62, cardY + 50);
+                    });
+                }
+                p.fill(70, 85, 130);
+                p.textAlign(p.CENTER, p.BOTTOM);
                 p.textSize(5);
-                p.textAlign(p.RIGHT, p.TOP);
-                p.text('⏱ TIME FROZEN', gameWidth - 10, 6);
+                p.text(
+                    'Click 🎒 again or press ESC to close',
+                    gameWidth / 2,
+                    bpPanY + bpPanH - 8,
+                );
             }
-        }
 
-        // Pause overlay — drawn last so it sits on top
-        this.pauseManager.render(mx, my);
-        } catch(e) { console.error('[RunState.render] CRASH:', e.stack || e); }
+            // Developer mode indicator and shortcuts
+            if (this.ctx.devMode) {
+                p.noStroke();
+                p.fill(255, 60, 60, 180);
+                p.rect(0, 0, gameWidth, 24);
+                p.fill(255, 255, 255);
+                p.textAlign(p.CENTER, p.TOP);
+                p.textSize(5);
+                p.text(
+                    '🛠 DEV MODE: K=Kill  E=Teleport  T=Freeze time',
+                    gameWidth / 2,
+                    6,
+                );
+
+                // Show frozen time indicator
+                if (this._timelineFrozen) {
+                    p.fill(255, 150, 0);
+                    p.textSize(5);
+                    p.textAlign(p.RIGHT, p.TOP);
+                    p.text('⏱ TIME FROZEN', gameWidth - 10, 6);
+                }
+            }
+
+            // Pause overlay — drawn last so it sits on top
+            this.pauseManager.render(mx, my);
+        } catch (e) {
+            console.error('[RunState.render] CRASH:', e.stack || e);
+        }
     }
 
     mousePressed(mx, my) {
         if (this.pauseManager.isPaused) {
-            this.pauseManager.mousePressed(mx, my,
+            this.pauseManager.mousePressed(
+                mx,
+                my,
                 () => this.pauseManager.resume(),
-                () => { this._resetRound(false); this.pauseManager.resume(); },
+                () => {
+                    this._resetRound(false);
+                    this.pauseManager.resume();
+                },
                 () => {
                     // Store where to return so TutorialState knows to come back
                     this.ctx.tutorialReturnStage = GameStage.RUN;
@@ -421,7 +462,7 @@ export class RunState extends State {
                 () => {
                     this.ctx.devMode = !this.ctx.devMode;
                     this.pauseManager.resume();
-                }
+                },
             );
             return;
         }
@@ -430,14 +471,32 @@ export class RunState extends State {
         const bagRects = this._bagButtonRects();
         const p1Bag = bagRects[0];
         const p2Bag = bagRects[1];
-        if (mx >= p1Bag.x && mx <= p1Bag.x + p1Bag.w && my >= p1Bag.y && my <= p1Bag.y + p1Bag.h) {
-            if (this._showBackpack && this._backpackPlayer === 0) { this._showBackpack = false; }
-            else { this._showBackpack = true; this._backpackPlayer = 0; }
+        if (
+            mx >= p1Bag.x &&
+            mx <= p1Bag.x + p1Bag.w &&
+            my >= p1Bag.y &&
+            my <= p1Bag.y + p1Bag.h
+        ) {
+            if (this._showBackpack && this._backpackPlayer === 0) {
+                this._showBackpack = false;
+            } else {
+                this._showBackpack = true;
+                this._backpackPlayer = 0;
+            }
             return;
         }
-        if (mx >= p2Bag.x && mx <= p2Bag.x + p2Bag.w && my >= p2Bag.y && my <= p2Bag.y + p2Bag.h) {
-            if (this._showBackpack && this._backpackPlayer === 1) { this._showBackpack = false; }
-            else { this._showBackpack = true; this._backpackPlayer = 1; }
+        if (
+            mx >= p2Bag.x &&
+            mx <= p2Bag.x + p2Bag.w &&
+            my >= p2Bag.y &&
+            my <= p2Bag.y + p2Bag.h
+        ) {
+            if (this._showBackpack && this._backpackPlayer === 1) {
+                this._showBackpack = false;
+            } else {
+                this._showBackpack = true;
+                this._backpackPlayer = 1;
+            }
             return;
         }
     }
@@ -445,8 +504,11 @@ export class RunState extends State {
     keyPressed() {
         const { p, players } = this.ctx;
         if (p.keyCode === p.ESCAPE) {
-            if (this._showBackpack) { this._showBackpack = false; }
-            else { this.pauseManager.toggle(); }
+            if (this._showBackpack) {
+                this._showBackpack = false;
+            } else {
+                this.pauseManager.toggle();
+            }
         }
 
         // Developer mode shortcuts
@@ -455,7 +517,10 @@ export class RunState extends State {
                 // Kill player - trigger death for first playing player
                 for (const player of players) {
                     if (player.gameState === PlayerGameState.PLAYING) {
-                        this.respawnManager.triggerDeath(player, DeathReason.TRAP);
+                        this.respawnManager.triggerDeath(
+                            player,
+                            DeathReason.TRAP,
+                        );
                         this.ctx.audioManager?.playSound('death');
                         break;
                     }
@@ -466,10 +531,17 @@ export class RunState extends State {
                 for (const player of players) {
                     if (player.gameState === PlayerGameState.PLAYING) {
                         // Find endpoint tile position
-                        let endX = gameWidth / 2, endY = gameHeight / 2;
+                        let endX = gameWidth / 2,
+                            endY = gameHeight / 2;
                         for (let ty = 0; ty < tiledMap.MAP.length; ty++) {
-                            for (let tx = 0; tx < tiledMap.MAP[ty].length; tx++) {
-                                if (tiledMap.MAP[ty][tx] === TileType.ENDPOINT) {
+                            for (
+                                let tx = 0;
+                                tx < tiledMap.MAP[ty].length;
+                                tx++
+                            ) {
+                                if (
+                                    tiledMap.MAP[ty][tx] === TileType.ENDPOINT
+                                ) {
                                     endX = tx * GameConfig.TILE;
                                     endY = ty * GameConfig.TILE;
                                     break;
@@ -528,13 +600,31 @@ export class RunState extends State {
     }
 
     _bagButtonRects() {
-        const { gameWidth } = this.ctx;
-        const bagW = 42;
-        const bagH = 10;
+        const { gameWidth, p, players, scoreManager } = this.ctx;
         const topY = 10;
+        const bagH = 18;
+        const paddingX = 4;
+        const makeBagLabel = (player) =>
+            `🎒 ${this._showBackpack && this._backpackPlayer === player.playerNo ? 'OPEN' : 'BAG'}`;
+
+        p.push();
+        p.textFont(GameConfig.FONT);
+        p.textSize(18);
+
+        const p1Prefix = `P1  🪙 ${scoreManager.getRoundCoins(players[0])}  💰 ${scoreManager.getWallet(players[0])}  `;
+        const p1BagLabel = makeBagLabel(players[0]);
+        const p1X = 10 + p.textWidth(p1Prefix) - paddingX;
+        const p1W = p.textWidth(p1BagLabel) + paddingX * 2;
+
+        const p2BagLabel = makeBagLabel(players[1]);
+        const p2W = p.textWidth(p2BagLabel) + paddingX * 2;
+        const p2RightEdge = gameWidth - 10;
+
+        p.pop();
+
         return [
-            { x: 138, y: topY, w: bagW, h: bagH },
-            { x: gameWidth - 178, y: topY, w: bagW, h: bagH },
+            { x: p1X, y: topY, w: p1W, h: bagH },
+            { x: p2RightEdge - p2W - paddingX, y: topY, w: p2W, h: bagH },
         ];
     }
 
@@ -602,7 +692,14 @@ export class RunState extends State {
         p.push();
         p.noSmooth();
         if (img) {
-            const { sx, sy, sw, sh, dx, dy, dw, dh } = this._inventoryIconSpec(type, img, x, y, w, h);
+            const { sx, sy, sw, sh, dx, dy, dw, dh } = this._inventoryIconSpec(
+                type,
+                img,
+                x,
+                y,
+                w,
+                h,
+            );
             p.image(img, dx, dy, dw, dh, sx, sy, sw, sh);
         } else if (type === ObstacleType.BOMB) {
             const cx = x + w / 2;
@@ -643,64 +740,131 @@ export class RunState extends State {
     _inventoryIconSpec(type, img, x, y, w, h) {
         if (type === ObstacleType.MOVING_PLATFORM) {
             return {
-                sx: 0, sy: 0, sw: 32, sh: 8,
-                dx: x + 4, dy: y + Math.floor(h / 2) - 5, dw: w - 8, dh: 10,
+                sx: 0,
+                sy: 0,
+                sw: 32,
+                sh: 8,
+                dx: x + 4,
+                dy: y + Math.floor(h / 2) - 5,
+                dw: w - 8,
+                dh: 10,
             };
         }
 
         if (type === ObstacleType.FALLING_PLATFORM) {
             return {
-                sx: 0, sy: 0, sw: 32, sh: 10,
-                dx: x + 5, dy: y + Math.floor(h / 2) - 5, dw: w - 10, dh: 10,
+                sx: 0,
+                sy: 0,
+                sw: 32,
+                sh: 10,
+                dx: x + 5,
+                dy: y + Math.floor(h / 2) - 5,
+                dw: w - 10,
+                dh: 10,
             };
         }
 
         if (type === ObstacleType.BOUNCE_PAD) {
             return {
-                sx: 0, sy: 0, sw: 28, sh: 28,
-                dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+                sx: 0,
+                sy: 0,
+                sw: 28,
+                sh: 28,
+                dx: x + 6,
+                dy: y + 6,
+                dw: w - 12,
+                dh: h - 12,
             };
         }
 
         if (type === ObstacleType.SAW) {
             return {
-                sx: 0, sy: 0, sw: 38, sh: 38,
-                dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+                sx: 0,
+                sy: 0,
+                sw: 38,
+                sh: 38,
+                dx: x + 6,
+                dy: y + 6,
+                dw: w - 12,
+                dh: h - 12,
             };
         }
 
         if (type === ObstacleType.FLAME) {
             return {
-                sx: 0, sy: 0, sw: 16, sh: 32,
-                dx: x + 13, dy: y + 5, dw: w - 26, dh: h - 10,
+                sx: 0,
+                sy: 0,
+                sw: 16,
+                sh: 32,
+                dx: x + 13,
+                dy: y + 5,
+                dw: w - 26,
+                dh: h - 10,
             };
         }
 
         if (type === ObstacleType.WIND_ZONE) {
             return {
-                sx: 0, sy: 0, sw: 32, sh: 32,
-                dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+                sx: 32 * 2 + 6,
+                sy: 9,
+                sw: 22,
+                sh: 14,
+                dx: x,
+                dy: y,
+                dw: w,
+                dh: h,
+            };
+        }
+
+        if (type === ObstacleType.SPIKE) {
+            return {
+                sx: 41,
+                sy: 0,
+                sw: 38,
+                sh: 40,
+                dx: x,
+                dy: y,
+                dw: w,
+                dh: h,
             };
         }
 
         if (type === ObstacleType.CANNON) {
             return {
-                sx: 0, sy: 0, sw: 30, sh: 18,
-                dx: x + 6, dy: y + 12, dw: w - 12, dh: 20,
+                sx: 0,
+                sy: 0,
+                sw: 30,
+                sh: 18,
+                dx: x + 6,
+                dy: y + 12,
+                dw: w - 12,
+                dh: 20,
             };
         }
 
         if (type === ObstacleType.SPIKED_BALL) {
             return {
-                sx: 0, sy: 0, sw: 28, sh: 28,
-                dx: x + 6, dy: y + 6, dw: w - 12, dh: h - 12,
+                sx: 0,
+                sy: 0,
+                sw: 28,
+                sh: 28,
+                dx: x + 6,
+                dy: y + 6,
+                dw: w - 12,
+                dh: h - 12,
             };
         }
 
         if (type === ObstacleType.TELEPORTER) {
             return {
-                sx: 0, sy: 0, sw: 40, sh: 40,
-                dx: x + 4, dy: y + 4, dw: w - 8, dh: h - 8,
+                sx: 0,
+                sy: 0,
+                sw: 40,
+                sh: 40,
+                dx: x + 4,
+                dy: y + 4,
+                dw: w - 8,
+                dh: h - 8,
             };
         }
 
@@ -710,14 +874,26 @@ export class RunState extends State {
             type === ObstacleType.ICE_BLOCK
         ) {
             return {
-                sx: 0, sy: 0, sw: 40, sh: 40,
-                dx: x + 5, dy: y + 5, dw: w - 10, dh: h - 10,
+                sx: 0,
+                sy: 0,
+                sw: 40,
+                sh: 40,
+                dx: x + 5,
+                dy: y + 5,
+                dw: w - 10,
+                dh: h - 10,
             };
         }
 
         return {
-            sx: 0, sy: 0, sw: img.width, sh: img.height,
-            dx: x + 5, dy: y + 5, dw: w - 10, dh: h - 10,
+            sx: 0,
+            sy: 0,
+            sw: img.width,
+            sh: img.height,
+            dx: x + 5,
+            dy: y + 5,
+            dw: w - 10,
+            dh: h - 10,
         };
     }
 }

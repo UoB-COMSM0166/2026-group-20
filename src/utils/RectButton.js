@@ -6,8 +6,8 @@ export class RectButton extends Button {
         super(p, x, y, w, h);
         this.label = label;
         this.radius = 10;
-        this.defaultColour = { r: 100, g: 100, b: 225 }; // blue background
-        this.changedColour = { r: 0, g: 100, b: 225 }; // purple background
+        this.defaultColour = { r: 100, g: 100, b: 225 };
+        this.changedColour = { r: 0, g: 100, b: 225 };
         this.textSize = 10;
         this.textColour = 250;
     }
@@ -28,6 +28,8 @@ export class RectButton extends Button {
                 this.defaultColour.b,
             );
         } else {
+            p.stroke(0);
+            p.strokeWeight(2);
             this.p.fill(
                 this.changedColour.r,
                 this.changedColour.g,
@@ -46,7 +48,11 @@ export class RectButton extends Button {
         );
         this.p.textSize(Math.min(this.textSize, fitByHeight, fitByWidth));
         this.p.textAlign(this.p.CENTER, this.p.CENTER);
-        this.p.text(this.label, this.x + this.w / 2, currentY + this.h / 2 + 0.5);
+        this.p.text(
+            this.label,
+            this.x + this.w / 2,
+            currentY + this.h / 2 + 0.5,
+        );
     }
 
     updateCursor(mx, my) {

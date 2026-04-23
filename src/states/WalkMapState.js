@@ -17,23 +17,22 @@ import { getPixelatedSprite } from '../utils/PixelSprite.js';
  * ESC — go back to MENU
  */
 export class WalkMapState extends State {
-
     enter() {
         const { p, players, mapPreviews } = this.ctx;
 
-        const gW  = this.ctx.gameWidth  || 960;
-        const gH  = this.ctx.gameHeight || 400;
-        const T   = GameConfig.TILE || 32;
+        const gW = this.ctx.gameWidth || 960;
+        const gH = this.ctx.gameHeight || 400;
+        const T = GameConfig.TILE || 32;
 
         // Place walkers at bottom-centre of the selection arena
         // Each player controls their selected character
         this._walkers = players.map((pl, i) => ({
-            x:   gW / 2 + (i === 0 ? -60 : 60),
-            y:   gH - T * 3,
-            vx:  0,
-            vy:  0,
-            w:   28,
-            h:   34,
+            x: gW / 2 + (i === 0 ? -60 : 60),
+            y: gH - T * 3,
+            vx: 0,
+            vy: 0,
+            w: 28,
+            h: 34,
             onG: false,
             jumpsLeft: 2,
             jumpHeld: false,
@@ -69,18 +68,18 @@ export class WalkMapState extends State {
             },
         ];
 
-        this._age      = 0;
+        this._age = 0;
         this._selectedMap = {}; // 记录每个玩家选择的地图
         this._selectTimer = 0; // brief delay before transitioning
         this._previewCache = new Map();
     }
 
     update(deltaTime) {
-        const dt  = deltaTime / 16.67;
-        const gW  = this.ctx.gameWidth  || 960;
-        const gH  = this.ctx.gameHeight || 400;
-        const T   = GameConfig.TILE || 32;
-        const GR  = 0.7; // gravity
+        const dt = deltaTime / 16.67;
+        const gW = this.ctx.gameWidth || 960;
+        const gH = this.ctx.gameHeight || 400;
+        const T = GameConfig.TILE || 32;
+        const GR = 0.7; // gravity
         const SPD = 3.2;
         const JMP = 12;
         const FLOOR = gH - T;
@@ -90,7 +89,7 @@ export class WalkMapState extends State {
         // Check if both players have selected same map - if so, wait and transition
         const p1MapSelected = this._selectedMap[0];
         const p2MapSelected = this._selectedMap[1];
-        
+
         if (p1MapSelected && p2MapSelected && p1MapSelected === p2MapSelected) {
             this._selectTimer += deltaTime;
             if (this._selectTimer >= 600) {
@@ -102,7 +101,7 @@ export class WalkMapState extends State {
 
         for (const w of this._walkers) {
             // Horizontal input
-            const left  = w.inp.left;
+            const left = w.inp.left;
             const right = w.inp.right;
             w.vx = left ? -SPD : right ? SPD : w.vx * 0.85;
 
@@ -132,7 +131,10 @@ export class WalkMapState extends State {
                 w.vy = -JMP;
                 w.onG = false;
                 w.jumpsLeft -= 1;
-                this.ctx.audioManager?.playSound('jump');
+
+                if (!this._selectedMap[w.idx]) {
+                    this.ctx.audioManager?.playSound('jump');
+                }
             }
             w.jumpHeld = w.inp.jump;
 
@@ -140,10 +142,16 @@ export class WalkMapState extends State {
             for (const portal of this._portals) {
                 const ox = w.x + w.w / 2;
                 const oy = w.y + w.h / 2;
-                if (ox > portal.x && ox < portal.x + portal.w &&
-                    oy > portal.y && oy < portal.y + portal.h) {
-                    this._selectedMap[w.idx] = portal.key;
-                    this.ctx.audioManager?.playSound('finish');
+                if (
+                    ox > portal.x &&
+                    ox < portal.x + portal.w &&
+                    oy > portal.y &&
+                    oy < portal.y + portal.h
+                ) {
+                    if (this._selectedMap[w.idx] !== portal.key) {
+                        this._selectedMap[w.idx] = portal.key;
+                        this.ctx.audioManager?.playSound('finish');
+                    }
                 }
             }
         }
@@ -151,9 +159,9 @@ export class WalkMapState extends State {
 
     render(mx, my) {
         const { p, players } = this.ctx;
-        const gW = this.ctx.gameWidth  || 960;
+        const gW = this.ctx.gameWidth || 960;
         const gH = this.ctx.gameHeight || 400;
-        const T  = GameConfig.TILE || 32;
+        const T = GameConfig.TILE || 32;
 
         // Background
         if (this.ctx.walkMapBg) {
@@ -184,19 +192,25 @@ export class WalkMapState extends State {
         if (p.frameCount % 120 < 80) {
             p.fill(255);
             p.textSize(5);
-            p.text('Double jump over your choice to lock in the match', gW / 2, 45);
+            p.text(
+                'Double jump over your choice to lock in the match',
+                gW / 2,
+                45,
+            );
         }
 
         p.fill(255, 150);
         p.textSize(5);
         p.text('ESC TO GO BACK', gW / 2, 70);
-        
+
+        const p1Id = this._playerIdLabel(players[0], 0);
+        const p2Id = this._playerIdLabel(players[1], 1);
         const p1Char = players[0]?.character?.displayName || 'Character';
         const p2Char = players[1]?.character?.displayName || 'Character';
         p.textAlign(p.LEFT, p.TOP);
-        p.text(`P1: ${p1Char}`, 20, 72);
+        p.text(`${p1Id}: ${p1Char}`, 20, 72);
         p.textAlign(p.RIGHT, p.TOP);
-        p.text(`${p2Char} :P2`, gW - 20, 72);
+        p.text(`${p2Char} :${p2Id}`, gW - 20, 72);
 
         // Map cards
         for (const portal of this._portals) {
@@ -204,15 +218,27 @@ export class WalkMapState extends State {
             const p1Selected = this._selectedMap[0] === portal.key;
             const p2Selected = this._selectedMap[1] === portal.key;
             const bothSelected = p1Selected && p2Selected;
-            const alpha = bothSelected ? 255 : (p1Selected || p2Selected) ? 200 : 180 * pulse;
+            const alpha = bothSelected
+                ? 255
+                : p1Selected || p2Selected
+                  ? 200
+                  : 180 * pulse;
             const hovered =
-                mx > portal.x && mx < portal.x + portal.w &&
-                my > portal.y && my < portal.y + portal.h;
+                mx > portal.x &&
+                mx < portal.x + portal.w &&
+                my > portal.y &&
+                my < portal.y + portal.h;
 
             // Card glow
             p.noStroke();
             p.fill(...portal.col, bothSelected ? 60 : hovered ? 48 : 28);
-            p.rect(portal.x - 10, portal.y - 10, portal.w + 20, portal.h + 20, 10);
+            p.rect(
+                portal.x - 10,
+                portal.y - 10,
+                portal.w + 20,
+                portal.h + 20,
+                10,
+            );
 
             // Preview frame
             p.fill(18, 24, 40, alpha);
@@ -230,12 +256,24 @@ export class WalkMapState extends State {
                 );
             } else {
                 p.fill(...portal.col, 120);
-                p.rect(portal.x + 8, portal.y + 8, portal.w - 16, portal.h - 58, 6);
+                p.rect(
+                    portal.x + 8,
+                    portal.y + 8,
+                    portal.w - 16,
+                    portal.h - 58,
+                    6,
+                );
             }
 
             // Bottom info plate
             p.fill(8, 12, 22, 220);
-            p.rect(portal.x + 8, portal.y + portal.h - 48, portal.w - 16, 40, 6);
+            p.rect(
+                portal.x + 8,
+                portal.y + portal.h - 48,
+                portal.w - 16,
+                40,
+                6,
+            );
 
             // Frame stroke
             p.stroke(...portal.col, bothSelected ? 255 : hovered ? 220 : 170);
@@ -245,14 +283,26 @@ export class WalkMapState extends State {
             p.noStroke();
 
             // Label above portal
-            const col2 = bothSelected ? [255, 255, 100] : (p1Selected || p2Selected) ? [255, 200, 100] : [230, 236, 255];
+            const col2 = bothSelected
+                ? [255, 255, 100]
+                : p1Selected || p2Selected
+                  ? [255, 200, 100]
+                  : [230, 236, 255];
             p.fill(...col2);
             p.textAlign(p.CENTER, p.TOP);
             p.textSize(6);
-            p.text(portal.label, portal.x + portal.w / 2, portal.y + portal.h - 42);
+            p.text(
+                portal.label,
+                portal.x + portal.w / 2,
+                portal.y + portal.h - 42,
+            );
             p.fill(120, 140, 175);
             p.textSize(4.6);
-            p.text(portal.subtitle, portal.x + portal.w / 2, portal.y + portal.h - 24);
+            p.text(
+                portal.subtitle,
+                portal.x + portal.w / 2,
+                portal.y + portal.h - 24,
+            );
 
             // Selection indicator
             if (p1Selected || p2Selected) {
@@ -264,7 +314,11 @@ export class WalkMapState extends State {
                 if (bothSelected) {
                     p.text('READY!', portal.x + portal.w / 2, portal.y - 14);
                 } else {
-                    p.text(indicators.join('+'), portal.x + portal.w / 2, portal.y - 14);
+                    p.text(
+                        indicators.join('+'),
+                        portal.x + portal.w / 2,
+                        portal.y - 14,
+                    );
                 }
             }
         }
@@ -275,10 +329,19 @@ export class WalkMapState extends State {
             p.noStroke();
 
             // Draw sprite if available, else coloured rect
-            if (pl && pl.framesArr && pl.framesArr.length > 0 && pl.animConfig) {
+            if (
+                pl &&
+                pl.framesArr &&
+                pl.framesArr.length > 0 &&
+                pl.animConfig
+            ) {
                 const frames = pl.animConfig.IDLE;
-                const fi     = frames[Math.floor(this._age / 200) % frames.length];
-                const img    = getPixelatedSprite(p, pl.framesArr[fi], pl.character?.pixelScale ?? 1);
+                const fi = frames[Math.floor(this._age / 200) % frames.length];
+                const img = getPixelatedSprite(
+                    p,
+                    pl.framesArr[fi],
+                    pl.character?.pixelScale ?? 1,
+                );
                 if (img) {
                     const scale = 2.5;
                     const dw = pl.w * scale;
@@ -286,11 +349,20 @@ export class WalkMapState extends State {
                     p.push();
                     p.noSmooth();
                     if (w.vx < 0) {
-                        p.translate(w.x + dw / 2, w.y + dh / 2 - (dh - w.h) / 2);
+                        p.translate(
+                            w.x + dw / 2,
+                            w.y + dh / 2 - (dh - w.h) / 2,
+                        );
                         p.scale(-1, 1);
                         p.image(img, -dw / 2, -dh / 2, dw, dh);
                     } else {
-                        p.image(img, w.x - (dw - w.w) / 2, w.y - (dh - w.h) / 2, dw, dh);
+                        p.image(
+                            img,
+                            w.x - (dw - w.w) / 2,
+                            w.y - (dh - w.h) / 2,
+                            dw,
+                            dh,
+                        );
                     }
                     p.pop();
                 } else {
@@ -306,11 +378,10 @@ export class WalkMapState extends State {
             p.fill(...w.col);
             p.textAlign(p.CENTER, p.BOTTOM);
             p.textSize(5.5);
-            p.text(`P${w.idx + 1}`, w.x + w.w / 2, w.y - 4);
+            p.text(this._playerIdLabel(pl, w.idx), w.x + w.w / 2, w.y - 4);
 
             this._drawControlHint(p, w);
         }
-
     }
 
     keyPressed() {
@@ -344,6 +415,14 @@ export class WalkMapState extends State {
         p.pop();
     }
 
+    _playerIdLabel(player, index) {
+        const fallback = `P${index + 1}`;
+        const nickname = player?.nickname?.trim();
+        if (!nickname) return fallback;
+        if (nickname === `Player ${index + 1}`) return fallback;
+        return nickname;
+    }
+
     _drawControlHint(p, walker) {
         const centerX = walker.x + walker.w / 2;
         const topY = walker.y - 78;
@@ -351,9 +430,10 @@ export class WalkMapState extends State {
         const keyH = 18;
         const gap = 5;
         const baseCol = walker.idx === 0 ? [90, 170, 255] : [255, 200, 80];
-        const keys = walker.idx === 0
-            ? { up: 'W', left: 'A', down: 'S', right: 'D' }
-            : { up: '↑', left: '←', down: '↓', right: '→' };
+        const keys =
+            walker.idx === 0
+                ? { up: 'W', left: 'A', down: 'S', right: 'D' }
+                : { up: '↑', left: '←', down: '↓', right: '→' };
         const rowY = topY + keyH + gap;
         const crossX = centerX - (keyW * 1.5 + gap) - 6;
         const crossY = topY - 6;
@@ -371,7 +451,13 @@ export class WalkMapState extends State {
         p.rect(crossX, crossY + keyH + gap, crossW, keyH + 12, 7);
         p.fill(255, 255, 255, 10);
         p.rect(crossX + keyW + gap + 2, crossY + 2, keyW + 8, crossH * 0.32, 6);
-        p.rect(crossX + 2, crossY + keyH + gap + 2, crossW - 4, (keyH + 12) * 0.28, 6);
+        p.rect(
+            crossX + 2,
+            crossY + keyH + gap + 2,
+            crossW - 4,
+            (keyH + 12) * 0.28,
+            6,
+        );
         p.stroke(baseCol[0], baseCol[1], baseCol[2], 85);
         p.strokeWeight(1);
         p.noFill();
@@ -386,11 +472,7 @@ export class WalkMapState extends State {
                     : [10, 14, 26, alpha],
             );
             p.rect(x, y, keyW, keyH, 5);
-            p.fill(
-                highlighted
-                    ? [255, 255, 255, 42]
-                    : [255, 255, 255, 18],
-            );
+            p.fill(highlighted ? [255, 255, 255, 42] : [255, 255, 255, 18]);
             p.rect(x + 1, y + 1, keyW - 2, keyH * 0.42, 4);
             if (highlighted) {
                 p.noStroke();
