@@ -3,9 +3,11 @@ import { z } from "zod";
 
 export class AIMapGenerator {
   constructor(apiKey) {
-    this.ai = new GoogleGenAI({
-        apiKey: apiKey || import.meta.env.VITE_GEMINI_API_KEY
-    });
+    // this.ai = new GoogleGenAI({
+    //     apiKey: apiKey || import.meta.env.VITE_GEMINI_API_KEY
+    // });
+
+    this.apiKey = apiKey;
     this.systemPrompt = `
         You are a 2D platformer game map designer. Your role is to generate a random complex map for a 2D platformer game along with the original "Start_Point" and "End_Point"
         
@@ -38,6 +40,7 @@ export class AIMapGenerator {
         </rules>
         
         Follow the rules. Once created the map, check again if you have followed all the rules. Place a 3 "Solid Block" horizontal platform immediately beneath the "Start_Point".
+        Do not wrap the json responses in JSON markers.
         `;
     this.responseSchema = z.object({
         map: z.array(z.number()).describe(`
@@ -47,9 +50,10 @@ export class AIMapGenerator {
       });
   }
 
-  async generateMap() {
+  async generateMap(apiKey) {
+      const keyToUse = apiKey || this.apiKey;
       try {
-          let data =  await this._callToGenerateMap();
+          let data =  await this._callToGenerateMap(keyToUse);
           
           if (data.length < 510) {
               data = data.concat(new Array(510 - data.length).fill(0));
@@ -89,7 +93,10 @@ export class AIMapGenerator {
       }
   }
 
-  async _callToGenerateMap() {
+  async _callToGenerateMap(apiKey) {
+    if (!apiKey) {
+        throw new Error("API Key is required for AI Map Generation");
+    }
     const inputPrompt = `
         Follow the system instructions and generate a map using the below inputs.
         Input:
@@ -97,9 +104,10 @@ export class AIMapGenerator {
     `;
     var attempt = 1;
     var waitTime = 1000; // ms
+    let data;
     for (let i = 0; i < 3; i++) {
         try {
-            console.log(`Starting Generation ${i+1}`);
+            console.log(`Starting Generation`);
             // const response = await this.ai.models.generateContent({
             //     model: "gemini-2.5-flash",
             //     contents: inputPrompt,
@@ -109,62 +117,65 @@ export class AIMapGenerator {
             //         responseJsonSchema: z.toJSONSchema(this.responseSchema),
             //     },
             // });
+            console.log(apiKey);
+            const response = await fetch('https://api.aimlapi.com/v1/chat/completions', {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    model: "google/gemini-3-1-pro-preview",
+                    messages: [
+                        {
+                            role: "system",
+                            content: this.systemPrompt
+                        },
+                        {
+                            role: "user",
+                            content: inputPrompt
+                        }
+                    ]
+                })
+            });
 
-            // const response = await fetch('https://api.aimlapi.com/v1/chat/completions', {
-            //     method: "POST",
-            //     headers: {
-            //         "Authorization": `Bearer ${import.meta.env.VITE_AIML_KEY}`,
-            //         "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify({
-            //         model: "google/gemini-3-1-pro-preview",
-            //         messages: [
-            //             {
-            //                 role: "system",
-            //                 content: this.systemPrompt
-            //             },
-            //             {
-            //                 role: "user",
-            //                 content: inputPrompt
-            //             }
-            //         ]
-            //     })
-            // });
-            //
-            // const datab = await response.json();
-            //
+            data = await response.json();
+            await console.log("Generated AI Map");
+            // await console.log(data.choices[0].message.content, typeof data.choices[0].message.content);
+
+            // await new Promise((resolve) => setTimeout(resolve, 30000));
             // console.log(datab.choices[0].message.content.Map);
+            //
+            // let data = [
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
+            //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 0, 0, 0
+            // ]
 
-            await new Promise((resolve) => setTimeout(resolve, 30000));
-            console.log("Generated AI Map");
+            let mapData = JSON.parse(data.choices[0].message.content);
+            console.log("new Map: ", mapData.Map);
+            return mapData.Map;
 
-            let data = [
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 31, 31, 31, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 0, 0, 0
-            ]
-            return data;
 
         } catch (error) {
             if (i == 2) {
                 console.log("Error generating map by AI:", error);
-                console.log("Calling procedural generation");
-                // call procedural map generator here
-                throw error;
+                console.log("Using procedural generation");
+                return;
             } else {
                 let delay = waitTime * 2 ** (i + 1);
                 console.log(`Attempted ${i+1} times. Retrying in ${delay / 1000}s...`);

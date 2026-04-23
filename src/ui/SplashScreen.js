@@ -119,7 +119,9 @@ export class SplashScreen {
      * @param {number} mx - Mouse X position
      * @param {number} my - Mouse Y position
      */
-    render(p, mx, my, showSettings = false, displayMode = 'fit', fontMode = 'press_start_2p', aiMapFlag = 1, apiKey = '', apiKeyFocused = false) {
+    render(p, mx, my, showSettings = false,
+           displayMode = 'fit', fontMode = 'press_start_2p',
+           aiMapFlag = 1, apiKey = '', apiKeyFocused = false) {
         const scale = Math.min(this.gameWidth / 1920, this.gameHeight / 1080);
         const titleBaseX = 500 * (this.gameWidth / 1920);
         const titleX =
@@ -305,7 +307,7 @@ export class SplashScreen {
         // --- API KEY ---
         p.fill(120, 144, 188);
         p.textFont(GameConfig.FONT, 5.8 * uiTextScale);
-        p.text('GEMINI API KEY', panel.x + panel.w / 2, panel.y + 390);
+        p.text('AIML API KEY', panel.x + panel.w / 2, panel.y + 390);
 
         this.apiKeyInputButton.textSize = 5.5 * uiTextScale;
         this.apiKeyInputButton.drawButton(p, mx, my);

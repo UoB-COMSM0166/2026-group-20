@@ -117,17 +117,17 @@ export class MapManager {
         ctx.mapManager = this;
         this._applySelectedMap(ctx);
         if (this.aiMapFlag === 0) {
-            this.preloadNextAIMap();
+            this.preloadNextAIMap(ctx.apiKey);
         }
     }
 
-    preloadNextAIMap() {
+    preloadNextAIMap(apiKey = null) {
         if (this.aiMapFlag !== 0) return null;
         if (this._preloadPromise) return this._preloadPromise;
 
         this._preloadPromise = (async () => {
             try {
-                this.preloadedAIMap = await this.aiGenerator.generateMap();
+                this.preloadedAIMap = await this.aiGenerator.generateMap(apiKey);
             } catch (e) {
                 console.error('AI Map Preload failed:', e);
             } finally {
@@ -173,7 +173,7 @@ export class MapManager {
             // }
 
             this.preloadedAIMap = null;
-            this.preloadNextAIMap();
+            this.preloadNextAIMap(ctx.apiKey);
 
             if (aiResult) {
                 this._applyAIMapResult(aiResult, mapKey, ctx);
@@ -628,6 +628,44 @@ export class MapManager {
         const coinSprite = this._coinSprite;
         const endpointSprite = this._endPointSprite;
 
+        const coinHorizontalOffset = (tx, ty) => {
+            const width = visualBlockMap[0]?.length ?? 0;
+            const height = visualBlockMap.length;
+            const leftBlocked =
+                ty < 0 ||
+                ty >= height ||
+                tx - 1 < 0 ||
+                visualBlockMap[ty][tx - 1];
+            const rightBlocked =
+                ty < 0 ||
+                ty >= height ||
+                tx + 1 >= width ||
+                visualBlockMap[ty][tx + 1];
+            if (leftBlocked && !rightBlocked) return tileW * 0.28;
+            if (rightBlocked && !leftBlocked) return -tileW * 0.28;
+            return 0;
+        };
+
+        const coinDefs = [];
+        const spawnProbability = 0.30;
+        for (let i = 0; i < aiResult.map.length; i++) {
+            if (aiResult.map[i] === 2) {
+                const col = i % cols;
+                const row = Math.floor(i / cols);
+                if (row > 0) {
+                    const cx = col * tileW;
+                    const cy = (row - 1) * tileH;
+                    if (
+                        !((cx === startX && cy === startY) || (cx === endX && cy === endY))
+                    ) {
+                        if (Math.random() < spawnProbability) {
+                            coinDefs.push({ x: cx, y: cy });
+                        }
+                    }
+                }
+            }
+        }
+
         const generatedMap = {
             MAP: collisionMap,
             visualBlockMap,
@@ -763,7 +801,18 @@ export class MapManager {
                 p.pop();
             },
             getCoins() {
-                return [];
+                return coinDefs.map((coin) => {
+                    const tx = Math.floor((coin.x + tileW * 0.25) / tileW);
+                    const ty = Math.floor((coin.y + tileH * 0.25) / tileH);
+                    return new Coin(
+                        p,
+                        coin.x,
+                        coin.y,
+                        GameConfig.COIN_VALUE,
+                        coinSprite,
+                        coinHorizontalOffset(tx, ty),
+                    );
+                });
             },
         };
 
