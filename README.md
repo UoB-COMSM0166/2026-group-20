@@ -632,10 +632,10 @@ The user interface is responsible for managing the presentation layer of the gam
 This separation allows for a clearer distinction between gameplay logic and visual presentation, enabling more flexible and maintainable design of interface elements such as buttons, the scoreboard, and other in-game displays. In addition, external graphical assets (e.g. the splashscreen PNG) can be integrated independently of the codebase, supporting more refined and visually consistent presentation without being constrained by in-code rendering.
 
 ### 3.6 Rescource Manager 
-The game implements a **Resource Manager** to handle game assets. A resource manager prepares assets and ensures they are loaded into memory when needed and released when no longer required [5, p571]. //released?
+The game implements a **Resource Manager** to handle game assets. A resource manager prepares assets and ensures they are loaded into memory when needed and released when no longer required [5, p571]. 
 
 //better segue
-In this project, map assests are managed by `MapLoader`, which reads map configuration files and generates game objects such as obstacles and  coins. This approach decouples level design from the core game logic, allowing maps to be modified or extended without changes to the underlying codebase.
+Map assests are managed by `MapLoader`, which reads map configuration files and generates game objects such as obstacles and  coins. This approach decouples level design from the core game logic, allowing maps to be modified or extended without changes to the underlying codebase.
 
 
 ### 3.7 Assets
@@ -874,12 +874,19 @@ The development of this game followed an Agile methodology, organised into two-w
 
 **6.3.1. The Product Backlog and Sprint Planning**
 
-//change
-The product backlog contained all requirements for the game. These requirements were collectively defined by the team during the initial planning phase and were continuously refined and prioritised to reflect development needs and project constraints. 
+As part of the development process, the product backlog was used to record all of our game requirements. These requirements were collectively defined by the team during the initial planning phase and were continuously refined and prioritised to reflect development needs and project constraints. 
 
 At the beginning of each sprint, a sprint planning meeting was led by the Scrum Master to review and reorganise the backlog. Following this, team members selected tasks based on priority and complexity, ensuring an even distribution of workload and alignment with sprint objectives.
 
 Throughout each sprint, development was carried out collaboratively, focusing on feature implementation, system testing, and integration with the existing game framework. Progress was monitored on an ongoing basis, with completed tasks undergoing review to ensure correctness and consistency before being incorporated into subsequent development cycles.
+
+<div align="center">
+   <img src= "docs/assets/gif/kanban.gif" alt= "Kanban Board Gif" width= "700">
+</div>
+
+<div align="center">
+<p><em>Figure ?: Kanban Board Overview</em></p>
+</div>
 
 **6.3.2 Horizontal Development Strategy**
 
@@ -966,11 +973,48 @@ main
  //TO BE ADDED AFTER MARAN'S REFLECTION
 
 ### 6.6. Reflection on Teamwork 
-//do today
+
+Overall, our group demonstrated strong motivation, consistent participation, and a clear willingness to engage creatively with the project. Communication was a key strength, supported by good meeting attendance and an organised workflow that everyone followed, including the use of pull requests, separate branches, and agreed version control practices. Project management was handled responsibly, with individuals taking ownership of their roles, which helped maintain steady progress. We also managed our time effectively, resolved conflicts constructively, and worked well in pairs. Team members were generally open to feedback and alternative ideas, contributing to a collaborative and supportive environment.
+
+However, the group faced several challenges. Some initial ideas were overly ambitious given the time constraints, and deciding on the project direction took longer than expected, causing some early tension. Progress slowed at times due to uneven availability, and limited upfront architectural planning meant we had to continuously adapt our structure, occasionally leading to confusion. A lack of detailed code comments also made collaboration more difficult, and there were instances where some members relied on AI tools instead of seeking help directly. Despite these issues, we adapted and continued to work effectively as a team. Overall, the experience was highly valuable, reflecting real-world industry challenges and helping us develop both technically and collaboratively.
+
 
 ## 7. Subtainability, Ethics and Accessibility
 (~750 words) 
 Environmental + 2 of the following: Social, Enconimic, Technical and Individual 
+
+<strong><em>Sustainability Awareness Framework</em></strong>
+
+From the perspective of the Karlskrona Manifesto [add link],From the perspective of the Karlskrona Manifesto, our game highlights a range of interconnected sustainability implications across multiple dimensions, prompting both reflection on our current design choices and consideration of how these could be improved in future iterations. 
+
+**Environmentally**, while we have opted for accessible hosting via GitHub Pages, supported by Microsoft Azure, and implemented AI-based map generation through Gemini on Google Cloud, we recognise that these choices externalise significant environmental costs, including energy consumption, water usage, and emissions associated with data centres. So far, our approach has prioritised ease of deployment over environmental optimisation; however, moving forward, we would aim to reduce unnecessary API calls (e.g., caching previously generated maps), improve efficiency, and consider hosting providers with lower environmental impact or strategies that reduce unnecessary energy use.
+
+**Economically**, we have created a product with potential value generation, but we also acknowledge the risk that it could overlap with or compete against existing similar games in the market. While this has not yet been directly addressed, future iterations would require more careful positioning, for example by identifying what makes our game meaningfully different from existing alternatives. It would also involve a clearer understanding of the wider supply chain, including reliance on hosting services such as cloud infrastructure providers, as well as distribution channels like web platforms or app stores, and how these affect both cost and long-term sustainability.
+
+From a **Technical** perspective, we have prioritised usability and accessibility, ensuring the game is intuitive and easy to engage with, which supports inclusivity. However, limited upfront architectural planning has already led to maintainability challenges, and scaling the game would require more resource-intensive solutions such as dedicated servers, concurrency management, and cross-device compatibility. Future improvements would therefore need to balance performance with resource efficiency through better architectural design. 
+
+At the **Individual** level, we recognise that the game’s short, repeatable loops and appealing design may encourage excessive use, particularly among younger players. While we have introduced a cap on consecutive play sessions, this could be strengthened through features such as on-screen playtime reminders, optional cooldown periods after extended use, or gentle prompts encouraging breaks. 
+
+**Socially**, although the game has the potential to foster a sense of community, it also carries risks associated with online interaction. While there is currently no login system, we anticipate that when one is introduced, profile pictures will be restricted to minimise identity-based targeting. This should be complemented by clearer community guidelines, reporting mechanisms, and moderation policies to address harmful behaviour. 
+
+Overall, while we have taken some initial steps to address sustainability concerns, a more critical and proactive approach, grounded in continuous evaluation and responsible design choices, will be necessary to ensure the system remains sustainable as it evolves.
+
+<div align="center">
+   <img src= "docs/assets/images/spider-diagram.png" alt= "Sustainability Framework Spider Chart" width= "700">
+</div>
+
+<div align="center">
+<p><em>Figure ?: Sustainability Framework Spider Chart</em></p>
+</div>
+
+
+<strong><em>Green Software Foundation Implementation Patterns</em></strong>
+
+From the perspective of the Green Software Foundation implementation patterns [add sourse], our design choices for the AI and data components of the game align with three key sustainability principles. To begin with, we follow the pattern of <em>**Select a more energy efficient AI/ML</em> framework** by using Gemini via API calls rather than developing or training our own model. This significantly reduces energy consumption, as it avoids the highly resource-intensive process of training large AI models from scratch, which typically requires extensive GPU/TPU usage and prolonged data centre operation. Instead, we rely on an already optimised system that delivers the required functionality in a more efficient and scalable way.
+In addition, we apply the principle to <em>**Leverage pre-trained models and transfer learning for AI/ML development**</em> by using Gemini as a pre-trained model instead of building or training a custom solution. This means we are reusing an existing, large-scale model that has already been trained and optimised, rather than duplicating that computational effort ourselves. As a result, we reduce unnecessary energy use and benefit from a system that has been refined for efficiency at an industrial level, allowing us to focus on integration rather than model training.
+Lastly, we follow the pattern to <em>**Use efficient file formats for AI/ML development**</em> through our use of JSON for map data storage and transfer. JSON is a lightweight, widely adopted industry standard that enables fast parsing and low overhead when exchanging data between the game and the AI system. This reduces processing cost during runtime and avoids the inefficiencies associated with more complex or less structured formats. 
+Overall, these design decisions reflect a conscious effort to align our implementation with recognised green software practices by prioritising efficiency, reuse of existing systems, and minimisation of unnecessary computational load.
+
 
 ## 8. Conclusion
 
@@ -978,10 +1022,27 @@ Environmental + 2 of the following: Social, Enconimic, Technical and Individual
 
 - Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
 
+Reflecting on this project as a whole, one of the most significant lessons we took away was how difficult it is to properly interpret and refine requirements in a real development context. Moving from broad, often vague requirements into structured epics and then into concrete user stories proved more difficult than expected. We found that small misunderstandings early on could easily escalate into uncertainty and lead to incorrect design choices, highlighting the importance of early clarification and continuous refinement. Another key learning point was the value of team composition. While it helped that everyone was motivated and committed, it was equally beneficial that we came from different academic and technical backgrounds. This diversity often led to more creative solutions and helped us avoid overly narrow thinking. At the same time, we gained hands-on experience with industry-standard workflows such as Kanban boards, backlogs, daily stand-ups, and collaborative Git usage. Although these tools initially felt overly formal compared to previous individual work, they quickly became essential for maintaining organisation and enabling effective parallel development.
+
+There were also notable challenges in adapting to this way of working. As this was our first full-scale group software project, learning to share ownership of the codebase required a shift in mindset. It was not always easy to step away from full control of individual work and trust others to build on it effectively, but this proved to be an important aspect of the learning process and reflective of industry practice. We also found that communication must be intentional and consistent. Even small updates, such as pushing changes to a branch, needed to be clearly communicated to avoid confusion or duplicated effort. This highlighted that professional development environments rely heavily on shared awareness rather than individual effort alone.
+
+As for future development, the immediate next steps should focus on making the game more robust and scalable. This includes moving towards an online version with proper server hosting and concurrency support, as well as expanding compatibility across multiple devices. These improvements would help transition the project from a prototype into a more deployable product. In the longer term, a more advanced version could involve releasing the game on an app store, introducing user accounts for score tracking, and adding global leaderboards to encourage competition and sustained engagement. The project could also potentially be developed further and positioned for pitching to investors.
+
+Overall, this project was a valuable learning experience, not only because of the technical progress made but also due to how our understanding of software development evolved. Rather than strictly following an initial plan, development involved continuous balancing between design decisions, constraints, communication, and adaptation. We learned that building software is just as much about collaboration and working effectively with others as it is about writing high-quality code. It also provided a more realistic understanding of industry practices, where progress depends on shared responsibility, iterative improvement, and the ability to respond to issues as they arise.
+
 
 ## 9. Contribution Statement
 
 - Provide a table of everyone's contribution, which _may_ be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
+
+| Name       | Feature                                                                 | Individual Weight |
+|------------|-------------------------------------------------------------------------|-------------------|
+| Megi       | Animation, Movement mechanics, Visual design, Report writing            | 1.0               |
+| Jacqueline | Animation, Movement mechanics, Visual design, Report writing            | 1.0               |
+| Maran      | CI/CD pipeline, AI map generation                                       | 1.0               |
+| Jinwang    | Collision detection, UX (Audio, Tutorial, Scoreboard, Wallet System), Obstacle physics, State Manager | 1.0 |
+| Mengxiao   | Procedural map generation, State Manager                                | 1.0               |
+| Eira       | Collision detection, UX (Audio, Tutorial, Scoreboard, Wallet System)    | 1.0               |
 
 ## 10. AI Statement 
 (~250 words) 
