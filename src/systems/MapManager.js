@@ -49,16 +49,17 @@ export class MapManager {
         this.preloadedAIMap = null;
         this._preloadPromise = null;
 
+        const baseUrl = import.meta.env.BASE_URL;
         this.mapLoaders = {
             map1: new TiledMapLoader(
                 p,
-                'src/assets/maps/map1/map.JSON',
-                'src/assets/maps/map1/Tileset.png',
+                `${baseUrl}src/assets/maps/map1/map.JSON`,
+                `${baseUrl}src/assets/maps/map1/Tileset.png`,
             ),
             map2: new TiledMapLoader(
                 p,
-                'src/assets/maps/map2/map2.JSON',
-                'src/assets/maps/map2/Tileset.png',
+                `${baseUrl}src/assets/maps/map2/map2.JSON`,
+                `${baseUrl}src/assets/maps/map2/Tileset.png`,
             ),
         };
 
@@ -79,9 +80,10 @@ export class MapManager {
         this._preloadChunkPool();
         this._preloadBackgrounds();
 
-        this._coinSprite = this.p.loadImage('src/assets/obstacles/Coin/coin.png');
+        const baseUrl = import.meta.env.BASE_URL;
+        this._coinSprite = this.p.loadImage(`${baseUrl}src/assets/obstacles/Coin/coin.png`);
         this._endPointSprite = this.p.loadImage(
-            'src/assets/obstacles/endpoint/Checkpoint(FlagIdle)(64x64).png',
+            `${baseUrl}src/assets/obstacles/endpoint/Checkpoint(FlagIdle)(64x64).png`,
         );
 
         for (const loader of Object.values(this.mapLoaders)) {
@@ -91,7 +93,8 @@ export class MapManager {
     }
 
     _preloadChunkPool() {
-        this.p.loadJSON('src/assets/maps/chunks/index.json', (manifest) => {
+        const baseUrl = import.meta.env.BASE_URL;
+        this.p.loadJSON(`${baseUrl}src/assets/maps/chunks/index.json`, (manifest) => {
             if (!manifest?.files) return;
             for (const filename of manifest.files) {
                 const base = filename.replace(/\.json$/, '');
@@ -105,7 +108,8 @@ export class MapManager {
     }
 
     _preloadBackgrounds() {
-        const basePath = 'src/assets/images/background/';
+        const baseUrl = import.meta.env.BASE_URL;
+        const basePath = `${baseUrl}src/assets/images/background/`;
         for (const [theme, files] of Object.entries(MapManager.BG_FILES)) {
             this._backgroundImages[theme] = files.map((file) =>
                 this.p.loadImage(basePath + file),
@@ -152,7 +156,8 @@ export class MapManager {
 
     async _loadChunk(filename) {
         try {
-            const url = `src/assets/maps/chunks/${filename}`;
+            const baseUrl = import.meta.env.BASE_URL;
+            const url = `${baseUrl}src/assets/maps/chunks/${filename}`;
             const resp = await fetch(url);
             if (!resp.ok) return null;
             return await resp.json();

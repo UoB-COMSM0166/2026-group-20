@@ -203,6 +203,7 @@ export class SplashScreen {
         apiKeyFocused,
     ) {
         const panel = this.settingsPanel;
+        const uiTextScale = 3;
         p.noStroke();
         p.fill(0, 0, 0, 170);
         p.rect(0, 0, this.gameWidth, this.gameHeight);

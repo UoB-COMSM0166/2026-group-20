@@ -16,7 +16,7 @@ export class AIMapGenerator {
         
         Output:
         Follow the schema given for output
-        1. Map - A 2D flattened map from the given input labels. The output Map array length should be equal to 600 indices.
+        1. Map - A 2D flattened map from the given input labels. The output Map array length should be equal to 510 indices.
         
         <rules>
         
@@ -78,6 +78,16 @@ export class AIMapGenerator {
               }
               return value;
           });
+
+          if (startPoint !== -1) {
+              const width = 60;
+              const belowIndex = startPoint + width;
+              if (belowIndex < data.length) {
+                  data[belowIndex] = 31;
+                  if (belowIndex % width > 0) data[belowIndex - 1] = 31;
+                  if (belowIndex % width < width - 1) data[belowIndex + 1] = 31;
+              }
+          }
 
           data = this.processSolidBlocks(data);
           // console.log(data);
