@@ -289,7 +289,7 @@ flowchart LR
 
 ### 3.1 System Architecture Overview
 
-The project adopts a modular game architecture that combines **Entity–Component–System (ECS)** architecture[5] and **Object-Oriented Design**[9]. 
+The project adopts a modular game architecture that combines **Entity–Component–System (ECS)** architecture[<a href="#reference">5</a>] and **Object-Oriented Design**[<a href="#reference">9</a>]. 
 An ECS architecture separates data from logic. Entities mainly store data, while systems contain all the logic that processes this data. For instance, a **Player** entity may only store position and velocity data, while the **Physics System** is responsible for updating movement or detecting collisions for multiple entities (see Figure ). 
 In contrast, in typical Object-Oriented Design, a game object contains both its data and the logic that operates on that data. For example, a **Player** class may store data such as position and velocity while also containing functions that control movement and detect collisions. 
 
@@ -317,7 +317,7 @@ PhysicsSystem
 <p><em>Figure 3: Conceptual comparison between object-oriented design and ECS architecture.</em></p>
 </div>
 
-Both architectures have advantages and limitations. Object-Oriented Design is easier to understand and implement as data and behaviour are encapsulated within the same class. This structure suits smaller projects where logic is organised around individual objects. However, as systems become more complex, tightly coupling logic within objects can reduce flexibility and limit code reusability [9, p.113]. In contrast, ECS architecture improves modularity by separating data from behaviour, allowing systems to process multiple entities using shared logic. This can improve scalability and maintainability, but it may introduce additional design complexity[6]. 
+Both architectures have advantages and limitations. Object-Oriented Design is easier to understand and implement as data and behaviour are encapsulated within the same class. This structure suits smaller projects where logic is organised around individual objects. However, as systems become more complex, tightly coupling logic within objects can reduce flexibility and limit code reusability [<a href="#reference">9</a>, p.113]. In contrast, ECS architecture improves modularity by separating data from behaviour, allowing systems to process multiple entities using shared logic. This can improve scalability and maintainability, but it may introduce additional design complexity[<a href="#reference">6</a>]. 
 
 Based on these considerations, the system architecture in this project follows a **hybrid approach**, which combines aspects of both ECS and object-oriented design. The player is represented as an **entity** that stores data such as position and movement speed, while certain gameplay behaviours are handled by independent systems. For instance, the PhysicsSystem processes collision detection between the player and obstacles, and the RespawnManager handles resetting the player when the character collides with a hazard. However, some game logic, such as the player movement, remains implemented within the player object itself.
 
@@ -515,9 +515,9 @@ direction TB
 
 ### 3.2 Entities 
 
-**Entities** represent the main objects within the game world, such as players, coins and obstacles. These entities store important state information, such as position, velocity and phase (e.g., lifeState, movementState and gameState), and also implement some game logic. This structure adheres to a data-driven design approach [5, p1024], where specific parameters such as movement speed and initial jump velocity are defined in configuration files in the `config` folder rather than hardcoded.
+**Entities** represent the main objects within the game world, such as players, coins and obstacles. These entities store important state information, such as position, velocity and phase (e.g., lifeState, movementState and gameState), and also implement some game logic. This structure adheres to a data-driven design approach <a href="#reference">5</a>, p1024], where specific parameters such as movement speed and initial jump velocity are defined in configuration files in the `config` folder rather than hardcoded.
 
-During runtime, entities are updated through the **game loop** (`draw()`). All entities are stored in a list, and the `update()` function iterates through this list during each frame to update the state of each entity sequentially. This approach ensures a consistent and accurate update of the entities during the game run [5, p1088].
+During runtime, entities are updated through the **game loop** (`draw()`). All entities are stored in a list, and the `update()` function iterates through this list during each frame to update the state of each entity sequentially. This approach ensures a consistent and accurate update of the entities during the game run [<a href="#reference">5</a>, p1088].
 
 
 ### 3.3 Systems
@@ -632,7 +632,7 @@ The user interface is responsible for managing the presentation layer of the gam
 This separation allows for a clearer distinction between gameplay logic and visual presentation, enabling more flexible and maintainable design of interface elements such as buttons, the scoreboard, and other in-game displays. In addition, external graphical assets (e.g. the splashscreen PNG) can be integrated independently of the codebase, supporting more refined and visually consistent presentation without being constrained by in-code rendering.
 
 ### 3.6 Rescource Manager 
-The game implements a **Resource Manager** to handle game assets. A resource manager prepares assets and ensures they are loaded into memory when needed and released when no longer required [5, p571]. 
+The game implements a **Resource Manager** to handle game assets. A resource manager prepares assets and ensures they are loaded into memory when needed and released when no longer required [<a href="#reference">5</a>, p571]. 
 
 //better segue
 Map assests are managed by `MapLoader`, which reads map configuration files and generates game objects such as obstacles and  coins. This approach decouples level design from the core game logic, allowing maps to be modified or extended without changes to the underlying codebase.
@@ -658,14 +658,14 @@ Overall, our system architecture integrates multiple components, including entit
 
 ## 4.1 Implementaion Overall
 
-The p5.js instance mode [8] was chosen at the start of development, as it avoids the global namespace used in standard mode where functions are shared across scripts. Such mode isolates functions from the global scope by encapsulating the sketch within an object, which reduces naming conflicts and improving code organisation and maintainability in a modular architecture.
+The p5.js instance mode [<a href="#reference">8</a>] was chosen at the start of development, as it avoids the global namespace used in standard mode where functions are shared across scripts. Such mode isolates functions from the global scope by encapsulating the sketch within an object, which reduces naming conflicts and improving code organisation and maintainability in a modular architecture.
 
 Alongside these architectural decisions, we also set up a **CI/CD pipeline** to maintain code quality, catch bugs early and ensure consistency in development practices across the team. As illustrated in Figure ?, the pipeline begins when developers make changes locally and commit using `git commit`, where a Husky pre-commit hook runs linting, testing and code standardisation before the commit is accepted. Once the code is pushed to the repository, GitHub Actions is triggered based on branch or tag rules. The first workflow runs linting and tests to validate the codebase, and if successful, the second workflow (on main branches or release tags) builds the project and deploys it to GitHub Pages. Overall, this setup reduces manual effort and lowers the risk of errors reaching the live game website.
 
 Though its implementation was challenging due to the need for correctly coordinating multiple tools and workflows (Husky, Git hooks, and GitHub Actions), while ensuring consistent behaviour across different development environments, it was ultimately rewarding as it significantly improved the reliability and automation of our deployment process.
 
 <div align="center">
-<img src="docs/assets/images/cicd-pipeline.png" alt="CI/CD Pipeline Process Chart" width="400">
+<img src="docs/assets/images/cicd-pipeline.png" alt="CI/CD Pipeline Process Chart" width="600">
 </div>
 <div align="center">
 <p><em>Figure ?: CI/CD Pipeline Process Chart</em></p>
@@ -681,7 +681,7 @@ To address this, we introduced a procedural system inspired by Procedural Conten
 The challenge was therefore combining AI and procedural generation to ensure the system could reliably deliver both variety and consistent playability. The AI component introduced diverse and novel map structures, while the procedural system acted as a dependable fallback, guaranteeing that a valid, playable map could always be generated even when AI outputs failed validation or external API calls were unavailable.
 
 <div align="center">
-<img src="docs/assets/gif/random-map-generation.gif" alt="Map Generation Gif" width="400">
+<img src="docs/assets/gif/random-map-generation.gif" alt="Map Generation Gif" width="600">
 </div>
 <div align="center">
 <p><em>Figure ?: Map Generation</em></p>
@@ -714,7 +714,7 @@ To address these challenges, we adopted a structured and incremental approach, b
 Evaluating the game’s usability and user experience is essential for identifying design issues and improving future iterations. In this project, we adopted a mixed-methods approach consisting of the **Think-Aloud Method**, **Heuristic Evaluation**, **The System Usability Scale** and **NASA-TLX**. These methods allowed us to identify usability issues and measure user satisfaction so that we could improve later versions of the game. 
 
 ### 5.1 Qualitative Evaluation
-The qualitative evaluation aimed to identify usability problems and understand how players interact with the game. Twenty participants, including classmates and attendees of the Testathon event, were recruited to play the game while verbalising their thoughts using the Think-Aloud Method. During the evaluation, participants were instructed to complete the game by reaching the goal as quickly as possible. Their verbal feedback and in-game behaviours were recorded and analysed to identify common usability issues. To complement these findings, a Heuristic evaluation based on Nielsen’s usability Heuristics [3] was conducted to provide a systematic assessment of interface design flaws and the overall user experience.
+The qualitative evaluation aimed to identify usability problems and understand how players interact with the game. Twenty participants, including classmates and attendees of the Testathon event, were recruited to play the game while verbalising their thoughts using the Think-Aloud Method. During the evaluation, participants were instructed to complete the game by reaching the goal as quickly as possible. Their verbal feedback and in-game behaviours were recorded and analysed to identify common usability issues. To complement these findings, a Heuristic evaluation based on Nielsen’s usability Heuristics [<a href="#reference">3</a>] was conducted to provide a systematic assessment of interface design flaws and the overall user experience.
 
 <div align="center">
 <img src="docs/assets/gif/v0.1.0.gif" alt="Basic version" width="400">
@@ -724,7 +724,7 @@ The qualitative evaluation aimed to identify usability problems and understand h
 </div>
 
 **A. Think Aloud**
-The think-aloud approach is widely used in usability studies because it provides rich qualitative data while requiring relatively little preparation or participant commitment[1]. We chose this approach to efficiently identify usability issues and better understand how players interact with the game during gameplay. During this method, users were asked to verbalise their thoughts while playing the game. This approach enabled us to identify specific usability bottlenecks and understand the reasoning behind user errors as they occurred.
+The think-aloud approach is widely used in usability studies because it provides rich qualitative data while requiring relatively little preparation or participant commitment[<a href="#reference">1</a>]. We chose this approach to efficiently identify usability issues and better understand how players interact with the game during gameplay. During this method, users were asked to verbalise their thoughts while playing the game. This approach enabled us to identify specific usability bottlenecks and understand the reasoning behind user errors as they occurred.
 
 - Most users agreed the player movement controls were smooth. 
 - Some users were not aware there was a time limit in the game. 
@@ -741,7 +741,7 @@ The think-aloud approach is widely used in usability studies because it provides
 
 **B. Heuristic Evaluation**
 
-To complement user testing, we conducted a Nielsen’s heuristic evaluation. This method was selected because it is a well-established and cost-effective approach for identifying usability issues[2]. It enabled us to systematically evaluate the interface and identify potential design problems based on recognised usability guidelines. 
+To complement user testing, we conducted a Nielsen’s heuristic evaluation. This method was selected because it is a well-established and cost-effective approach for identifying usability issues[<a href="#reference">2</a>]. It enabled us to systematically evaluate the interface and identify potential design problems based on recognised usability guidelines. 
 
 Table ? presents the usability issues identified during the heuristic evaluation.
 
@@ -761,12 +761,12 @@ Therefore, these two issues should be prioritised during the development process
 | 6 | No undo or quick restart option for mistakes | H3 - User Control and Freedom | 3 | 4 | 2 | 3.0 |
 
 <div align="center">
-<p><em>Figure ?: Usability issues identified in the heuristic evaluation (Presntation of the table was adapted from [4]).</em></p>
+<p><em>Figure ?: Usability issues identified in the heuristic evaluation (Presntation of the table was adapted from <a href="#reference">4</a>]).</em></p>
 </div>
 
 
 ### 5.2. Quantitative Evaluation
-According to Brooke[7], usability does not exist in any absolute sense but must be evaluated in relation to the context in which a system is used. To systematically measure usability and user experience within the context of our game, we adopted two widely used evaluation instruments: the System Usability Scale (SUS) and the NASA Task Load Index (NASA-TLX). 
+According to Brooke[<a href="#reference">7</a>], usability does not exist in any absolute sense but must be evaluated in relation to the context in which a system is used. To systematically measure usability and user experience within the context of our game, we adopted two widely used evaluation instruments: the System Usability Scale (SUS) and the NASA Task Load Index (NASA-TLX). 
 
 SUS provides a quick and reliable measure of overall usability, allowing comparison with established benchmarks. NASA-TLX measures perceived workload across several dimensions, including mental demand, effort, and frustration. Using both metrics allows the evaluation to capture not only usability but also the cognitive effort required to play the game.
 
@@ -1069,9 +1069,9 @@ Overall, this project was a valuable learning experience, not only because of th
 | Megi       | Animation, Movement mechanics, Visual design, Report writing            | 1.0               |
 | Jacqueline | Animation, Movement mechanics, Visual design, Report writing            | 1.0               |
 | Maran      | CI/CD pipeline, AI map generation                                       | 1.0               |
-| Jinwang    | Collision detection, UX (Audio, Tutorial, Scoreboard, Wallet System), Obstacle physics, State Manager | 1.0 |
+| Jinwang    | Collision detection, UX (Audio, Tutorial, Scoreboard, Wallet System), Obstacle physics, State Manager, Video Designer | 1.0 |
 | Mengxiao   | Procedural map generation, State Manager                                | 1.0               |
-| Eira       | Collision detection, UX (Audio, Tutorial, Scoreboard, Wallet System)    | 1.0               |
+| Eira       | Collision detection, UX (Audio, Tutorial, Scoreboard, Wallet System), Video Designer    | 1.0               |
 
 ## 10. AI Statement 
 (~250 words) 
