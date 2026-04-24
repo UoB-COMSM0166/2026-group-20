@@ -89,9 +89,6 @@ GROUP PHOTO. Add a group photo here.
 
 ## 1. Introduction
 
-- 5% ~250 words
-- Describe your game, what is based on, what makes it novel? (what's the "twist"?)
-
 <p>
 <strong><i>The Incredible ChickenBunny</i></strong> is a newly developed and enhanced adaptation of the multiplayer platformer game <strong><i>Ultimate Chicken Horse</i></strong>. The original game was chosen as inspiration due to its distinctive multiplayer mechanics, in which players strategically select obstacles from an in-game shop and place them on the map in order to gain an advantage while simultaneously making the course more difficult for their opponents. This unique gameplay mechanism creates a dynamic balance between cooperation and competition, making the game very engaging. The original game also features colourful cartoon-style character sprites that contribute to a visually appealing aesthetic suitable for players of all age groups.
 
@@ -107,8 +104,6 @@ Furthermore, a coin and wallet system was implemented to increase competitivenes
 
 
 ## 2. Requirements
-
-(15% ~750 words)
 
 Our team began by brainstorming various game ideas and collectively selected the concept to develop. After the game was selected, we identified the stakeholders to understand who would be affected by the system and whose needs should be considered during the design process. Based on this understanding, we outlined epics for the game's key features, followed by user stories describing the detailed functional requirements. 
 
@@ -137,7 +132,7 @@ Both games were analysed to identify the most suitable base for the project. To 
 
 ### 2.2 Stakeholders 
 
-To begin our game design process, we identified all relevant stakeholders including individuals and entities that needed to be taken into account when developing our game. These stakeholders were visualised using an onion model diagram (see Figure ?).
+To begin our game design process, we identified all relevant stakeholders including individuals and entities that needed to be taken into account when developing our game. These stakeholders were visualised using an onion model diagram (see Figure 1).
 
 <div align="center">
   <img src="docs/assets/images/onion-model.png" alt="Onion Model" width="700">
@@ -282,10 +277,6 @@ flowchart LR
 </div>
 
 ## 3. Design
-
-(15% ~750 words)
-
-- System architecture. Class diagrams, behavioural diagrams.
 
 ### 3.1 System Architecture Overview
 
@@ -652,15 +643,11 @@ Overall, our system architecture integrates multiple components, including entit
 
 ## 4. Implementation
 
-(15% ~750 words)
-
-- Describe implementation of your game, in particular highlighting the TWO areas of _technical challenge_ in developing your game.
-
 ## 4.1 Implementaion Overall
 
 The p5.js instance mode [<a href="#reference">8</a>] was chosen at the start of development, as it avoids the global namespace used in standard mode where functions are shared across scripts. Such mode isolates functions from the global scope by encapsulating the sketch within an object, which reduces naming conflicts and improving code organisation and maintainability in a modular architecture.
 
-Alongside these architectural decisions, we also set up a **CI/CD pipeline** to maintain code quality, catch bugs early and ensure consistency in development practices across the team. As illustrated in Figure ?, the pipeline begins when developers make changes locally and commit using `git commit`, where a Husky pre-commit hook runs linting, testing and code standardisation before the commit is accepted. Once the code is pushed to the repository, GitHub Actions is triggered based on branch or tag rules. The first workflow runs linting and tests to validate the codebase, and if successful, the second workflow (on main branches or release tags) builds the project and deploys it to GitHub Pages. Overall, this setup reduces manual effort and lowers the risk of errors reaching the live game website.
+Alongside these architectural decisions, we also set up a **CI/CD pipeline** to maintain code quality, catch bugs early and ensure consistency in development practices across the team. As illustrated in Figure 7, the pipeline begins when developers make changes locally and commit using `git commit`, where a Husky pre-commit hook runs linting, testing and code standardisation before the commit is accepted. Once the code is pushed to the repository, GitHub Actions is triggered based on branch or tag rules. The first workflow runs linting and tests to validate the codebase, and if successful, the second workflow (on main branches or release tags) builds the project and deploys it to GitHub Pages. Overall, this setup reduces manual effort and lowers the risk of errors reaching the live game website.
 
 Though its implementation was challenging due to the need for correctly coordinating multiple tools and workflows (Husky, Git hooks, and GitHub Actions), while ensuring consistent behaviour across different development environments, it was ultimately rewarding as it significantly improved the reliability and automation of our deployment process.
 
@@ -668,7 +655,7 @@ Though its implementation was challenging due to the need for correctly coordina
 <img src="docs/assets/images/cicd-pipeline.png" alt="CI/CD Pipeline Process Chart" width="600">
 </div>
 <div align="center">
-<p><em>Figure ?: CI/CD Pipeline Process Chart</em></p>
+<p><em>Figure 7: CI/CD Pipeline Process Chart</em></p>
 </div>
 
  
@@ -684,11 +671,10 @@ The challenge was therefore combining AI and procedural generation to ensure the
 <img src="docs/assets/gif/random-map-generation.gif" alt="Map Generation Gif" width="600">
 </div>
 <div align="center">
-<p><em>Figure ?: Map Generation</em></p>
+<p><em>Figure 8: Map Generation</em></p>
 </div>
 
 ## 4.3 Technical Challenge 2: Collision and Physics System
-(250-300 words)
 
 Our second technical challenge was implementing a robust **Collision and Physics System** that could support a variety of obstacle behaviours while integrating smoothly with player movement, randomly generated maps. This process was inherently iterative, as we first had to establish basic collision handling before gradually introducing more complex obstacle interactions and effects. The difficulty increased when multiple physics effects needed to act on the player simultaneously, requiring careful coordination to prevent conflicts or unintended behaviour, especially when integrating with existing logic that was already functioning correctly.
 
@@ -700,16 +686,11 @@ To address these challenges, we adopted a structured and incremental approach, b
 <img src="docs/assets/gif/collision.gif" alt="Collision and Physics System Gif" width="400">
 </div>
 <div align="center">
-<p><em>Figure ?: Collision and Physics System</em></p>
+<p><em>Figure 9: Collision and Physics System</em></p>
 </div>
 
 
 ## 5. Evaluation
-
-(15% ~750 words)
-- One qualitative evaluation (of your choice)
-- One quantitative evaluation (of your choice)
-- Description of how code was tested.
 
 Evaluating the game’s usability and user experience is essential for identifying design issues and improving future iterations. In this project, we adopted a mixed-methods approach consisting of the **Think-Aloud Method**, **Heuristic Evaluation**, **The System Usability Scale** and **NASA-TLX**. These methods allowed us to identify usability issues and measure user satisfaction so that we could improve later versions of the game. 
 
@@ -720,7 +701,7 @@ The qualitative evaluation aimed to identify usability problems and understand h
 <img src="docs/assets/gif/v0.1.0.gif" alt="Basic version" width="400">
 </div>
 <div align="center">
-<p><em>Figure ?: The version of the game used in the qualitative evaluation.</em></p>
+<p><em>Figure 10: The version of the game used in the qualitative evaluation.</em></p>
 </div>
 
 **A. Think Aloud**
@@ -743,9 +724,9 @@ The think-aloud approach is widely used in usability studies because it provides
 
 To complement user testing, we conducted a Nielsen’s heuristic evaluation. This method was selected because it is a well-established and cost-effective approach for identifying usability issues[<a href="#reference">2</a>]. It enabled us to systematically evaluate the interface and identify potential design problems based on recognised usability guidelines. 
 
-Table ? presents the usability issues identified during the heuristic evaluation.
+Table 5 presents the usability issues identified during the heuristic evaluation.
 
-The severity score was calculated by averaging the ratings for frequency, impact and persistence of each problem. From Table ?, we could see that the most severe problem identified was the lack of visual guidance. Many participants were unsure what actions were required to complete the game. In particular, several players did not realise that the game was designed for two players, nor that they needed to avoid obstacles and reach the goal to finish the level. 
+The severity score was calculated by averaging the ratings for frequency, impact and persistence of each problem. From Table 5, we could see that the most severe problem identified was the lack of visual guidance. Many participants were unsure what actions were required to complete the game. In particular, several players did not realise that the game was designed for two players, nor that they needed to avoid obstacles and reach the goal to finish the level. 
 
 The second most severe issue was the absence of instructions for the game controls. Since this is a two-player game, it is essential to clearly display the keyboard controls for each player at the beginning of the game. During the test, several participants appeared confused about how to control their characters. 
 
@@ -761,7 +742,7 @@ Therefore, these two issues should be prioritised during the development process
 | 6 | No undo or quick restart option for mistakes | H3 - User Control and Freedom | 3 | 4 | 2 | 3.0 |
 
 <div align="center">
-<p><em>Figure ?: Usability issues identified in the heuristic evaluation (Presntation of the table was adapted from <a href="#reference">4</a>]).</em></p>
+<p><em>Table 5: Usability issues identified in the heuristic evaluation (Presntation of the table was adapted from <a href="#reference">4</a>]).</em></p>
 </div>
 
 
@@ -770,7 +751,7 @@ According to Brooke[<a href="#reference">7</a>], usability does not exist in any
 
 SUS provides a quick and reliable measure of overall usability, allowing comparison with established benchmarks. NASA-TLX measures perceived workload across several dimensions, including mental demand, effort, and frustration. Using both metrics allows the evaluation to capture not only usability but also the cognitive effort required to play the game.
 
-To perform this evaluation, we recruited ten participants to play both the basic version and the harder version of the game (see Figure ?). After playing each version, participants were asked to complete the SUS and NASA-TLX questionnaires to assess the usability of the game and the workload experienced during gameplay.
+To perform this evaluation, we recruited ten participants to play both the basic version and the harder version of the game (see Figure 11). After playing each version, participants were asked to complete the SUS and NASA-TLX questionnaires to assess the usability of the game and the workload experienced during gameplay.
 
 The collected responses were then converted into numerical scores according to the standard scoring procedures for both frameworks.
 
@@ -785,7 +766,7 @@ The collected responses were then converted into numerical scores according to t
   </tr>
 </table>
 <div align="center">
-<p><em>Figure ?: The versions of the game used in quantitative evaluation.</em></p>
+<p><em>Figure 11: The versions of the game used in quantitative evaluation.</em></p>
 </div>
 
 
@@ -794,7 +775,7 @@ To analyse the data, Wilcoxon signed-rank tests were conducted to compare the pe
 
 **A. NASA-TLX**
 
-The results are summarised in Table ? and plotted in Figure ? and ?. The results indicate that participants experienced a significantly higher workload when playing the harder version of the game compared to the basic version (p = 0.032). This increase in perceived workload was primarily driven by higher ratings in mental demand (p = 0.002), effort (p = 0.003), and frustration (p = 0.046). Such findings suggest that the harder version required greater cognitive effort from players and led to increased frustration during gameplay compared to the basic version. This outcome is consistent with the intended design goal of creating a more challenging gameplay experience.
+The results are summarised in Table 5 and plotted in Figure 11 and 12. The results indicate that participants experienced a significantly higher workload when playing the harder version of the game compared to the basic version (p = 0.032). This increase in perceived workload was primarily driven by higher ratings in mental demand (p = 0.002), effort (p = 0.003), and frustration (p = 0.046). Such findings suggest that the harder version required greater cognitive effort from players and led to increased frustration during gameplay compared to the basic version. This outcome is consistent with the intended design goal of creating a more challenging gameplay experience.
 
 <div align="center">
 
@@ -807,18 +788,18 @@ The results are summarised in Table ? and plotted in Figure ? and ?. The results
 | Effort | 4.9 $\pm$ 3.0 | 13.5 $\pm$ 3.3 | **0.004** |
 | Frustration | 3.0 $\pm$ 3.8 | 9.9 $\pm$ 6.8 | 0.047 |
 | **Overall Workload** | **5.1 $\pm$ 1.2** | **10.3 $\pm$ 3.0** | 0.031 |
-<p><em>Table ?: A summary of the NASA-TLX statistical results.</em></p>
+<p><em>Table 5: A summary of the NASA-TLX statistical results.</em></p>
 </div>
 
 
 <div align="center">
     <img src="docs/quantitative-evaluation/NASA_all.png" alt="NASA TLX Results (All)" width="600">
-    <p><em>Figure ?: NASA-TLX workload scores for each dimension across the two game versions.</em></p>
+    <p><em>Figure 11: NASA-TLX workload scores for each dimension across the two game versions.</em></p>
 </div>
 
 <div align="center">
     <img src="docs/quantitative-evaluation/NASA_ave.png" alt="NASA TLX Results" width="300">
-    <p><em>Table ?: NASA-TLX overall workload across the two game versions.</em></p>
+    <p><em>Figure 12: NASA-TLX overall workload across the two game versions.</em></p>
 </div>
 
 
@@ -843,18 +824,18 @@ However, while the usability  score is acceptable at this stage, the results als
 | Q9 | 4.0 $\pm$ 1.2 | 3,2 $\pm$ 1.0 | 0.172 |
 | Q10 | 1.3 $\pm$ 0.5 | 2.2 $\pm$ 1.2 | 0.063 |
 | **Overall SUS Score** | **70.75 $\pm$ 15.0** | **64.25 $\pm$ 19.5** | 0.281 |
-<p><em>Table X: A Summary of SUS responses.</em></p>
+<p><em>Table 6: A Summary of SUS responses.</em></p>
 </div>
 
 
 <div align="center">
     <img src="docs/quantitative-evaluation/SUS_all.png" alt="SUS Results (All)" width="600">
-      <p><em>Figure ?: SUS responses for each question across the basic and harder versions of the game.</em></p>
+      <p><em>Figure 13: SUS responses for each question across the basic and harder versions of the game.</em></p>
 </div>
 
 <div align="center">
     <img src="docs/quantitative-evaluation/SUS_ave.png" alt="SUS Results" width="300">
-    <p><em>Figure ?: Average SUS usability scores for the basic and harder versions of the game.</em></p>
+    <p><em>Figure 14: Average SUS usability scores for the basic and harder versions of the game.</em></p>
 </div>
 
 
@@ -864,7 +845,7 @@ To ensure the reliability and correctness of the system, a series of structured 
 
 Although black-box testing is effective for validating user-interaction reliant behaviour, it was not adopted in this project as our focus was on verifying internal logic within classes such as physics processing, state management, and input handling. For our game, correctness heavily depends on the behaviour of internal operations, which may not always be fully reflected through external outputs alone.
 
-Thus, white-box testing was used to directly examine and validate internal functionality, allowing more precise and thorough verification of individual units. A summary of the main test areas covered is presented in Table?.
+Thus, white-box testing was used to directly examine and validate internal functionality, allowing more precise and thorough verification of individual units. A summary of the main test areas covered is presented in Table 7.
 
 
 | <div align="center">Test File</div>| <div align="center">Purpose of Test</div>| <div align="center">Type of Check</div> | 
@@ -876,13 +857,11 @@ Thus, white-box testing was used to directly examine and validate internal funct
 | Respawn Manager                    | Tests object/player respawn behaviour             | Edge case testing              |
 | Collision Detection                | Validates intersection and collision calculations | Logical Path Testing           |                 
 
+<div>
+<p><em>Table 7: A Summary of Test Cases.</em></p>
+</div>
 
 ## 6. Process
-
-(15% ~750 words)
-
-- Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project. (add kanban)
-
 
 ### 6.1 Team Organisation 
 Our team operated under a flat and collaborative structure where responsibilities were shared among all members. We did not assign fixed roles for individual team members. Instead, everyone contributed to implementing gameplay systems and programming tasks, while also participating in testing and project management. To ensure the quality of the codebase, the six members were organised into three pairs (Megi and Jacqueline, Maran and Mengxiao, and Jinwang and Eira), adopting a pair programming approach. This enabled continuous peer review during development, allowing design and implementation decisions to be discussed in real time and leading to more robust solutions. As a result, fewer issues were identified during later review stages, and development proceeded more efficiently due to reduced overhead in cross-team code checking.
@@ -918,7 +897,7 @@ Throughout each sprint, development was carried out collaboratively, focusing on
 </div>
 
 <div align="center">
-<p><em>Figure ?: Kanban Board Overview</em></p>
+<p><em>Figure 15: Kanban Board Overview</em></p>
 </div>
 
 **6.3.2 Horizontal Development Strategy**
@@ -963,7 +942,7 @@ flowchart LR
     D2 --> D3
 ```
 <div align="center">
-    <p><em>Figure ?: Horizontal Development Strategy</em></p>
+    <p><em>Figure 16: Horizontal Development Strategy</em></p>
 </div>
 
 
@@ -1009,12 +988,10 @@ However, the group faced several challenges. Some initial ideas were overly ambi
 
 
 ## 7. Subtainability, Ethics and Accessibility
-(~750 words) 
-Environmental + 2 of the following: Social, Enconimic, Technical and Individual 
 
 <strong><em>Sustainability Awareness Framework</em></strong>
 
-From the perspective of the Karlskrona Manifesto [add link],From the perspective of the Karlskrona Manifesto, our game highlights a range of interconnected sustainability implications across multiple dimensions, prompting both reflection on our current design choices and consideration of how these could be improved in future iterations. 
+From the perspective of the Karlskrona Manifesto [<a href="reference">11</a>],From the perspective of the Karlskrona Manifesto, our game highlights a range of interconnected sustainability implications across multiple dimensions, prompting both reflection on our current design choices and consideration of how these could be improved in future iterations. 
 
 **Environmentally**, while we have opted for accessible hosting via GitHub Pages, supported by Microsoft Azure, and implemented AI-based map generation through Gemini on Google Cloud, we recognise that these choices externalise significant environmental costs, including energy consumption, water usage, and emissions associated with data centres. So far, our approach has prioritised ease of deployment over environmental optimisation; however, moving forward, we would aim to reduce unnecessary API calls (e.g., caching previously generated maps), improve efficiency, and consider hosting providers with lower environmental impact or strategies that reduce unnecessary energy use.
 
@@ -1033,23 +1010,19 @@ Overall, while we have taken some initial steps to address sustainability concer
 </div>
 
 <div align="center">
-<p><em>Figure ?: Sustainability Framework Spider Chart</em></p>
+<p><em>Figure 17: Sustainability Framework Spider Chart</em></p>
 </div>
 
 
 <strong><em>Green Software Foundation Implementation Patterns</em></strong>
 
-From the perspective of the Green Software Foundation implementation patterns [add sourse], our design choices for the AI and data components of the game align with three key sustainability principles. To begin with, we follow the pattern of <em>**Select a more energy efficient AI/ML</em> framework** by using Gemini via API calls rather than developing or training our own model. This significantly reduces energy consumption, as it avoids the highly resource-intensive process of training large AI models from scratch, which typically requires extensive GPU/TPU usage and prolonged data centre operation. Instead, we rely on an already optimised system that delivers the required functionality in a more efficient and scalable way.
+From the perspective of the Green Software Foundation implementation patterns [<a href="reference">12</a>], our design choices for the AI and data components of the game align with three key sustainability principles. To begin with, we follow the pattern of <em>**Select a more energy efficient AI/ML</em> framework** by using Gemini via API calls rather than developing or training our own model. This significantly reduces energy consumption, as it avoids the highly resource-intensive process of training large AI models from scratch, which typically requires extensive GPU/TPU usage and prolonged data centre operation. Instead, we rely on an already optimised system that delivers the required functionality in a more efficient and scalable way.
 In addition, we apply the principle to <em>**Leverage pre-trained models and transfer learning for AI/ML development**</em> by using Gemini as a pre-trained model instead of building or training a custom solution. This means we are reusing an existing, large-scale model that has already been trained and optimised, rather than duplicating that computational effort ourselves. As a result, we reduce unnecessary energy use and benefit from a system that has been refined for efficiency at an industrial level, allowing us to focus on integration rather than model training.
 Lastly, we follow the pattern to <em>**Use efficient file formats for AI/ML development**</em> through our use of JSON for map data storage and transfer. JSON is a lightweight, widely adopted industry standard that enables fast parsing and low overhead when exchanging data between the game and the AI system. This reduces processing cost during runtime and avoids the inefficiencies associated with more complex or less structured formats. 
 Overall, these design decisions reflect a conscious effort to align our implementation with recognised green software practices by prioritising efficiency, reuse of existing systems, and minimisation of unnecessary computational load.
 
 
 ## 8. Conclusion
-
-(10% ~500 words)
-
-- Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
 
 Reflecting on this project as a whole, one of the most significant lessons we took away was how difficult it is to properly interpret and refine requirements in a real development context. Moving from broad, often vague requirements into structured epics and then into concrete user stories proved more difficult than expected. We found that small misunderstandings early on could easily escalate into uncertainty and lead to incorrect design choices, highlighting the importance of early clarification and continuous refinement. Another key learning point was the value of team composition. While it helped that everyone was motivated and committed, it was equally beneficial that we came from different academic and technical backgrounds. This diversity often led to more creative solutions and helped us avoid overly narrow thinking. At the same time, we gained hands-on experience with industry-standard workflows such as Kanban boards, backlogs, daily stand-ups, and collaborative Git usage. Although these tools initially felt overly formal compared to previous individual work, they quickly became essential for maintaining organisation and enabling effective parallel development.
 
@@ -1075,7 +1048,7 @@ Overall, this project was a valuable learning experience, not only because of th
 
 ## 10. AI Statement 
 (~250 words) 
-summerise your team'suse of AI so we know where to give you credit for work done 
+summerise your team's use of AI so we know where to give you credit for work done 
 charater animation 
 
 We acknowledge the use of ChatGPT and Copilot as assistive tools to support our development process. Their primary role was educational, helping us understand unfamiliar concepts, clarify technical approaches, and explain complex sections of code in a more understandable way.
@@ -1118,6 +1091,10 @@ https://zjnu2017.github.io/OOAD/reading/Object.Oriented.Analysis.and.Design.with
 [10] I. F. Alexander, “A taxonomy of stakeholders: Human roles in system development,”
 Int. J. Technol. Human Interact., vol. 1, no. 1, pp. 23–59, 2005.
 doi: 10.4018/jthi.2005010102. 
+
+[11] “sustainabilitydesign.” Accessed: Apr. 25, 2026. [Online]. Available: https://sustainabilitydesign.org/
+
+[12] “Green Software Patterns,” Green Software Patterns. Accessed: Apr. 25, 2026. [Online]. Available: https://patterns.greensoftware.foundation/
 
 ### Appendix
 
