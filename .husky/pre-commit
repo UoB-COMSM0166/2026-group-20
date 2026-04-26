@@ -29,7 +29,7 @@ EOF
 
 printf "\n${CYAN}Stage 1: Formating using prettier${NC}" > /dev/tty
 
-FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(js|ts|jsx|tsx|css|html|json|md)$' | sed 's| |\\ |g')
 npm run prettier-ci -- $FILES --write
 git update-index --again
 

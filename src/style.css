@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'PanasChill';
-    src: url('./assets/fonts/PanasChill.ttf') format('truetype');
+    src: url('./public/assets/fonts/PanasChill.ttf') format('truetype');
     font-display: swap;
 }
 

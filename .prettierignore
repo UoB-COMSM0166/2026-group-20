@@ -1,3 +1,18 @@
 # Ignore artifacts:
 build
 coverage
+
+# Ignore binary/media files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+*.ico
+*.mp3
+*.mp4
+*.wav
+*.ttf
+*.woff
+*.woff2

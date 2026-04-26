@@ -5,6 +5,7 @@ export default defineConfig({
     root: './',
     // Base public path when served in production
     base: '/2026-group-20/main-game/',
+    publicDir: 'src/public',
     build: {
         outDir: 'dist',
     },

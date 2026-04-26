@@ -22,33 +22,33 @@ import { AnimationConfigBunny } from './config/AnimationConfigBunny.js';
 import { AIMapGenerator } from './systems/AIMapGenerator.js';
 
 // import images
-import chickenSprite from './assets/sprites/chicken_all_frames.png';
-import bunnySprite from './assets/sprites/bunny_all_frames.png';
-import duckSprite from './assets/sprites/duck_all_frames.png';
-import polarSprite from './assets/sprites/polar_all_frames.png';
+import chickenSprite from './public/assets/sprites/chicken_all_frames.png';
+import bunnySprite from './public/assets/sprites/bunny_all_frames.png';
+import duckSprite from './public/assets/sprites/duck_all_frames.png';
+import polarSprite from './public/assets/sprites/polar_all_frames.png';
 
-import saw from './assets/obstacles/Saw/On (38x38).png';
-import fire from './assets/obstacles/Fire/On (16x32).png';
-import trampoline from './assets/obstacles/Trampoline/Jump (28x28).png';
-import spikedBall from './assets/obstacles/Spiked Ball/Spiked Ball.png';
-import cannon from './assets/obstacles/Cannon/cannon (30x18).png';
-import fallingPlatform from './assets/obstacles/Falling Platforms/On (32x10).png';
-import platform from './assets/obstacles/Platforms/platform (40x40).png';
-import movingPlatform from './assets/obstacles/Moving Platforms/Brown On (32x8).png';
-import icePlatform from './assets/obstacles/Ice Platforms/ice platform (40x40).png';
-import spikePlatform from './assets/obstacles/Spike Platforms/spike platform2 (40x40).png';
-import teleporter from './assets/obstacles/Teleporter/teleporter (40x40).png';
-import windZone from './assets/obstacles/Wind Zone/wind zone (32x32).png';
-import iceBlock from './assets/obstacles/Ice Block/ice block (40x40).png';
-import endpointFlag from './assets/obstacles/endpoint/Checkpoint(FlagIdle)(64x64).png';
-import shadowIcon from './assets/obstacles/Shadow/shadow-icon.svg';
-import map1Preview from './assets/maps/map1/background.png';
-import map2Preview from './assets/maps/map2/background.png';
-import startScreen from './assets/images/background/startscreen-bg.png';
-import mapBackground from './assets/images/background/map-selection-bg.png';
-import panasChillFont from './assets/fonts/PanasChill.ttf';
+import saw from './public/assets/obstacles/Saw/On (38x38).png';
+import fire from './public/assets/obstacles/Fire/On (16x32).png';
+import trampoline from './public/assets/obstacles/Trampoline/Jump (28x28).png';
+import spikedBall from './public/assets/obstacles/Spiked Ball/Spiked Ball.png';
+import cannon from './public/assets/obstacles/Cannon/cannon (30x18).png';
+import fallingPlatform from './public/assets/obstacles/Falling Platforms/On (32x10).png';
+import platform from './public/assets/obstacles/Platforms/platform (40x40).png';
+import movingPlatform from './public/assets/obstacles/Moving Platforms/Brown On (32x8).png';
+import icePlatform from './public/assets/obstacles/Ice Platforms/ice platform (40x40).png';
+import spikePlatform from './public/assets/obstacles/Spike Platforms/spike platform2 (40x40).png';
+import teleporter from './public/assets/obstacles/Teleporter/teleporter (40x40).png';
+import windZone from './public/assets/obstacles/Wind Zone/wind zone (32x32).png';
+import iceBlock from './public/assets/obstacles/Ice Block/ice block (40x40).png';
+import endpointFlag from './public/assets/obstacles/endpoint/Checkpoint(FlagIdle)(64x64).png';
+import shadowIcon from './public/assets/obstacles/Shadow/shadow-icon.svg';
+import map1Preview from './public/assets/maps/map1/background.png';
+import map2Preview from './public/assets/maps/map2/background.png';
+import startScreen from './public/assets/images/background/startscreen-bg.png';
+import mapBackground from './public/assets/images/background/map-selection-bg.png';
+import panasChillFont from './public/assets/fonts/PanasChill.ttf';
 
-import backgroundMusic from './assets/audio/music-bg.mp3';
+import backgroundMusic from './public/assets/audio/music-bg.mp3';
 /**
  * Root p5 sketch.
  *
