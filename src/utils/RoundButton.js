@@ -1,4 +1,5 @@
 import { Button } from './Button.js';
+import { GameConfig } from '../config/GameConfig.js';
 
 export class RoundButton extends Button {
     constructor(p, x, y, diameter, label) {
@@ -7,7 +8,7 @@ export class RoundButton extends Button {
         this.defaultColour = { r: 100, g: 100, b: 225 };
         this.changedColour = { r: 0, g: 100, b: 225 };
         this.label = label;
-        this.textSize = 25;
+        this.textSize = 10;
         this.textColour = 250;
     }
 
@@ -31,9 +32,15 @@ export class RoundButton extends Button {
         p.circle(this.x, currentY, this.diameter);
 
         this.p.fill(this.textColour);
-        this.p.textSize(this.textSize);
+        this.p.textFont(GameConfig.FONT);
+        this.p.textSize(
+            Math.max(
+                6,
+                Math.min(this.textSize, Math.floor(this.diameter * 0.34)),
+            ),
+        );
         this.p.textAlign(this.p.CENTER, this.p.CENTER);
-        this.p.text(this.label, this.x, currentY);
+        this.p.text(this.label, this.x, currentY + 0.5);
     }
 
     isHovered(mx, my) {
