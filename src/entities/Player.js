@@ -21,6 +21,7 @@ export class Player {
     constructor(p, x, y, playerNo, spriteSheet, animationconfig) {
         this.p = p;
         this.playerNo = playerNo;
+        this.nickname = `Player ${playerNo + 1}`; // Default nickname, can be changed
         this.spawnX = x;
         this.spawnY = y;
         this.x = x;
@@ -71,27 +72,10 @@ export class Player {
         this.inventory = new Map();
 
         this.input = new HandleInput(p, playerNo);
-        //this.state = PlayerMovementState.IDLE;
-        this.facingRight = true;
-
-        /**
-         * Speed multiplier applied this frame by IceBlock.
-         * 1.0 = normal. IceBlock sets it to > 1 while player is inside.
-         * Reset to 1.0 at the start of every horizontalMovement() call.
-         */
-        this.speedMultiplier = 1.0;
-
-        /**
-         * Persistent obstacle inventory — survives across rounds.
-         * Map of ObstacleType string → count.
-         * Populated by ShopState, consumed by BuildState.
-         * @type {Map<string, number>}
-         */
-        this.inventory = new Map();
-
-        this.input = new HandleInput(p, playerNo);
         this.facingRight = true;
         this.respawnCountdown = 0;
+        this.character = null;
+        this._shadowHistory = [];
 
         // ── Sprite animation ─
         this.spriteSheet = spriteSheet ?? null;
@@ -182,7 +166,7 @@ export class Player {
      */
 
     //move
-    update(allPlayers, respawnManager, obstacles = [], MAP, gameHeight) {
+    update(allPlayers, respawnManager, obstacles = [], MAP, worldHeight = GameConfig.GAME_HEIGHT) {
         if (this.lifeState !== PlayerState.ALIVE) {
             return;
         }
@@ -197,7 +181,7 @@ export class Player {
             return;
         }
 
-        if (checkFallDeath(this, gameHeight ?? GameConfig.GAME_HEIGHT)) {
+        if (checkFallDeath(this, worldHeight)) {
             respawnManager.triggerDeath(this, DeathReason.FALL);
             return;
         }

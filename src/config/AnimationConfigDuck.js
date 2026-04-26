@@ -1,7 +1,7 @@
 export const AnimationConfigDuck = {
-    IDLE: [11, 12],
-    RUN: [6, 7, 8],
-    JUMP: [3, 4],
-    FALL: [2, 3],
-    RESPAWNING: [0],
+    IDLE: [1, 2],
+    RUN: [4, 5, 6],
+    JUMP: [8, 9],
+    FALL: [9, 10],
+    RESPAWNING: [12],
 };

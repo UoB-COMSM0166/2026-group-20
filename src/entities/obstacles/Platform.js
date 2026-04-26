@@ -6,12 +6,20 @@ import { GameConfig } from '../../config/GameConfig.js';
  * Blocks player movement on all sides (treated like a '#' map tile).
  */
 export class Platform extends Obstacle {
+    constructor(p, x, y, sprite = null) {
+        super(p, x, y, sprite);
+    }
+
     get isSolid() {
         return true;
     }
 
     draw() {
         const p = this.p;
+        if (this.obstacleSheet) {
+            p.image(this.obstacleSheet, this.x, this.y, this.w, this.h, 0, 0, 40, 40);
+            return;
+        }
         p.noStroke();
 
         // Main face
@@ -36,7 +44,14 @@ export class Platform extends Obstacle {
      * @param {number} x
      * @param {number} y
      */
-    static drawGhost(p, x, y) {
+    static drawGhost(p, x, y, sprite = null) {
+        if (sprite) {
+            p.push();
+            p.tint(255, 150);
+            p.image(sprite, x, y, GameConfig.TILE, GameConfig.TILE, 0, 0, 40, 40);
+            p.pop();
+            return;
+        }
         p.noStroke();
         p.fill(120, 90, 60, 130);
         p.rect(x, y, GameConfig.TILE, GameConfig.TILE, 3);

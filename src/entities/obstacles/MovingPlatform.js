@@ -1,7 +1,5 @@
 import { Obstacle } from '../Obstacle.js';
 import { GameConfig } from '../../config/GameConfig.js';
-import { aabbIntersects } from '../../systems/PhysicsSystem.js';
-
 /**
  * MovingPlatform — a solid platform that slides horizontally on a fixed path.
  *
@@ -12,11 +10,12 @@ import { aabbIntersects } from '../../systems/PhysicsSystem.js';
  * @extends Obstacle
  */
 export class MovingPlatform extends Obstacle {
-    constructor(p, x, y) {
-        super(p, x, y);
+    constructor(p, x, y, sprite = null) {
+        super(p, x, y, sprite);
         this._startX = x;
         this._dir = 1; // 1 = right, -1 = left
         this._frameDX = 0; // displacement this frame, used by carryPlayers
+        this._animAge = 0;
     }
 
     get isSolid() {
@@ -29,6 +28,7 @@ export class MovingPlatform extends Obstacle {
     update(deltaTime) {
         const dt = deltaTime / 16.67; // normalise to 60 fps
         const prevX = this.x;
+        this._animAge += deltaTime;
 
         this.x += this._dir * GameConfig.MOVING_PLATFORM_SPEED * dt;
 
@@ -64,6 +64,15 @@ export class MovingPlatform extends Obstacle {
 
     draw() {
         const p = this.p;
+        if (this.obstacleSheet) {
+            const frameCount = Math.max(1, Math.floor(this.obstacleSheet.width / 32));
+            const frame = Math.floor((this._animAge / 120) % frameCount);
+            const dw = this.w;
+            const dh = dw * (8 / 32);
+            const dy = this.y + (this.h - dh) / 2;
+            p.image(this.obstacleSheet, this.x, dy, dw, dh, frame * 32, 0, 32, 8);
+            return;
+        }
         p.noStroke();
 
         // Body — blue-tinted plank
@@ -95,8 +104,17 @@ export class MovingPlatform extends Obstacle {
         p.noStroke();
     }
 
-    static drawGhost(p, x, y) {
+    static drawGhost(p, x, y, sprite = null) {
         const T = GameConfig.TILE;
+        if (sprite) {
+            p.push();
+            p.tint(255, 150);
+            const dh = T * (8 / 32);
+            const dy = y + (T - dh) / 2;
+            p.image(sprite, x, dy, T, dh, 0, 0, 32, 8);
+            p.pop();
+            return;
+        }
         p.noStroke();
         p.fill(80, 110, 160, 130);
         p.rect(x, y, T, T, 3);

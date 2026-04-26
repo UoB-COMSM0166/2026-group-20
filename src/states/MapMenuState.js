@@ -11,11 +11,8 @@ import { GameStage } from '../config/GameStage.js';
  */
 export class MapMenuState extends State {
     enter() {
-        //added font
-        const { p, gameWidth, gameHeight, font } = this.ctx;
-        //const { p, font } = this.ctx;
-        //this.mapMenu = new MapMenu(p, gameWidth, gameHeight, font);
-        this.mapMenu = new MapMenu(p, font);
+        const { p, gameWidth, gameHeight } = this.ctx;
+        this.mapMenu = new MapMenu(p, gameWidth, gameHeight);
     }
 
     render(mx, my) {
@@ -30,11 +27,18 @@ export class MapMenuState extends State {
         if (mapMenu.buttonReturn.isHovered(mx, my)) {
             this.goTo(GameStage.MENU);
         } else if (mapMenu.buttonMap1.isHovered(mx, my)) {
-            this.ctx.selectMap('map1');
-            this.goTo(GameStage.TUTORIAL);
+            this.ctx.selectMap('map1'); // pre-select so ctx is valid
+            this.goTo(GameStage.WALK_MAP);
         } else if (mapMenu.buttonMap2.isHovered(mx, my)) {
             this.ctx.selectMap('map2');
-            this.goTo(GameStage.TUTORIAL);
+            this.goTo(GameStage.WALK_MAP);
+        }
+    }
+
+    keyPressed() {
+        const { p } = this.ctx;
+        if (p.keyCode === p.ESCAPE) {
+            this.goTo(GameStage.MENU);
         }
     }
 }

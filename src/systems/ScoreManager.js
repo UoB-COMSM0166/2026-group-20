@@ -20,6 +20,7 @@ export class ScoreManager {
      */
     constructor(players) {
         this.currentRound = 0;
+        this.maxRounds = 5;
         this.wallet = new Map(players.map((p) => [p.playerNo, 0]));
         this.roundCoins = new Map(players.map((p) => [p.playerNo, 0]));
 
@@ -59,10 +60,6 @@ export class ScoreManager {
     /**
      * Called by TimeManager when a player reaches the finish tile.
      * Awards (finish reward + round coins) to wallet, snapshots stats.
-<<<<<<< HEAD
-=======
-     *
->>>>>>> feature/charSelect
      * @param {Player} player
      * @param {number} rank        — 1-indexed finish position
      * @param {number} elapsedSecs — seconds elapsed since round start
@@ -92,10 +89,6 @@ export class ScoreManager {
     /**
      * Called by TimeManager when a player fails (time up without finishing).
      * Round coins are lost; wallet unchanged; stats snapshotted.
-<<<<<<< HEAD
-=======
-     *
->>>>>>> feature/charSelect
      * @param {Player} player
      */
     onPlayerFail(player) {
@@ -126,10 +119,6 @@ export class ScoreManager {
      *   3. Among failed:   more coins collected = higher rank (consolation).
      *
      * Also stamps rank back onto each PlayerScore.
-<<<<<<< HEAD
-=======
-     *
->>>>>>> feature/charSelect
      * @returns {PlayerScore[]}
      */
     getRankedScores() {
@@ -188,8 +177,10 @@ export class ScoreManager {
      * Reset round state. Wallet persists; PlayerScore records are fresh.
      * Call at the start of each new round.
      */
-    resetRound() {
-        this.currentRound++;
+    resetRound({ advanceRound = true } = {}) {
+        if (advanceRound) {
+            this.currentRound++;
+        }
         for (const [playerNo] of this.roundCoins) {
             this.roundCoins.set(playerNo, 0);
             this.scores.set(playerNo, new PlayerScore(playerNo));

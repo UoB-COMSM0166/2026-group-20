@@ -1,6 +1,6 @@
 export const GameConfig = {
-    GAME_WIDTH: 1920,
-    GAME_HEIGHT: 1080,
+    GAME_WIDTH: 960,
+    GAME_HEIGHT: 544,
 
     RESPAWN_TIME: 2000, // 2 seconds
     SPAWN_POSITION: { x: 100, y: 100 },
@@ -13,41 +13,41 @@ export const GameConfig = {
     SKIN_WIDTH: 0.01,
 
     // Start Screen
-    //FONT: 'Apple Chancery', //or courier new?
-    TITLE_FONTSIZE: 140,
-    TITLE_X: 500,
-    TITLE_Y: 230,
-    TITLE_COLOUR: { r: 245, g: 140, b: 265 }, // purple
+    FONT: 'PanasChill',
+    TITLE_FONTSIZE: 19,
+    TITLE_X: 310,
+    TITLE_Y: 200,
+    TITLE_COLOUR: { r: 200, g: 232, b: 212 },
 
-    PRESS_FONTSIZE: 57,
-    PRESS_X: 1050,
-    PRESS_Y: 650,
-    PRESS_COLOUR: { r: 255, g: 215, b: 0 }, // yellow
+    PRESS_FONTSIZE: 7,
+    PRESS_X: 350,
+    PRESS_Y: 300,
+    PRESS_COLOUR: { r: 108, g: 176, b: 152 },
 
     BUTTON1_X: 330,
     BUTTON1_Y: 330,
-    BUTTON1_W: 60,
-    BUTTON1_H: 25,
+    BUTTON1_W: 112,
+    BUTTON1_H: 34,
 
     BUTTON2_X: 480,
     BUTTON2_Y: 330,
-    BUTTON2_W: 60,
-    BUTTON2_H: 25,
+    BUTTON2_W: 112,
+    BUTTON2_H: 34,
 
     // MAP MENU
     MAP_TITLE_COLOUR: { r: 143, g: 57, b: 133 }, // purple
-    MAP_TITLE_X: 1920 / 2,
+    MAP_TITLE_X: 330,
     MAP_TITLE_Y: 200,
 
     MAP_BUTTON1_X: 200,
     MAP_BUTTON1_Y: 330,
-    MAP_BUTTON1_W: 120,
-    MAP_BUTTON1_H: 50,
+    MAP_BUTTON1_W: 112,
+    MAP_BUTTON1_H: 34,
 
     MAP_BUTTON2_X: 400,
     MAP_BUTTON2_Y: 330,
-    MAP_BUTTON2_W: 120,
-    MAP_BUTTON2_H: 50,
+    MAP_BUTTON2_W: 112,
+    MAP_BUTTON2_H: 34,
 
     MAP_RETURN_X: 50,
     MAP_RETURN_Y: 50,
@@ -86,7 +86,15 @@ export const GameConfig = {
         ICE_BLOCK: 4,
         WIND_ZONE: 6,
         TELEPORTER: 10,
+        BOMB: 8,
+        SHADOW: 9,
     },
+    SHADOW_RECORD_MS: 5000,
+    SHADOW_COOLDOWN_MS: 5000,
+    BOMB_FUSE_MS: 2000,   // ms before bomb explodes after trigger
+    BOMB_RADIUS: 1,       // tile radius of explosion (destroys tiles + obstacles)
+    BOMB_MAX_DEPTH: 1,    // extra tiles below the surface that a bomb can carve out
+    BOMB_TRIGGER_RADIUS: 1.5, // tile distance to trigger fuse
 
     // MovingPlatform
     MOVING_PLATFORM_SPEED: 1.5, // px per frame at 60 fps
@@ -108,4 +116,10 @@ export const GameConfig = {
 
     // Teleporter
     TELEPORTER_COOLDOWN_MS: 1200, // ms before same player can teleport again
+
+    // Developer Mode settings
+    DEV_MODE_UNLIMITED_TIME: true,      // disables time limit
+    DEV_MODE_INSTANT_KILL: true,        // K key to kill current player
+    DEV_MODE_TELEPORT_TO_END: true,     // E key to teleport to finish line
+    DEV_MODE_FREEZE_TIME: true,         // T key to freeze/unfreeze time
 };

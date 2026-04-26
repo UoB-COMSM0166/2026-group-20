@@ -16,57 +16,45 @@
  *   }
  */
 export class PauseManager {
-    constructor(p, gameWidth, gameHeight) {
-        this.p = p;
-        this.gameWidth = gameWidth;
-        this.gameHeight = gameHeight;
-        this._paused = false;
 
-        // Four buttons stacked, centred horizontally
-        const bW = 200;
-        const bH = 44;
+    constructor(p, gameWidth, gameHeight, audioManager = null) {
+        this.p            = p;
+        this.gameWidth    = gameWidth;
+        this.gameHeight   = gameHeight;
+        this._paused      = false;
+        this.audioManager = audioManager;
+
+        // Five action buttons + audio settings row
+        const bW  = 200;
+        const bH  = 44;
         const gap = 10;
-        const cx = gameWidth / 2;
+        const cx  = gameWidth / 2;
 
-        const stackH = bH * 4 + gap * 3;
-        const topY = gameHeight / 2 - stackH / 2 + 24;
+        const stackH = bH * 5 + gap * 4;
+        const topY   = gameHeight / 2 - stackH / 2 - 8;
 
-        this._btnResume = { x: cx - bW / 2, y: topY, w: bW, h: bH };
-        this._btnRestart = {
-            x: cx - bW / 2,
-            y: topY + (bH + gap),
-            w: bW,
-            h: bH,
-        };
-        this._btnTutorial = {
-            x: cx - bW / 2,
-            y: topY + (bH + gap) * 2,
-            w: bW,
-            h: bH,
-        };
-        this._btnQuit = {
-            x: cx - bW / 2,
-            y: topY + (bH + gap) * 3,
-            w: bW,
-            h: bH,
-        };
+        this._btnResume   = { x: cx - bW / 2, y: topY,                   w: bW, h: bH };
+        this._btnRestart  = { x: cx - bW / 2, y: topY + (bH + gap),       w: bW, h: bH };
+        this._btnTutorial = { x: cx - bW / 2, y: topY + (bH + gap) * 2,   w: bW, h: bH };
+        this._btnQuit     = { x: cx - bW / 2, y: topY + (bH + gap) * 3,   w: bW, h: bH };
+        this._btnDevMode  = { x: cx - bW / 2, y: topY + (bH + gap) * 4,   w: bW, h: bH };
+
+        // Audio toggle chips — below the button stack
+        const chipW  = 88;
+        const chipH  = 30;
+        const chipGap = 12;
+        const chipY  = topY + stackH + 52;
+        this._chipSFX   = { x: cx - chipW - chipGap / 2, y: chipY, w: chipW, h: chipH };
+        this._chipMusic = { x: cx + chipGap / 2,         y: chipY, w: chipW, h: chipH };
     }
 
     // ── Public API ────────────────────────────────────────────────────────
 
-    get isPaused() {
-        return this._paused;
-    }
+    get isPaused() { return this._paused; }
 
-    pause() {
-        this._paused = true;
-    }
-    resume() {
-        this._paused = false;
-    }
-    toggle() {
-        this._paused = !this._paused;
-    }
+    pause()  { this._paused = true;  }
+    resume() { this._paused = false; }
+    toggle() { this._paused = !this._paused; }
 
     /**
      * Draw the pause overlay. Call at the end of RunState.render().
@@ -74,7 +62,7 @@ export class PauseManager {
     render(mx, my) {
         if (!this._paused) return;
 
-        const p = this.p;
+        const p  = this.p;
         const gW = this.gameWidth;
         const gH = this.gameHeight;
 
@@ -83,9 +71,9 @@ export class PauseManager {
         p.fill(0, 0, 0, 160);
         p.rect(0, 0, gW, gH);
 
-        // Panel — taller to fit 4 buttons
+        // Panel — fits 5 buttons + audio settings row
         const panW = 300;
-        const panH = 330;
+        const panH = 460;
         const panX = gW / 2 - panW / 2;
         const panY = gH / 2 - panH / 2;
 
@@ -100,7 +88,7 @@ export class PauseManager {
         // Title
         p.fill(200, 215, 255);
         p.textAlign(p.CENTER, p.TOP);
-        p.textSize(22);
+        p.textSize(10);
         p.text('PAUSED', gW / 2, panY + 18);
 
         // Separator
@@ -112,53 +100,51 @@ export class PauseManager {
         // ESC hint
         p.fill(70, 85, 130);
         p.textAlign(p.CENTER, p.TOP);
-        p.textSize(10);
+        p.textSize(5.5);
         p.text('Press ESC to resume', gW / 2, panY + 58);
 
         // Buttons
-        this._drawButton(
-            p,
-            mx,
-            my,
-            this._btnResume,
+        this._drawButton(p, mx, my, this._btnResume,
             '▶  Resume',
-            [50, 130, 60],
-            [70, 160, 80],
-            [210, 245, 215],
-        );
+            [50, 130, 60],   [70, 160, 80],   [210, 245, 215]);
 
-        this._drawButton(
-            p,
-            mx,
-            my,
-            this._btnRestart,
+        this._drawButton(p, mx, my, this._btnRestart,
             '↺  Restart Round',
-            [40, 90, 150],
-            [55, 115, 185],
-            [190, 220, 255],
-        );
+            [40, 90, 150],   [55, 115, 185],  [190, 220, 255]);
 
-        this._drawButton(
-            p,
-            mx,
-            my,
-            this._btnTutorial,
+        this._drawButton(p, mx, my, this._btnTutorial,
             '?  How to Play',
-            [80, 65, 130],
-            [105, 85, 165],
-            [215, 200, 255],
-        );
+            [80, 65, 130],   [105, 85, 165],  [215, 200, 255]);
 
-        this._drawButton(
-            p,
-            mx,
-            my,
-            this._btnQuit,
+        this._drawButton(p, mx, my, this._btnQuit,
             '✕  Quit to Menu',
-            [110, 32, 32],
-            [145, 45, 45],
-            [250, 180, 180],
-        );
+            [110, 32, 32],   [145, 45, 45],   [250, 180, 180]);
+
+        this._drawButton(p, mx, my, this._btnDevMode,
+            '🛠  Developer Mode',
+            [80, 80, 40],   [110, 110, 60],   [220, 220, 140]);
+
+        // ── Audio settings row ────────────────────────────────────────────
+        const sfxOn   = this.audioManager ? this.audioManager.sfxEnabled   : true;
+        const musicOn = this.audioManager ? this.audioManager.musicEnabled  : true;
+
+        // Divider
+        p.stroke(45, 60, 110);
+        p.strokeWeight(1);
+        const divY = this._chipSFX.y - 28;
+        p.line(panX + 24, divY, panX + panW - 24, divY);
+        p.noStroke();
+
+        // Label
+        p.fill(90, 105, 155);
+        p.textAlign(p.CENTER, p.TOP);
+        p.textSize(5.5);
+        p.text('AUDIO SETTINGS', gW / 2, divY + 4);
+
+        // SFX chip
+        this._drawAudioChip(p, mx, my, this._chipSFX,  '🔊 SFX',   sfxOn);
+        // Music chip
+        this._drawAudioChip(p, mx, my, this._chipMusic, '🎵 Music', musicOn);
     }
 
     /**
@@ -167,14 +153,19 @@ export class PauseManager {
      * @param {Function} onRestart
      * @param {Function} onTutorial
      * @param {Function} onQuit
+     * @param {Function} onDevMode
      */
-    mousePressed(mx, my, onResume, onRestart, onTutorial, onQuit) {
+    mousePressed(mx, my, onResume, onRestart, onTutorial, onQuit, onDevMode) {
         if (!this._paused) return;
 
-        if (this._hits(mx, my, this._btnResume)) onResume();
-        else if (this._hits(mx, my, this._btnRestart)) onRestart();
+        if      (this._hits(mx, my, this._btnResume))   onResume();
+        else if (this._hits(mx, my, this._btnRestart))  onRestart();
         else if (this._hits(mx, my, this._btnTutorial)) onTutorial();
-        else if (this._hits(mx, my, this._btnQuit)) onQuit();
+        else if (this._hits(mx, my, this._btnQuit))     onQuit();
+        else if (this._hits(mx, my, this._btnDevMode) && onDevMode) onDevMode();
+        // Audio chip toggles — handled inline, no callback needed
+        else if (this.audioManager && this._hits(mx, my, this._chipSFX))   this.audioManager.toggleAudio('sfx');
+        else if (this.audioManager && this._hits(mx, my, this._chipMusic))  this.audioManager.toggleAudio('music');
     }
 
     // ── Private ───────────────────────────────────────────────────────────
@@ -185,20 +176,36 @@ export class PauseManager {
         p.fill(hov ? hoverCol : baseCol);
         p.rect(btn.x, btn.y, btn.w, btn.h, 8);
         p.fill(255, 255, 255, hov ? 22 : 14);
-        p.rect(btn.x, btn.y, btn.w, btn.h * 0.45, 8);
+        p.rect(btn.x, btn.y,               btn.w, btn.h * 0.45, 8);
         p.rect(btn.x, btn.y + btn.h * 0.45, btn.w, btn.h * 0.55);
         p.fill(...textCol);
         p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(14);
+        p.textSize(6.4);
         p.text(label, btn.x + btn.w / 2, btn.y + btn.h / 2);
     }
 
+    _drawAudioChip(p, mx, my, chip, label, active) {
+        const hov = this._hits(mx, my, chip);
+        p.noStroke();
+        p.fill(active
+            ? (hov ? [55, 120, 55]  : [38,  95, 38])
+            : (hov ? [70, 35,  35]  : [50,  28, 28]));
+        p.rect(chip.x, chip.y, chip.w, chip.h, 6);
+
+        // Active indicator glow on left edge
+        if (active) {
+            p.fill(100, 220, 100, 90);
+            p.rect(chip.x, chip.y, 4, chip.h, 6);
+        }
+
+        p.fill(active ? [180, 240, 180] : [160, 100, 100]);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(5.4);
+        p.text(label, chip.x + chip.w / 2, chip.y + chip.h / 2);
+    }
+
     _hits(mx, my, btn) {
-        return (
-            mx >= btn.x &&
-            mx <= btn.x + btn.w &&
-            my >= btn.y &&
-            my <= btn.y + btn.h
-        );
+        return mx >= btn.x && mx <= btn.x + btn.w &&
+               my >= btn.y && my <= btn.y + btn.h;
     }
 }

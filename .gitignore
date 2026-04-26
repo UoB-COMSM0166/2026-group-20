@@ -11,9 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
 
 # Editor directories and files
-.vscode
+.vscode/*
 .idea
 .DS_Store
 *.suo
@@ -24,5 +25,4 @@ dist-ssr
 
 # Exclusions
 !.vscode/extensions.json
-!.huskynode_modules/
-**/.DS_Store
+!.husky

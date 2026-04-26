@@ -15,9 +15,9 @@ export class Coin {
      * @param {number} x - World x position (pixels, top-left of bounding box)
      * @param {number} y - World y position (pixels, top-left of bounding box)
      * @param {number} value - How many coins this pickup is worth (default 1)
-     * @param {p5.Image} [spriteImage] - Optional coin sprite image
+     * @param {p5.Image|null} spriteImage - Optional animated coin spritesheet
      */
-    constructor(p, x, y, value = GameConfig.COIN_VALUE, spriteImage = null) {
+    constructor(p, x, y, value = GameConfig.COIN_VALUE, spriteImage = null, visualOffsetX = 0) {
         this.p = p;
         this.x = x;
         this.y = y;
@@ -26,6 +26,7 @@ export class Coin {
         this.value = value;
         this.collected = false;
         this.spriteImage = spriteImage;
+        this.visualOffsetX = visualOffsetX;
 
         // Randomised offset so coins don't all bob in sync
         this._baseY = y;
@@ -34,7 +35,6 @@ export class Coin {
 
     /**
      * Check for player overlap each frame; collect on first hit.
-     *
      * @param {Player[]} players
      * @param {ScoreManager} scoreManager
      */
@@ -64,47 +64,53 @@ export class Coin {
         }
     }
 
-    /** Spritesheet frame size (each frame is 16×16 pixels) */
     static FRAME_SIZE = 16;
-    /** Animation speed: frames to wait before advancing to next sprite frame */
     static ANIM_SPEED = 8;
 
     /**
-     * Draw a bobbing coin using the sprite image. Does nothing once collected.
+     * Draw a bobbing coin. Uses the spritesheet when available.
      */
     draw() {
         if (this.collected) return;
 
         const p = this.p;
         const bobY = this._baseY + Math.sin(this._age) * 3;
+        const drawW = this.w * 2;
+        const drawH = this.h * 2;
+        const drawX = this.x + (this.w - drawW) / 2 + this.visualOffsetX;
+        const liftY = this.h * 0.75;
+        const drawY = bobY + (this.h - drawH) / 2 - liftY;
 
         if (this.spriteImage) {
-            const fs = Coin.FRAME_SIZE;
-            const totalFrames = Math.floor(this.spriteImage.width / fs);
+            const frameSize = Coin.FRAME_SIZE;
+            const totalFrames = Math.max(
+                1,
+                Math.floor(this.spriteImage.width / frameSize),
+            );
             const frameIndex =
                 Math.floor(p.frameCount / Coin.ANIM_SPEED) % totalFrames;
-            const sx = frameIndex * fs;
+            const sx = frameIndex * frameSize;
             p.image(
                 this.spriteImage,
-                this.x,
-                bobY,
-                this.w,
-                this.h,
+                drawX,
+                drawY,
+                drawW,
+                drawH,
                 sx,
                 0,
-                fs,
-                fs,
+                frameSize,
+                frameSize,
             );
-        } else {
-            // Fallback: draw a simple gold circle
-            const cx = this.x + this.w / 2;
-            const cy = bobY + this.h / 2;
-            p.noStroke();
-            p.fill(255, 200, 0);
-            p.circle(cx, cy, this.w);
-            p.fill(255, 240, 120, 200);
-            p.circle(cx - this.w * 0.12, cy - this.h * 0.12, this.w * 0.4);
+            return;
         }
+
+        const cx = drawX + drawW / 2;
+        const cy = drawY + drawH / 2;
+        p.noStroke();
+        p.fill(255, 200, 0);
+        p.circle(cx, cy, drawW);
+        p.fill(255, 240, 120, 200);
+        p.circle(cx - drawW * 0.12, cy - drawH * 0.12, drawW * 0.4);
     }
 
     /**

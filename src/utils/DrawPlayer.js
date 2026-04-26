@@ -2,6 +2,8 @@ import { PlayerState } from '../config/PlayerState.js';
 import { PlayerMovementState } from '../config/PlayerMovementState.js';
 import { AnimationConfigChick } from '../config/AnimationConfigChick.js';
 import { AnimationConfigBunny } from '../config/AnimationConfigBunny.js';
+import { GameConfig } from '../config/GameConfig.js';
+import { getPixelatedSprite } from './PixelSprite.js';
 
 /**
  * DrawPlayer — renders a player each frame.
@@ -13,7 +15,6 @@ import { AnimationConfigBunny } from '../config/AnimationConfigBunny.js';
  * Frame advance rate: every call advances the frame index by 1. At ~60 fps
  * the animation plays at the p5 frame rate. The sprite branch animates on
  * every draw call, so we preserve that behaviour exactly.
- * @param player
  */
 export function DrawPlayer(player) {
     if (!player.isVisible) return;
@@ -49,27 +50,28 @@ export function DrawPlayer(player) {
     }
 
     // ── HUD label above player ─
-    p.noStroke();
-    p.fill(255);
-    p.textAlign(p.CENTER, p.BOTTOM);
-    p.textSize(16);
-    p.textFont('Arial');
+    // p.noStroke();
+    // p.fill(255);
+    // p.textAlign(p.CENTER, p.BOTTOM);
+    // p.textSize(6);
+    // p.textFont(GameConfig.FONT);
 
-    if (player.lifeState === PlayerState.RESPAWNING) {
-        p.fill(255, 100, 100);
-        p.text(
-            Math.ceil(player.respawnCountdown) + 's',
-            player.x + player.w / 2,
-            player.y - 5,
-        );
-    } else {
-        p.text(player.movementState, player.x + player.w / 2, player.y - 5);
-    }
+    // if (player.lifeState === PlayerState.RESPAWNING) {
+    //     p.fill(255, 100, 100);
+    //     p.text(
+    //         Math.ceil(player.respawnCountdown) + 's',
+    //         player.x + player.w / 2,
+    //         player.y - 5,
+    //     );
+    // } else {
+    //     p.text(player.movementState, player.x + player.w / 2, player.y - 5);
+    // }
 }
 
 /**
  * Draw a single sprite frame, handling horizontal flip for left-facing.
  * Advances the frame index on every call.
+ *
  * @param {Player}   player
  * @param {p5}       p
  * @param {number[]} frames      - array of frame indices into framesArr
@@ -78,19 +80,22 @@ export function DrawPlayer(player) {
  */
 function _drawFrame(player, p, frames, indexKey, flipOnLeft) {
     const idx = player[indexKey] % frames.length;
-    const img = player.framesArr[frames[idx]];
+    const baseImg = player.framesArr[frames[idx]];
+    const pixelScale = player.character?.pixelScale ?? 1;
+    const img = getPixelatedSprite(p, baseImg, pixelScale);
 
     if (!img) return; // guard against missing frame
 
+    p.push();
+    p.noSmooth();
     if (flipOnLeft && !player.facingRight) {
-        p.push();
         p.translate(player.x + player.w, player.y);
         p.scale(-1, 1);
         p.image(img, 0, 0);
-        p.pop();
     } else {
         p.image(img, player.x, player.y);
     }
+    p.pop();
 
     // Advance frame index — wraps automatically
     player[indexKey] = (player[indexKey] + 1) % frames.length;

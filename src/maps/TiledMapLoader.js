@@ -21,14 +21,14 @@ export class TiledMapLoader {
         this.p = p;
         this.jsonPath = jsonPath;
         this.tilesetPath = tilesetPath;
-        this.baseDir = this.jsonPath.slice(
-            0,
-            this.jsonPath.lastIndexOf('/') + 1,
-        );
+        this.baseDir = this.jsonPath.slice(0, this.jsonPath.lastIndexOf('/') + 1);
 
         this.mapData = null;
         this.tilesetImage = null;
+        this.coinSprite = null;
+        this.endPointSprite = null;
         this.imageLayerAssets = new Map();
+        this.visualBlockMap = [];
 
         /** @type {string[][]} Collision map: '#' solid, '.' empty, 'F' endpoint */
         this.MAP = [];
@@ -36,6 +36,10 @@ export class TiledMapLoader {
         /** Start position parsed from the object layer */
         this.startX = 0;
         this.startY = 0;
+        this.endX = 0;
+        this.endY = 0;
+        this.endW = 0;
+        this.endH = 0;
 
         this.gameWidth = 0;
         this.gameHeight = 0;
@@ -46,28 +50,14 @@ export class TiledMapLoader {
         this.GID_FLIP_D = 0x20000000;
 
         this._tilesetsSorted = [];
-
-        /** @type {p5.Image|null} coin sprite image */
-        this.coinSprite = null;
-
-        /** @type {p5.Image|null} endpoint sprite image */
-        this.endPointSprite = null;
     }
 
-    /**
-     * Set the coin sprite image to use when creating Coin entities.
-     * @param {p5.Image} img
-     */
     setCoinSprite(img) {
-        this.coinSprite = img;
+        this.coinSprite = img ?? null;
     }
 
-    /**
-     * Set the endpoint sprite image to use when rendering the map endpoint.
-     * @param {p5.Image} img
-     */
     setEndpointSprite(img) {
-        this.endPointSprite = img;
+        this.endPointSprite = img ?? null;
     }
 
     // preload JSON and tileset image
@@ -81,12 +71,8 @@ export class TiledMapLoader {
         for (const layer of this.mapData.layers || []) {
             if (layer.type !== 'imagelayer' || !layer.image) continue;
 
-            const candidatePaths = this._getImageLayerCandidatePaths(
-                layer.image,
-            );
-            const candidates = candidatePaths.map((path) =>
-                this.p.loadImage(path),
-            );
+            const candidatePaths = this._getImageLayerCandidatePaths(layer.image);
+            const candidates = candidatePaths.map((path) => this.p.loadImage(path));
             this.imageLayerAssets.set(layer.id, candidates);
         }
     }
@@ -105,6 +91,7 @@ export class TiledMapLoader {
         );
 
         this._generateCollisionMap();
+        this._generateVisualBlockMap();
         this._parseObjectLayer();
     }
 
@@ -147,67 +134,157 @@ export class TiledMapLoader {
 
                         // Render from tileset-local index (not global gid index).
                         const srcX = (gidInfo.localId % tilesetCols) * tileW;
-                        const srcY =
-                            p.floor(gidInfo.localId / tilesetCols) * tileH;
+                        const srcY = p.floor(gidInfo.localId / tilesetCols) * tileH;
 
                         p.image(
                             tilesetImage,
-                            destX,
-                            destY,
-                            tileW,
-                            tileH,
-                            srcX,
-                            srcY,
-                            tileW,
-                            tileH,
+                            destX, destY, tileW, tileH,
+                            srcX, srcY, tileW, tileH,
                         );
                     }
                 }
             }
         }
+    }
 
-        if (
-            this.endPointSprite &&
-            this.endX !== undefined &&
-            this.endY !== undefined
-        ) {
-            const fw = 64;
-            const fh = 64;
-            const frames = 10;
-            const frameIdx = p.floor(p.frameCount / 5) % frames;
+    renderEndpoint(flagSprite = this.endPointSprite) {
+        if (!flagSprite || !this.endW || !this.endH) return;
 
-            // Adjust Y so the 64px tall flag sits on the same bottom edge as the tiled object box
-            const drawX = this.endX;
-            const drawY = this.endY - (fh - (this.endHeight || tileH));
+        const p = this.p;
+        const frameCount = Math.max(1, Math.floor(flagSprite.width / 64));
+        const frameIndex = Math.floor((p.frameCount / 8) % frameCount);
+        const frameW = 64;
+        const frameH = 64;
+        const drawX = this.endX + this.endW / 2 - frameW / 2;
+        const drawY = this.endY + this.endH - frameH;
+        const srcX = frameIndex * frameW;
+        const pulse = 0.72 + 0.28 * Math.sin(p.frameCount * 0.08);
+        const glowCx = drawX + frameW / 2;
+        const glowCy = drawY + frameH * 0.56;
+        const baseY = drawY + frameH - 6;
+        const markerY = drawY - 16 + Math.sin(p.frameCount * 0.14) * 2.5;
 
-            p.image(
-                this.endPointSprite,
-                drawX,
-                drawY,
-                fw,
-                fh,
-                frameIdx * fw,
-                0,
-                fw,
-                fh,
-            );
-        }
+        p.push();
+        p.noStroke();
+        p.fill(120, 220, 255, 24 * pulse);
+        p.rect(glowCx - 7, drawY - 46, 14, frameH + 56, 5);
+        p.fill(120, 220, 255, 14 * pulse);
+        p.rect(glowCx - 14, drawY - 34, 28, frameH + 36, 8);
+        p.fill(255, 230, 110, 72 * pulse);
+        p.ellipse(glowCx, glowCy, frameW * 0.95, frameH * 0.95);
+        p.fill(120, 220, 255, 44 * pulse);
+        p.ellipse(glowCx, glowCy, frameW * 1.3, frameH * 1.18);
+        p.fill(120, 220, 255, 34 * pulse);
+        p.ellipse(glowCx, baseY + 1, frameW * 2.0, 24);
+        p.fill(120, 220, 255, 40 * pulse);
+        p.ellipse(glowCx, baseY, frameW * 1.55, 18);
+        p.fill(255, 230, 110, 65 * pulse);
+        p.ellipse(glowCx, baseY, frameW * 1.1, 10);
+        p.stroke(255, 245, 160, 230);
+        p.strokeWeight(2.5);
+        p.noFill();
+        p.rect(drawX - 5, drawY - 5, frameW + 10, frameH + 10, 6);
+        p.fill(255, 240, 170, 230);
+        p.noStroke();
+        p.triangle(
+            glowCx,
+            markerY,
+            glowCx - 9,
+            markerY + 13,
+            glowCx + 9,
+            markerY + 13,
+        );
+        p.fill(18, 24, 38, 235);
+        p.stroke(255, 245, 160, 220);
+        p.strokeWeight(1.7);
+        p.rect(glowCx - 30, drawY - 35, 60, 18, 4);
+        p.noStroke();
+        p.fill(255, 245, 170);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(5.2);
+        p.text('GOAL', glowCx, drawY - 25.5);
+        p.pop();
+
+        p.image(
+            flagSprite,
+            drawX,
+            drawY,
+            frameW,
+            frameH,
+            srcX,
+            0,
+            frameW,
+            frameH,
+        );
+    }
+
+    renderStartpoint() {
+        if (this.startX == null || this.startY == null) return;
+
+        const p = this.p;
+        const T = this.tilewidth ?? GameConfig.TILE;
+        const cx = this.startX + T / 2;
+        const cy = this.startY + T / 2;
+        const pulse = 0.72 + 0.28 * Math.sin(p.frameCount * 0.08);
+        const markerY = this.startY - 10 + Math.sin(p.frameCount * 0.14) * 2.5;
+
+        p.push();
+        p.noStroke();
+        p.fill(90, 255, 190, 22 * pulse);
+        p.rect(cx - 7, this.startY - 34, 14, T + 44, 5);
+        p.fill(90, 255, 190, 64 * pulse);
+        p.ellipse(cx, cy, T * 0.92, T * 0.92);
+        p.fill(80, 200, 255, 40 * pulse);
+        p.ellipse(cx, cy, T * 1.28, T * 1.12);
+        p.fill(80, 200, 255, 34 * pulse);
+        p.ellipse(cx, this.startY + T - 4, T * 1.75, 18);
+        p.fill(120, 255, 210, 70 * pulse);
+        p.ellipse(cx, this.startY + T - 4, T * 1.16, 10);
+
+        p.stroke(120, 255, 210, 230);
+        p.strokeWeight(2.5);
+        p.noFill();
+        p.rect(this.startX - 4, this.startY - 4, T + 8, T + 8, 6);
+
+        p.noStroke();
+        p.fill(130, 255, 220, 235);
+        p.triangle(
+            cx,
+            markerY,
+            cx - 9,
+            markerY + 13,
+            cx + 9,
+            markerY + 13,
+        );
+
+        p.fill(18, 24, 38, 235);
+        p.stroke(120, 255, 210, 220);
+        p.strokeWeight(1.7);
+        p.rect(cx - 34, this.startY - 24, 68, 18, 4);
+        p.noStroke();
+        p.fill(180, 255, 230);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(5.2);
+        p.text('START', cx, this.startY - 14.5);
+
+        p.noStroke();
+        p.fill(180, 255, 230, 210);
+        p.circle(cx, cy, T * 0.22);
+        p.fill(120, 255, 210, 120);
+        p.circle(cx, cy, T * 0.44);
+        p.pop();
     }
 
     /**
      * Returns the tile character at grid position (tx, ty).
      * Out-of-bounds tiles are treated as solid walls.
+     *
      * @param {number} tx
      * @param {number} ty
      * @returns {string}
      */
     getTile(tx, ty) {
-        if (
-            ty < 0 ||
-            ty >= this.MAP.length ||
-            tx < 0 ||
-            tx >= this.MAP[0].length
-        ) {
+        if (ty < 0 || ty >= this.MAP.length || tx < 0 || tx >= this.MAP[0].length) {
             return TileType.SOLID;
         }
         return this.MAP[ty][tx];
@@ -232,8 +309,30 @@ export class TiledMapLoader {
     }
 
     /**
+     * Returns true when a visible map tile occupies this cell, even if the
+     * collision layer forgot to mark it solid. Used by BuildState so players
+     * cannot place obstacles inside the map's drawn terrain.
+     *
+     * @param {number} tx
+     * @param {number} ty
+     * @returns {boolean}
+     */
+    hasVisibleTerrain(tx, ty) {
+        if (
+            ty < 0 ||
+            ty >= this.visualBlockMap.length ||
+            tx < 0 ||
+            tx >= (this.visualBlockMap[0]?.length ?? 0)
+        ) {
+            return true;
+        }
+        return this.visualBlockMap[ty][tx];
+    }
+
+    /**
      * Returns coin entities parsed from object layers.
      * Objects named 'coin' are treated as coin spawn points.
+     *
      * @returns {Coin[]}
      */
     /**
@@ -245,27 +344,23 @@ export class TiledMapLoader {
      * @returns {Coin[]}
      */
     getCoins(placedObstacles = []) {
-        const T = GameConfig.TILE;
-        const MAP = this.MAP;
+        const T    = GameConfig.TILE;
+        const MAP  = this.MAP;
         const cols = MAP[0]?.length ?? 0;
         const rows = MAP.length;
 
         // Build occupied set from placed obstacles
         const occupiedKeys = new Set(
-            placedObstacles.map(
-                (obs) => `${Math.round(obs.x / T)},${Math.round(obs.y / T)}`,
-            ),
+            placedObstacles.map(obs => `${Math.round(obs.x / T)},${Math.round(obs.y / T)}`)
         );
 
         // Candidate relocation tiles: EMPTY with solid directly below
         const candidates = [];
         for (let ty = 0; ty < rows - 1; ty++) {
             for (let tx = 0; tx < cols; tx++) {
-                if (
-                    MAP[ty][tx] === TileType.EMPTY &&
+                if (MAP[ty][tx] === TileType.EMPTY &&
                     MAP[ty + 1][tx] === TileType.SOLID &&
-                    !occupiedKeys.has(`${tx},${ty}`)
-                ) {
+                    !occupiedKeys.has(`${tx},${ty}`)) {
                     candidates.push({ tx, ty });
                 }
             }
@@ -298,6 +393,7 @@ export class TiledMapLoader {
                     }
                     // else: stay in place — count always preserved
                 }
+                const visualOffsetX = this._coinHorizontalOffset(coinTx, coinTy);
 
                 coins.push(
                     new Coin(
@@ -306,12 +402,22 @@ export class TiledMapLoader {
                         cy,
                         GameConfig.COIN_VALUE,
                         this.coinSprite,
+                        visualOffsetX,
                     ),
                 );
             }
         }
 
         return coins;
+    }
+
+    _coinHorizontalOffset(tx, ty) {
+        const T = GameConfig.TILE;
+        const leftBlocked = this.hasVisibleTerrain(tx - 1, ty);
+        const rightBlocked = this.hasVisibleTerrain(tx + 1, ty);
+        if (leftBlocked && !rightBlocked) return T * 0.28;
+        if (rightBlocked && !leftBlocked) return -T * 0.28;
+        return 0;
     }
 
     _generateCollisionMap() {
@@ -344,8 +450,38 @@ export class TiledMapLoader {
         }
     }
 
+    _generateVisualBlockMap() {
+        const { mapData } = this;
+        const cols = mapData.width;
+        const rows = mapData.height;
+        this.visualBlockMap = Array.from(
+            { length: rows },
+            () => Array(cols).fill(false),
+        );
+
+        for (const layer of mapData.layers) {
+            if (
+                layer.type !== 'tilelayer' ||
+                layer.name === 'Collision_Layer' ||
+                layer.visible === false
+            ) {
+                continue;
+            }
+
+            const data = layer.data ?? [];
+            for (let i = 0; i < data.length; i++) {
+                const gidInfo = this._parseGid(data[i]);
+                if (gidInfo.isEmpty) continue;
+                const x = i % cols;
+                const y = Math.floor(i / cols);
+                this.visualBlockMap[y][x] = true;
+            }
+        }
+    }
+
     /**
      * Public helper for systems that want gid conversion info.
+     *
      * @param {number} gid
      * @returns {{
      *   rawGid:number,
@@ -366,6 +502,7 @@ export class TiledMapLoader {
 
     /**
      * Convenience helper when only local id is needed.
+     *
      * @param {number} gid
      * @returns {number}
      */
@@ -442,7 +579,9 @@ export class TiledMapLoader {
     }
 
     _resolveLayerImagePath(layerImagePath) {
-        if (layerImagePath.startsWith('src/')) return layerImagePath;
+        if (layerImagePath.startsWith('src/')) {
+            return `${import.meta.env.BASE_URL}${layerImagePath}`;
+        }
         return `${this.baseDir}${layerImagePath}`;
     }
 
@@ -495,17 +634,12 @@ export class TiledMapLoader {
                 } else if (obj.name === 'endPoint') {
                     this.endX = obj.x;
                     this.endY = obj.y;
-                    this.endWidth = obj.width;
-                    this.endHeight = obj.height;
-
+                    this.endW = obj.width;
+                    this.endH = obj.height;
                     const startCol = p.floor(obj.x / mapData.tilewidth);
                     const startRow = p.floor(obj.y / mapData.tileheight);
-                    const endCol = p.floor(
-                        (obj.x + obj.width) / mapData.tilewidth,
-                    );
-                    const endRow = p.floor(
-                        (obj.y + obj.height) / mapData.tileheight,
-                    );
+                    const endCol = p.floor((obj.x + obj.width) / mapData.tilewidth);
+                    const endRow = p.floor((obj.y + obj.height) / mapData.tileheight);
 
                     for (let r = startRow; r <= endRow; r++) {
                         for (let c = startCol; c <= endCol; c++) {

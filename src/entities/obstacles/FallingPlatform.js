@@ -1,5 +1,6 @@
 import { Obstacle } from '../Obstacle.js';
 import { GameConfig } from '../../config/GameConfig.js';
+import { TileType } from '../../config/TileType.js';
 import { aabbIntersects } from '../../systems/PhysicsSystem.js';
 
 /**
@@ -42,12 +43,45 @@ export class FallingPlatform extends Obstacle {
         return false;
     }
 
-    update(deltaTime, _gameWidth, gameHeight) {
+    update(deltaTime, _gameWidth, gameHeight, MAP) {
         if (this._gone) return;
 
         if (this._falling) {
+            const prevY = this.y;
             this._vy += GameConfig.FALLING_PLATFORM_GRAVITY;
             this.y += this._vy;
+            
+            // Check collision with map platforms to prevent穿模
+            if (MAP) {
+                const T = GameConfig.TILE;
+                const obsLeft = this.x;
+                const obsRight = this.x + this.w;
+                const obsTop = this.y;
+                const obsBottom = this.y + this.h;
+                
+                let collided = false;
+                for (let ty = 0; ty < MAP.length; ty++) {
+                    for (let tx = 0; tx < MAP[ty].length; tx++) {
+                        if (MAP[ty][tx] === TileType.SOLID) {
+                            const tileX = tx * T;
+                            const tileY = ty * T;
+                            const tileRight = tileX + T;
+                            const tileBottom = tileY + T;
+                            
+                            // Check AABB collision
+                            if (obsLeft < tileRight && obsRight > tileX &&
+                                obsTop < tileBottom && obsBottom > tileY) {
+                                // Collision detected - mark as gone to prevent further issues
+                                this._gone = true;
+                                collided = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (collided) break;
+                }
+            }
+            
             if (this.y > (gameHeight ?? 800) + 60) this._gone = true;
             return;
         }
