@@ -1,225 +1,341 @@
-import { Player } from "./entities/Player.js";
-//import { MAP, TILE } from "./utils/tiles.js";
-import { RespawnManager } from "./systems/RespawnManager.js";
-import { GameStage } from "./config/GameStage.js";
-import { MapMenu } from "./systems/MapMenu.js";
-import { SplashScreen } from "./systems/SplashScreen.js";
+import { Player } from './entities/Player.js';
+import { ScoreManager } from './systems/ScoreManager.js';
+import { GameStage } from './config/GameStage.js';
+import { MapManager } from './systems/MapManager.js';
 
-import { TimeManager } from "./systems/TimeManager.js"; 
-import { PlayerGameState } from "./config/PlayerGameState.js"; 
+import { AudioManager } from './systems/AudioManager.js';
+import { BootState } from './states/BootState.js';
+import { MenuState } from './states/MenuState.js';
+import { CharSelectState } from './states/CharSelectState.js';
 
-import { drawMap, MAP } from "./systems/MapGeneration.js";
+import { MapMenuState } from './states/MapMenuState.js';
+import { BuildState } from './states/BuildState.js';
+import { RunState } from './states/RunState.js';
+import { ResultsState } from './states/ResultsState.js';
+import { ShopState } from './states/ShopState.js';
+import { TutorialState } from './states/TutorialState.js';
+import { WalkMapState } from './states/WalkMapState.js';
+// import { Map2State } from './states/Map2State.js';
 import { GameConfig } from './config/GameConfig.js';
-import { DrawPlayer } from "./utils/DrawPlayer.js";
+import { AnimationConfigChick } from './config/AnimationConfigChick.js';
+import { AnimationConfigBunny } from './config/AnimationConfigBunny.js';
+import { AIMapGenerator } from './systems/AIMapGenerator.js';
 
+// import images
+import chickenSprite from './assets/sprites/chicken_all_frames.png';
+import bunnySprite from './assets/sprites/bunny_all_frames.png';
+import duckSprite from './assets/sprites/duck_all_frames.png';
+import polarSprite from './assets/sprites/polar_all_frames.png';
+
+import saw from './assets/obstacles/Saw/On (38x38).png';
+import fire from './assets/obstacles/Fire/On (16x32).png';
+import trampoline from './assets/obstacles/Trampoline/Jump (28x28).png';
+import spikedBall from './assets/obstacles/Spiked Ball/Spiked Ball.png';
+import cannon from './assets/obstacles/Cannon/cannon (30x18).png';
+import fallingPlatform from './assets/obstacles/Falling Platforms/On (32x10).png';
+import platform from './assets/obstacles/Platforms/platform (40x40).png';
+import movingPlatform from './assets/obstacles/Moving Platforms/Brown On (32x8).png';
+import icePlatform from './assets/obstacles/Ice Platforms/ice platform (40x40).png';
+import spikePlatform from './assets/obstacles/Spike Platforms/spike platform2 (40x40).png';
+import teleporter from './assets/obstacles/Teleporter/teleporter (40x40).png';
+import windZone from './assets/obstacles/Wind Zone/wind zone (32x32).png';
+import iceBlock from './assets/obstacles/Ice Block/ice block (40x40).png';
+import endpointFlag from './assets/obstacles/endpoint/Checkpoint(FlagIdle)(64x64).png';
+import shadowIcon from './assets/obstacles/Shadow/shadow-icon.svg';
+import map1Preview from './assets/maps/map1/background.png';
+import map2Preview from './assets/maps/map2/background.png';
+import startScreen from './assets/images/background/startscreen-bg.png';
+import mapBackground from './assets/images/background/map-selection-bg.png';
+import panasChillFont from './assets/fonts/PanasChill.ttf';
+
+import backgroundMusic from './assets/audio/music-bg.mp3';
+/**
+ * Root p5 sketch.
+ *
+ * Manages the canvas, viewport transform, shared session context,
+ * and the active state machine. All game logic lives in src/states/.
+ *
+ * State flow:
+ *   BOOT → MENU → MAPMENU → BUILD → RUN → RESULTS → SHOP → BUILD → …
+ *                                                    ↑  ESC  ↓
+ *                                                  MAPMENU
+ */
 export const sketch = (p) => {
-    let players = [];
-    let respawnManager;
-    let timeManager;
-    
-    let gameWidth;
-    let gameHeight;
+    let activeState;
+    let states;
 
-    let stage;
-    let splashScreen;
-    let mapMenu;
+    let gameWidth = GameConfig.GAME_WIDTH;
+    let gameHeight = GameConfig.GAME_HEIGHT;
 
-    let scaleFactor = 1;
-    let offsetX = 0;
-    let offsetY = 0;
+    let aiMapFlag = 1; // 0 for AI map generator, 1 for procedural
+    let apiKey = '';
+    const mapManager = new MapManager(p, aiMapFlag, apiKey);
+    const audioManager = new AudioManager();
+
+    let sawFrames;
+    let fireFrames;
+    let trampolineBouncing;
+    let spikedBallImg;
+    let cannonImg;
+    let fallingPlatformFrames;
+    let platformImg;
+    let movingPlatformImg;
+    let icePlatformImg;
+    let spikePlatformImg;
+    let teleporterImg;
+    let windZoneImg;
+    let iceBlockImg;
+    let endpointFlagImg;
+    let shadowIconImg;
+    let map1PreviewImg;
+    let map2PreviewImg;
+    let startScreenBackground;
+    let mapMenuBackgroundImg;
+    let menuFont;
+
+    let chickenSheet;
+    let bunnySheet;
+    let duckSheet;
+    let polarSheet;
+
+    let music;
+
+    let ctx;
+
+    p.preload = function () {
+        chickenSheet = p.loadImage(chickenSprite);
+        bunnySheet = p.loadImage(bunnySprite);
+        duckSheet = p.loadImage(duckSprite);
+        polarSheet = p.loadImage(polarSprite);
+        sawFrames = p.loadImage(saw);
+        fireFrames = p.loadImage(fire);
+        trampolineBouncing = p.loadImage(trampoline);
+        spikedBallImg = p.loadImage(spikedBall);
+        cannonImg = p.loadImage(cannon);
+        fallingPlatformFrames = p.loadImage(fallingPlatform);
+        platformImg = p.loadImage(platform);
+        movingPlatformImg = p.loadImage(movingPlatform);
+        icePlatformImg = p.loadImage(icePlatform);
+        spikePlatformImg = p.loadImage(spikePlatform);
+        teleporterImg = p.loadImage(teleporter);
+        windZoneImg = p.loadImage(windZone);
+        iceBlockImg = p.loadImage(iceBlock);
+        endpointFlagImg = p.loadImage(endpointFlag);
+        shadowIconImg = p.loadImage(shadowIcon);
+        map1PreviewImg = p.loadImage(map1Preview);
+        map2PreviewImg = p.loadImage(map2Preview);
+        startScreenBackground = p.loadImage(startScreen);
+        mapMenuBackgroundImg = p.loadImage(mapBackground);
+        menuFont = p.loadFont(panasChillFont);
+        music = p.loadSound(backgroundMusic);
+        mapManager.preloadAll();
+    };
+
+    // ── Setup ──
 
     p.setup = function () {
         p.createCanvas(p.windowWidth, p.windowHeight);
 
-        gameWidth = MAP[0].length * GameConfig.TILE;
-        gameHeight = MAP.length * GameConfig.TILE;
+        window.ai = new AIMapGenerator(apiKey);
 
-        respawnManager = new RespawnManager();
-        //mapGeneration= new MapGeneration();
-        players = [
-            new Player(p, 11 * GameConfig.TILE,( 7 * GameConfig.TILE) - 40, 0),
-            new Player(p, 13 * GameConfig.TILE, (7 * GameConfig.TILE) - 40, 1),
-        ];
+        /**
+         * Shared session context.
+         * placedObstacles — written by BuildState, read by RunState.
+         *                   Lives here so it survives the BUILD → RUN transition.
+         * Obstacle tokens are now stored per-player in player.inventory (Map).
+         */
+        ctx = {
+            p,
+            gameWidth: GameConfig.GAME_WIDTH,
+            gameHeight: GameConfig.GAME_HEIGHT,
+            walkMapBg: mapMenuBackgroundImg,
+            players: [],
+            tiledMap: null,
+            scoreManager: null,
+            mapKey: 'map1',
+            selectMap: (mapKey) => mapManager.selectMap(mapKey, ctx),
+            sprites: {
+                chicken: chickenSheet,
+                bunny: bunnySheet,
+                duck: duckSheet,
+                polar: polarSheet,
+            },
+            mapPreviews: {
+                map1: map1PreviewImg,
+                map2: map2PreviewImg,
+            },
+            shopIcons: {
+                PLATFORM: platformImg,
+                MOVING_PLATFORM: movingPlatformImg,
+                FALLING_PLATFORM: fallingPlatformFrames,
+                ICE_PLATFORM: icePlatformImg,
+                BOUNCE_PAD: trampolineBouncing,
+                SPIKE: spikePlatformImg,
+                CANNON: cannonImg,
+                SAW: sawFrames,
+                FLAME: fireFrames,
+                SPIKED_BALL: spikedBallImg,
+                ICE_BLOCK: iceBlockImg,
+                WIND_ZONE: windZoneImg,
+                TELEPORTER: teleporterImg,
+                BOMB: null,
+                SHADOW: shadowIconImg,
+            },
+            endpointFlag: endpointFlagImg,
+            placedObstacles: [],
+            shopHasRun: false,
+            audioManager,
+            devMode: false,
+            resumeRunState: false,
+            displayMode: 'stretch',
+            aiMapFlag,
+            apiKey,
+            mapManager,
+        };
 
-        timeManager = new TimeManager(players);
+        document.body.style.fontFamily = "'PanasChill', monospace";
 
-        timeManager.reset(); 
+        mapManager.initialize(ctx);
+        gameWidth = ctx.gameWidth;
+        gameHeight = ctx.gameHeight;
+        audioManager.setMusicTrack(music);
 
-        stage = GameStage.MENU;
-        splashScreen = new SplashScreen(p, gameWidth, gameHeight);
+        const goTo = (stage) => {
+            activeState?.exit();
+            activeState = states[stage];
+            activeState.enter();
+        };
+
+        states = {
+            [GameStage.BOOT]: new BootState(ctx, goTo),
+            [GameStage.MENU]: new MenuState(
+                ctx,
+                goTo,
+                startScreenBackground,
+                menuFont,
+            ),
+            [GameStage.CHAR_SELECT]: new CharSelectState(ctx, goTo),
+            [GameStage.MAPMENU]: new MapMenuState(ctx, goTo),
+            [GameStage.BUILD]: new BuildState(
+                ctx,
+                goTo,
+                sawFrames,
+                fireFrames,
+                trampolineBouncing,
+                spikedBallImg,
+                cannonImg,
+                fallingPlatformFrames,
+            ),
+            [GameStage.RUN]: new RunState(ctx, goTo),
+            [GameStage.RESULTS]: new ResultsState(ctx, goTo),
+            [GameStage.SHOP]: new ShopState(ctx, goTo),
+            [GameStage.TUTORIAL]: new TutorialState(ctx, goTo),
+            [GameStage.WALK_MAP]: new WalkMapState(ctx, goTo),
+            //            [GameStage.MAP2]: new Map2State(ctx, goTo),
+        };
+
+        goTo(GameStage.BOOT);
     };
 
-    p.draw = function () {
-        p.background(0);
+    // ── Draw ──
 
-        scaleFactor = p.min(p.width / gameWidth, p.height / gameHeight);
-        offsetX = (p.width - gameWidth * scaleFactor) / 2;
-        offsetY = (p.height - gameHeight * scaleFactor) / 2;
+    p.draw = function () {
+        if (ctx) {
+            gameWidth = ctx.gameWidth;
+            gameHeight = ctx.gameHeight;
+        }
+
+        p.background(0);
+        const viewport = _getViewport();
+        const mx = (p.mouseX - viewport.offsetX) / viewport.scaleX;
+        const my = (p.mouseY - viewport.offsetY) / viewport.scaleY;
 
         p.cursor(p.ARROW);
-
-        let realMouseX = (p.mouseX - offsetX) / scaleFactor;
-        let realMouseY = (p.mouseY - offsetY) / scaleFactor;
-
         p.push();
-        p.translate(offsetX, offsetY);
-        p.scale(scaleFactor);
+        p.translate(viewport.offsetX, viewport.offsetY);
+        p.scale(viewport.scaleX, viewport.scaleY);
+        p.textFont(GameConfig.FONT);
 
-        if (stage === GameStage.MENU) {
-            p.background(30);
-            splashScreen.render(p, realMouseX, realMouseY);
-        }
-        else if (stage === GameStage.MAPMENU) {
-            p.background(40);
-            if (!mapMenu) mapMenu = new MapMenu(p, gameWidth, gameHeight);
-            mapMenu.render(p, realMouseX, realMouseY);
-        }
-        else if (stage === GameStage.MAP1) {
-            playMap1Loop(p);
-        }
-        else if (stage === GameStage.MAP2) {
-            p.background(50);
-            p.fill(255);
-            p.textAlign(p.CENTER, p.CENTER);
-            p.textSize(24);
-            p.text("Map 2 is coming soon...", gameWidth / 2, gameHeight / 2);
-            p.textSize(14);
-            p.text("Press ESC to return to Map Menu", gameWidth / 2, gameHeight / 2 + 40);
-        }
+        activeState.update(p.deltaTime || 16.6);
+        const fontScale = _getFontSizeScale();
+        _withFontScale(fontScale, () => activeState.render(mx, my));
 
         p.pop();
     };
 
-    function playMap1Loop(p) {
-        p.background(25);
-        drawMap(p);
-
-        let deltaTime = p.deltaTime || 16.6;
-        respawnManager.update(deltaTime);
-
-        timeManager.update(deltaTime);
-
-        if (!timeManager.isGameOver) {
-            for (const player of players) {
-                if (player.gameState !== PlayerGameState.SUCCESS) {
-                    player.update(players, respawnManager);
-
-                    let tx = p.floor((player.x + player.w / 2) / GameConfig.TILE);
-                    let ty = p.floor((player.y + player.h / 2) / GameConfig.TILE);
-
-                    if (MAP[ty] && MAP[ty][tx] === "F") {
-                        timeManager.onPlayerReachFinish(player);
-                    }
-                }
-            }
-        }
-
-        for (const player of players) {
-            DrawPlayer(player);
-        }
-
-        p.fill(255);
-        p.textSize(24);
-        p.textAlign(p.CENTER, p.TOP);
-        p.text(`Time: ${Math.ceil(timeManager.timeLeft)}s`, gameWidth / 2, 20);
-
-        if (timeManager.isGameOver) {
-            p.fill(0, 0, 0, 150); 
-            p.rect(0, 0, gameWidth, gameHeight);
-            
-            p.fill(255);
-            p.textAlign(p.CENTER, p.CENTER);
-            p.textSize(48);
-            p.text("GAME OVER", gameWidth / 2, gameHeight / 2 - 50);
-
-            p.textSize(24);
-            if (timeManager.rankings.length > 0) {
-                let winner = timeManager.rankings[0];
-                p.text(`Winner: Player ${winner.playerNo + 1} !`, gameWidth / 2, gameHeight / 2 + 10);
-            } else {
-                p.text("Time's Up! Everyone Failed.", gameWidth / 2, gameHeight / 2 + 10);
-            }
-        }
-
-        p.fill(255);
-        p.textSize(14);
-        p.textAlign(p.LEFT, p.BOTTOM);
-        p.text("P1: A/D + W   P2: ←/→ + ↑   (Press ESC to Return)", 10, gameHeight - 10);
-    }
+    // ── Input ──
 
     p.mousePressed = function () {
-        let realMouseX = (p.mouseX - offsetX) / scaleFactor;
-        let realMouseY = (p.mouseY - offsetY) / scaleFactor;
-
-        if (stage === GameStage.MENU) {
-            if (splashScreen.button1 && splashScreen.button1.isHovered(realMouseX, realMouseY)) {
-                console.log("Splash Button 1 Clicked");
-            }
-        }
-        else if (stage === GameStage.MAPMENU) {
-            if (mapMenu.buttonReturn.isHovered(realMouseX, realMouseY)) {
-                stage = GameStage.MENU;
-            }
-            else if (mapMenu.buttonMap1.isHovered(realMouseX, realMouseY)) {
-                resetGame(); 
-                stage = GameStage.MAP1;
-            }
-            else if (mapMenu.buttonMap2.isHovered(realMouseX, realMouseY)) {
-                stage = GameStage.MAP2;
-            }
-        }
+        const viewport = _getViewport();
+        const mx = (p.mouseX - viewport.offsetX) / viewport.scaleX;
+        const my = (p.mouseY - viewport.offsetY) / viewport.scaleY;
+        activeState.mousePressed(mx, my);
     };
 
     p.keyPressed = function () {
-        if (stage === GameStage.MENU && p.key === " ") {
-            stage = GameStage.MAPMENU;
-            mapMenu = new MapMenu(p, gameWidth, gameHeight); 
-        }
-        else if ((stage === GameStage.MAP1 || stage === GameStage.MAP2) && p.keyCode === p.ESCAPE) {
-            stage = GameStage.MAPMENU;
-        }
+        activeState.keyPressed();
     };
 
     p.windowResized = function () {
         p.resizeCanvas(p.windowWidth, p.windowHeight);
     };
 
-    function resetGame() {
-        respawnManager.clear();
-        
-        if (timeManager) {
-            timeManager.reset();
+    p.doubleClicked = function () {
+        p.fullscreen(!p.fullscreen());
+    };
+
+    function _getViewport() {
+        if (ctx?.displayMode === 'stretch') {
+            return {
+                scaleX: p.width / gameWidth,
+                scaleY: p.height / gameHeight,
+                offsetX: 0,
+                offsetY: 0,
+            };
         }
 
-        for (const player of players) {
-            player.prepareRespawn();
-            player.finishRespawn();
-            player.setGameState(PlayerGameState.PLAYING); 
-        }
+        const scale = p.min(p.width / gameWidth, p.height / gameHeight);
+        return {
+            scaleX: scale,
+            scaleY: scale,
+            offsetX: (p.width - gameWidth * scale) / 2,
+            offsetY: (p.height - gameHeight * scale) / 2,
+        };
     }
 
+    function _getFontSizeScale() {
+        if (activeState === states?.[GameStage.MENU]) return 1;
+        return 3;
+    }
 
-   //  function drawMap() {
-   //      p.noStroke();
-   //      for (let y = 0; y < MAP.length; y++) {
-   //          for (let x = 0; x < MAP[0].length; x++) {
-   //              const c = MAP[y][x];
-   //              if (c === "#") {
-   //                  p.fill(80);
-   //                  p.rect(x * TILE, y * TILE, TILE, TILE);
-   //              } else if (c === "S") {
-   //                  p.fill(220, 80, 80);
-   //                  const px = x * TILE, py = y * TILE;
-   //                  p.triangle(px, py + TILE, px + TILE / 2, py + 6, px + TILE, py + TILE);
-   //              } else if (c === "F") {
-   //                  p.fill(100, 220, 100);
-   //                  p.rect(x * TILE, y * TILE, TILE, TILE);
-   //                  p.fill(255);
-   //                  p.textAlign(p.CENTER, p.CENTER);
-   //                  p.textSize(12);
-   //                  p.text("GOAL", x * TILE + TILE/2, y * TILE + TILE/2);
-   //              }
-   //          }
-   //      }
-   //  }
+    function _withFontScale(multiplier, drawFn) {
+        if (multiplier === 1) {
+            drawFn();
+            return;
+        }
+
+        const originalTextSize = p.textSize.bind(p);
+        const originalTextFont = p.textFont.bind(p);
+
+        p.textSize = function (size) {
+            if (typeof size === 'number') {
+                return originalTextSize(size * multiplier);
+            }
+            return originalTextSize(size);
+        };
+
+        p.textFont = function (font, size) {
+            if (typeof size === 'number') {
+                return originalTextFont(font, size * multiplier);
+            }
+            return originalTextFont(font);
+        };
+
+        try {
+            drawFn();
+        } finally {
+            p.textSize = originalTextSize;
+            p.textFont = originalTextFont;
+        }
+    }
 };

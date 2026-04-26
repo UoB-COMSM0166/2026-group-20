@@ -28,6 +28,8 @@ export class Button {
     }
 
     /**
+     * @param mx
+     * @param my
      * @description computes the Y position used for button animation
      */
     getRenderY(mx, my) {
@@ -38,6 +40,8 @@ export class Button {
     }
 
     /**
+     * @param mx
+     * @param my
      * @description mouse GUI to show the button is clickable (pointing hand)
      */
     updateCursor(mx, my) {

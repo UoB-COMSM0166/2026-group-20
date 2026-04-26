@@ -1,8 +1,27 @@
-/* Styles */
-html, body {
-  margin: 0;
-  padding: 0;
+@font-face {
+    font-family: 'PanasChill';
+    src: url('./assets/fonts/PanasChill.ttf') format('truetype');
+    font-display: swap;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    font-family: 'PanasChill', monospace;
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(150, 205, 180, 0.18),
+            transparent 22%
+        ),
+        linear-gradient(180deg, #1f3a4a 0%, #10262a 36%, #08140f 100%);
 }
 canvas {
-  display: block;
+    display: block;
 }
