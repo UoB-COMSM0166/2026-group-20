@@ -169,9 +169,9 @@ export class WalkMapState extends State {
             const scale = Math.min(gW / bg.width, gH / bg.height);
             const drawW = bg.width * scale;
             const drawH = bg.height * scale;
-            const drawX = (gW - drawW) / 2;
-            const drawY = (gH - drawH) / 2;
-            p.image(bg, drawX, drawY, drawW, drawH);
+            const drawX = gW;
+            const drawY = gH;
+            p.image(bg, -250, -50, p.windowWidth, p.windowHeight);
         } else {
             p.background(12, 16, 28);
         }

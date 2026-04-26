@@ -126,7 +126,7 @@ export class SplashScreen {
         const titleBaseX = 500 * (this.gameWidth / 1920);
         const titleX = titleBaseX;
         const titleY = 230 * (this.gameHeight / 1080);
-        const promptX = 1050 * (this.gameWidth / 1920);
+        const promptX = 960 * (this.gameWidth / 1920);
         const promptY = 650 * (this.gameHeight / 1080);
         const homepageFont = this.menuFont ?? 'PanasChill';
         const titleFontSize = Math.max(34, 140 * scale);
