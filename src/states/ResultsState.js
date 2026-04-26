@@ -20,8 +20,10 @@ import { LeaderboardManager } from '../systems/LeaderboardManager.js';
  */
 export class ResultsState extends State {
     enter() {
-        const { p, gameWidth, gameHeight, players, scoreManager, mapKey } = this.ctx;
-        this._isFinalRound = scoreManager.currentRound >= scoreManager.maxRounds;
+        const { p, gameWidth, gameHeight, players, scoreManager, mapKey } =
+            this.ctx;
+        this._isFinalRound =
+            scoreManager.currentRound >= scoreManager.maxRounds;
         this.scoreboard = this._isFinalRound
             ? new GameOverScreen(p, gameWidth, gameHeight)
             : new Scoreboard(p, gameWidth, gameHeight);
@@ -30,8 +32,8 @@ export class ResultsState extends State {
         const key = mapKey ?? 'map1';
         LeaderboardManager.record(key, players, scoreManager);
         this._leaderboard = LeaderboardManager.get(key);
-        this._mapKey  = key;
-        this._showLB  = false; // toggle with L key or button
+        this._mapKey = key;
+        this._showLB = false; // toggle with L key or button
     }
 
     render(mx, my) {
@@ -41,22 +43,29 @@ export class ResultsState extends State {
         // Leaderboard toggle button (top-right)
         if (this._isFinalRound) return;
 
-        const btnW = 120, btnH = 28;
+        const btnW = 120,
+            btnH = 28;
         const btnX = gameWidth - btnW - 10;
         const btnY = 10;
-        const hov  = mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH;
+        const hov =
+            mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH;
         p.noStroke();
         p.fill(hov ? [50, 80, 140] : [35, 55, 105]);
         p.rect(btnX, btnY, btnW, btnH, 5);
         p.fill(180, 200, 255);
         p.textAlign(p.CENTER, p.CENTER);
         p.textSize(6.6);
-        p.text(this._showLB ? 'Close Board' : 'Leaderboard', btnX + btnW / 2, btnY + btnH / 2);
+        p.text(
+            this._showLB ? 'Close Board' : 'Leaderboard',
+            btnX + btnW / 2,
+            btnY + btnH / 2,
+        );
 
         if (!this._showLB) return;
 
         // Leaderboard panel
-        const panW = 360, panH = 250;
+        const panW = 360,
+            panH = 250;
         const panX = gameWidth / 2 - panW / 2;
         const panY = gameHeight / 2 - panH / 2;
 
@@ -73,7 +82,11 @@ export class ResultsState extends State {
         p.fill(255, 215, 0);
         p.textAlign(p.CENTER, p.TOP);
         p.textSize(10);
-        p.text(`${this._mapKey?.toUpperCase() ?? 'MAP'} LEADERBOARD`, gameWidth / 2, panY + 14);
+        p.text(
+            `${this._mapKey?.toUpperCase() ?? 'MAP'} LEADERBOARD`,
+            gameWidth / 2,
+            panY + 14,
+        );
 
         p.stroke(45, 60, 110);
         p.strokeWeight(1);
@@ -99,11 +112,26 @@ export class ResultsState extends State {
         } else {
             entries.forEach((entry, i) => {
                 const ey = panY + 62 + i * 18;
-                p.fill(i === 0 ? [255, 215, 0] : i === 1 ? [192, 192, 200] : i === 2 ? [205, 127, 50] : [160, 165, 190]);
+                p.fill(
+                    i === 0
+                        ? [255, 215, 0]
+                        : i === 1
+                          ? [192, 192, 200]
+                          : i === 2
+                            ? [205, 127, 50]
+                            : [160, 165, 190],
+                );
                 p.textSize(6.6);
                 p.textAlign(p.LEFT, p.TOP);
-                const medal = i === 0 ? '1ST' : i === 1 ? '2ND' : i === 2 ? '3RD' : `${i + 1}.`;
-                p.text(medal,           panX + 14, ey);
+                const medal =
+                    i === 0
+                        ? '1ST'
+                        : i === 1
+                          ? '2ND'
+                          : i === 2
+                            ? '3RD'
+                            : `${i + 1}.`;
+                p.text(medal, panX + 14, ey);
                 p.text(this._fitText(entry.name, 13), panX + 58, ey);
                 p.fill(180, 230, 180);
                 p.text(`${entry.time}s`, panX + 198, ey);
@@ -117,7 +145,8 @@ export class ResultsState extends State {
         if (this._isFinalRound) return;
 
         const { gameWidth } = this.ctx;
-        const btnW = 130, btnH = 28;
+        const btnW = 130,
+            btnH = 28;
         const btnX = gameWidth - btnW - 10;
         if (mx >= btnX && mx <= btnX + btnW && my >= 10 && my <= 10 + btnH) {
             this._showLB = !this._showLB;
@@ -136,6 +165,8 @@ export class ResultsState extends State {
 
     _fitText(text, maxChars) {
         const safe = String(text ?? '');
-        return safe.length <= maxChars ? safe : `${safe.slice(0, maxChars - 1)}…`;
+        return safe.length <= maxChars
+            ? safe
+            : `${safe.slice(0, maxChars - 1)}…`;
     }
 }

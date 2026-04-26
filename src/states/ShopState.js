@@ -25,19 +25,28 @@ const ITEM_SUMMARIES = {
 
 // Rich item descriptions for hover tooltips
 const ITEM_DESCRIPTIONS = {
-    PLATFORM: 'Place a solid block that players can stand on, jump from, or use to block a route.',
-    MOVING_PLATFORM: 'Creates a platform that patrols left and right and can carry players along its path.',
-    FALLING_PLATFORM: 'Looks safe at first, then drops after a player stands on it for a short moment.',
-    ICE_PLATFORM: 'A solid platform with very low friction. Players keep sliding after they land on it.',
-    BOUNCE_PAD: 'A spring tile that throws players upward the moment they land on it.',
+    PLATFORM:
+        'Place a solid block that players can stand on, jump from, or use to block a route.',
+    MOVING_PLATFORM:
+        'Creates a platform that patrols left and right and can carry players along its path.',
+    FALLING_PLATFORM:
+        'Looks safe at first, then drops after a player stands on it for a short moment.',
+    ICE_PLATFORM:
+        'A solid platform with very low friction. Players keep sliding after they land on it.',
+    BOUNCE_PAD:
+        'A spring tile that throws players upward the moment they land on it.',
     SPIKE: 'A compact trap that kills instantly on contact.',
     CANNON: 'A directional trap that periodically fires projectiles across the map.',
     SAW: 'A spinning hazard that kills on touch and is best used in tight spaces.',
     FLAME: 'A timed fire trap that alternates between safe and deadly states.',
-    SPIKED_BALL: 'A dangerous static hazard that kills on contact but does not move.',
-    ICE_BLOCK: 'A pass-through ice zone that boosts slide and movement speed while overlapping it.',
-    WIND_ZONE: 'A directional force field that pushes players while they are inside it.',
-    TELEPORTER: 'One token places a linked portal pair. Step in one end to come out of the other.',
+    SPIKED_BALL:
+        'A dangerous static hazard that kills on contact but does not move.',
+    ICE_BLOCK:
+        'A pass-through ice zone that boosts slide and movement speed while overlapping it.',
+    WIND_ZONE:
+        'A directional force field that pushes players while they are inside it.',
+    TELEPORTER:
+        'One token places a linked portal pair. Step in one end to come out of the other.',
     BOMB: 'A proximity trap with a short fuse that explodes and destroys nearby placed obstacles.',
     SHADOW: 'Places a replay trigger that spawns a ghost copy of the last 5 seconds of movement.',
 };
@@ -48,7 +57,10 @@ let ALL_SHOP_ITEMS = Object.entries(GameConfig.SHOP_PRICES).map(
     ([type, price]) => ({
         type,
         price,
-        label: type.split('_').map((w) => w.charAt(0) + w.slice(1).toLowerCase()).join(' '),
+        label: type
+            .split('_')
+            .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
+            .join(' '),
         desc: ITEM_DESCRIPTIONS[type] || '',
     }),
 );
@@ -158,7 +170,9 @@ export class ShopState extends State {
         p.textAlign(p.RIGHT, p.CENTER);
         p.text(`WALLET ${wallet}`, panelX + panelW - 12, panelY + 13);
 
-        const invEntries = [...player.inventory.entries()].filter(([, c]) => c > 0);
+        const invEntries = [...player.inventory.entries()].filter(
+            ([, c]) => c > 0,
+        );
         p.fill(invEntries.length ? [150, 176, 220] : [95, 102, 130]);
         p.textAlign(p.LEFT, p.TOP);
         p.textSize(4.8);
@@ -179,12 +193,24 @@ export class ShopState extends State {
             const ry = gridY + row_i * (CARD_H + CARD_GAP_Y);
             const canAfford = wallet >= item.price;
             const iconRect = { x: rx + 12, y: ry + 18, w: 56, h: 56 };
-            const buyRect = { x: rx + CARD_W - 70, y: ry + CARD_H - 28, w: 58, h: 18 };
-            const cardHovered = mx >= rx && mx <= rx + CARD_W && my >= ry && my <= ry + CARD_H;
-            const iconHovered = mx >= iconRect.x && mx <= iconRect.x + iconRect.w &&
-                my >= iconRect.y && my <= iconRect.y + iconRect.h;
-            const buyHovered = mx >= buyRect.x && mx <= buyRect.x + buyRect.w &&
-                my >= buyRect.y && my <= buyRect.y + buyRect.h;
+            const buyRect = {
+                x: rx + CARD_W - 70,
+                y: ry + CARD_H - 28,
+                w: 58,
+                h: 18,
+            };
+            const cardHovered =
+                mx >= rx && mx <= rx + CARD_W && my >= ry && my <= ry + CARD_H;
+            const iconHovered =
+                mx >= iconRect.x &&
+                mx <= iconRect.x + iconRect.w &&
+                my >= iconRect.y &&
+                my <= iconRect.y + iconRect.h;
+            const buyHovered =
+                mx >= buyRect.x &&
+                mx <= buyRect.x + buyRect.w &&
+                my >= buyRect.y &&
+                my <= buyRect.y + buyRect.h;
             if (iconHovered) this._hoveredItem = item;
 
             p.noStroke();
@@ -210,7 +236,13 @@ export class ShopState extends State {
             p.noFill();
             p.rect(iconRect.x, iconRect.y, iconRect.w, iconRect.h, 6);
             p.noStroke();
-            this._drawShopIcon(item.type, iconRect.x, iconRect.y, iconRect.w, iconRect.h);
+            this._drawShopIcon(
+                item.type,
+                iconRect.x,
+                iconRect.y,
+                iconRect.w,
+                iconRect.h,
+            );
 
             p.fill(canAfford ? [255, 215, 0] : [170, 88, 88]);
             p.textAlign(p.LEFT, p.TOP);
@@ -224,14 +256,30 @@ export class ShopState extends State {
 
             p.fill(120, 132, 170);
             p.textSize(4.3);
-            p.text(ITEM_SUMMARIES[item.type] ?? '', rx + 12, ry + 82, CARD_W - 24, 28);
+            p.text(
+                ITEM_SUMMARIES[item.type] ?? '',
+                rx + 12,
+                ry + 82,
+                CARD_W - 24,
+                28,
+            );
 
-            p.fill(canAfford ? (buyHovered ? [72, 156, 90] : [46, 112, 62]) : [44, 44, 54]);
+            p.fill(
+                canAfford
+                    ? buyHovered
+                        ? [72, 156, 90]
+                        : [46, 112, 62]
+                    : [44, 44, 54],
+            );
             p.rect(buyRect.x, buyRect.y, buyRect.w, buyRect.h, 4);
             p.fill(canAfford ? [238, 248, 238] : [110, 110, 118]);
             p.textAlign(p.CENTER, p.CENTER);
             p.textSize(5);
-            p.text('BUY', buyRect.x + buyRect.w / 2, buyRect.y + buyRect.h / 2 + 0.5);
+            p.text(
+                'BUY',
+                buyRect.x + buyRect.w / 2,
+                buyRect.y + buyRect.h / 2 + 0.5,
+            );
         }
 
         if (this._hoveredItem) {
@@ -323,7 +371,12 @@ export class ShopState extends State {
             const row_i = Math.floor(i / GRID_COLS);
             const rx = gridX + col_i * (CARD_W + CARD_GAP_X);
             const ry = gridY + row_i * (CARD_H + CARD_GAP_Y);
-            const btnRect = { x: rx + CARD_W - 70, y: ry + CARD_H - 28, w: 58, h: 18 };
+            const btnRect = {
+                x: rx + CARD_W - 70,
+                y: ry + CARD_H - 28,
+                w: 58,
+                h: 18,
+            };
             if (
                 mx >= btnRect.x &&
                 mx <= btnRect.x + btnRect.w &&
@@ -471,7 +524,10 @@ export class ShopState extends State {
         if (type === ObstacleType.MOVING_PLATFORM) {
             const fit = this._fitIconRect(x, y, w, h, 32, 8, w, h);
             return {
-                sx: 0, sy: 0, sw: 32, sh: 8,
+                sx: 0,
+                sy: 0,
+                sw: 32,
+                sh: 8,
                 ...fit,
             };
         }
@@ -479,7 +535,10 @@ export class ShopState extends State {
         if (type === ObstacleType.FALLING_PLATFORM) {
             const fit = this._fitIconRect(x, y, w, h, 32, 10, w, h);
             return {
-                sx: 0, sy: 0, sw: 32, sh: 10,
+                sx: 0,
+                sy: 0,
+                sw: 32,
+                sh: 10,
                 ...fit,
             };
         }
@@ -487,7 +546,10 @@ export class ShopState extends State {
         if (type === ObstacleType.BOUNCE_PAD) {
             const fit = this._fitIconRect(x, y, w, h, 28, 28, w, h);
             return {
-                sx: 0, sy: 0, sw: 28, sh: 28,
+                sx: 0,
+                sy: 0,
+                sw: 28,
+                sh: 28,
                 ...fit,
             };
         }
@@ -495,7 +557,10 @@ export class ShopState extends State {
         if (type === ObstacleType.SAW) {
             const fit = this._fitIconRect(x, y, w, h, 38, 38, w, h);
             return {
-                sx: 0, sy: 0, sw: 38, sh: 38,
+                sx: 0,
+                sy: 0,
+                sw: 38,
+                sh: 38,
                 ...fit,
             };
         }
@@ -503,29 +568,47 @@ export class ShopState extends State {
         if (type === ObstacleType.FLAME) {
             const fit = this._fitIconRect(x, y, w, h, 16, 32, w, h);
             return {
-                sx: 0, sy: 0, sw: 16, sh: 32,
+                sx: 0,
+                sy: 0,
+                sw: 16,
+                sh: 32,
                 ...fit,
             };
         }
 
         if (type === ObstacleType.WIND_ZONE) {
             return {
-                sx: 32 * 2 + 6, sy: 9, sw: 22, sh: 14,
-                dx: x, dy: y, dw: w, dh: h,
+                sx: 32 * 2 + 6,
+                sy: 9,
+                sw: 22,
+                sh: 14,
+                dx: x,
+                dy: y,
+                dw: w,
+                dh: h,
             };
         }
 
         if (type === ObstacleType.SPIKE) {
             return {
-                sx: 41, sy: 0, sw: 38, sh: 40,
-                dx: x, dy: y, dw: w, dh: h,
+                sx: 41,
+                sy: 0,
+                sw: 38,
+                sh: 40,
+                dx: x,
+                dy: y,
+                dw: w,
+                dh: h,
             };
         }
 
         if (type === ObstacleType.CANNON) {
             const fit = this._fitIconRect(x, y, w, h, 30, 18, w, h);
             return {
-                sx: 0, sy: 0, sw: 30, sh: 18,
+                sx: 0,
+                sy: 0,
+                sw: 30,
+                sh: 18,
                 ...fit,
             };
         }
@@ -533,7 +616,10 @@ export class ShopState extends State {
         if (type === ObstacleType.SPIKED_BALL) {
             const fit = this._fitIconRect(x, y, w, h, 28, 28, w, h);
             return {
-                sx: 0, sy: 0, sw: 28, sh: 28,
+                sx: 0,
+                sy: 0,
+                sw: 28,
+                sh: 28,
                 ...fit,
             };
         }
@@ -541,7 +627,10 @@ export class ShopState extends State {
         if (type === ObstacleType.TELEPORTER) {
             const fit = this._fitIconRect(x, y, w, h, 40, 40, w, h);
             return {
-                sx: 0, sy: 0, sw: 40, sh: 40,
+                sx: 0,
+                sy: 0,
+                sw: 40,
+                sh: 40,
                 ...fit,
             };
         }
@@ -553,14 +642,20 @@ export class ShopState extends State {
         ) {
             const fit = this._fitIconRect(x, y, w, h, 40, 40, w, h);
             return {
-                sx: 0, sy: 0, sw: 40, sh: 40,
+                sx: 0,
+                sy: 0,
+                sw: 40,
+                sh: 40,
                 ...fit,
             };
         }
 
         const fit = this._fitIconRect(x, y, w, h, img.width, img.height, w, h);
         return {
-            sx: 0, sy: 0, sw: img.width, sh: img.height,
+            sx: 0,
+            sy: 0,
+            sw: img.width,
+            sh: img.height,
             ...fit,
         };
     }

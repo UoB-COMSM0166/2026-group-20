@@ -1,6 +1,7 @@
 import { State } from './State.js';
 import { SplashScreen } from '../ui/SplashScreen.js';
 import { GameStage } from '../config/GameStage.js';
+import { AIMapGenerator } from '../systems/AIMapGenerator.js';
 
 /**
  * MenuState — the main splash / title screen.
@@ -18,6 +19,7 @@ export class MenuState extends State {
     enter() {
         const { p, gameWidth, gameHeight } = this.ctx;
         this._showSettings = false;
+        this._apiKeyFocused = false;
         this.splashScreen = new SplashScreen(
             p,
             gameWidth,
@@ -25,6 +27,37 @@ export class MenuState extends State {
             this.bgImage,
             this.menuFont,
         );
+
+        this._handlePaste = (e) => {
+            if (this._showSettings && this._apiKeyFocused) {
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData(
+                    'text',
+                );
+                if (text) {
+                    this.ctx.apiKey = (this.ctx.apiKey || '') + text;
+                    if (this.ctx.mapManager.aiGenerator) {
+                        this.ctx.mapManager.aiGenerator.apiKey =
+                            this.ctx.apiKey;
+                    }
+                }
+            }
+        };
+
+        this._handleCopy = (e) => {
+            if (this._showSettings && this._apiKeyFocused && this.ctx.apiKey) {
+                e.preventDefault();
+                e.clipboardData.setData('text/plain', this.ctx.apiKey);
+            }
+        };
+
+        window.addEventListener('paste', this._handlePaste);
+        window.addEventListener('copy', this._handleCopy);
+    }
+
+    exit() {
+        window.removeEventListener('paste', this._handlePaste);
+        window.removeEventListener('copy', this._handleCopy);
     }
 
     render(mx, my) {
@@ -40,15 +73,36 @@ export class MenuState extends State {
             my,
             this._showSettings,
             this.ctx.displayMode ?? 'stretch',
+            this.ctx.aiMapFlag ?? 1,
+            this.ctx.apiKey ?? '',
+            this._apiKeyFocused,
         );
     }
 
     mousePressed(mx, my) {
         if (this._showSettings) {
             const action = this.splashScreen.settingsActionAt(mx, my);
-            if (action === 'close') this._showSettings = false;
-            else if (action === 'fit') this.ctx.displayMode = 'fit';
+            if (action === 'close') {
+                this._showSettings = false;
+                this._apiKeyFocused = false;
+            } else if (action === 'fit') this.ctx.displayMode = 'fit';
             else if (action === 'stretch') this.ctx.displayMode = 'stretch';
+            else if (action === 'ai_on') {
+                const hasApiKey =
+                    this.ctx.apiKey && this.ctx.apiKey.trim().length > 0;
+                if (hasApiKey) {
+                    this.ctx.aiMapFlag = 0;
+                    this.ctx.mapManager.aiMapFlag = 0;
+                    this.ctx.mapManager.preloadNextAIMap(this.ctx.apiKey);
+                }
+            } else if (action === 'ai_off') {
+                this.ctx.aiMapFlag = 1;
+                this.ctx.mapManager.aiMapFlag = 1;
+            } else if (action === 'focus_api_key') {
+                this._apiKeyFocused = true;
+            } else {
+                this._apiKeyFocused = false;
+            }
             return;
         }
 
@@ -65,9 +119,38 @@ export class MenuState extends State {
 
     keyPressed() {
         const { p } = this.ctx;
-        if (this._showSettings && p.keyCode === p.ESCAPE) {
-            this._showSettings = false;
-            return;
+        if (this._showSettings) {
+            if (p.keyCode === p.ESCAPE) {
+                this._showSettings = false;
+                this._apiKeyFocused = false;
+                return;
+            }
+            if (this._apiKeyFocused) {
+                if (p.keyCode === p.ENTER || p.keyCode === 13) {
+                    this._apiKeyFocused = false;
+                    // Update MapManager with the new API Key
+                    if (this.ctx.apiKey && this.ctx.mapManager.aiGenerator) {
+                        this.ctx.mapManager.aiGenerator.apiKey =
+                            this.ctx.apiKey;
+                    }
+                } else if (p.keyCode === p.BACKSPACE) {
+                    this.ctx.apiKey = this.ctx.apiKey.slice(0, -1);
+                    if (this.ctx.apiKey.trim().length === 0) {
+                        this.ctx.aiMapFlag = 1;
+                        this.ctx.mapManager.aiMapFlag = 1;
+                    }
+                } else if (p.key && p.key.length === 1) {
+                    // Ignore character if Control or Command is held (shortcuts like Ctrl+V)
+                    const isShortcut =
+                        p.keyIsDown(p.CONTROL) ||
+                        p.keyIsDown(91) ||
+                        p.keyIsDown(93);
+                    if (!isShortcut) {
+                        this.ctx.apiKey += p.key;
+                    }
+                }
+                return;
+            }
         }
         if (p.key === ' ') {
             this.goTo(GameStage.CHAR_SELECT);

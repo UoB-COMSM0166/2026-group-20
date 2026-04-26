@@ -14,11 +14,12 @@ import { RunState } from './states/RunState.js';
 import { ResultsState } from './states/ResultsState.js';
 import { ShopState } from './states/ShopState.js';
 import { TutorialState } from './states/TutorialState.js';
-import { WalkMapState }  from './states/WalkMapState.js';
+import { WalkMapState } from './states/WalkMapState.js';
 // import { Map2State } from './states/Map2State.js';
 import { GameConfig } from './config/GameConfig.js';
 import { AnimationConfigChick } from './config/AnimationConfigChick.js';
 import { AnimationConfigBunny } from './config/AnimationConfigBunny.js';
+import { AIMapGenerator } from './systems/AIMapGenerator.js';
 
 // import images
 import chickenSprite from './assets/sprites/chicken_all_frames.png';
@@ -66,7 +67,9 @@ export const sketch = (p) => {
     let gameWidth = GameConfig.GAME_WIDTH;
     let gameHeight = GameConfig.GAME_HEIGHT;
 
-    const mapManager   = new MapManager(p);
+    let aiMapFlag = 1; // 0 for AI map generator, 1 for procedural
+    let apiKey = '';
+    const mapManager = new MapManager(p, aiMapFlag, apiKey);
     const audioManager = new AudioManager();
 
     let sawFrames;
@@ -95,7 +98,7 @@ export const sketch = (p) => {
     let duckSheet;
     let polarSheet;
 
-    let music; 
+    let music;
 
     let ctx;
 
@@ -132,6 +135,8 @@ export const sketch = (p) => {
 
     p.setup = function () {
         p.createCanvas(p.windowWidth, p.windowHeight);
+
+        window.ai = new AIMapGenerator(apiKey);
 
         /**
          * Shared session context.
@@ -183,6 +188,9 @@ export const sketch = (p) => {
             devMode: false,
             resumeRunState: false,
             displayMode: 'stretch',
+            aiMapFlag,
+            apiKey,
+            mapManager,
         };
 
         document.body.style.fontFamily = "'PanasChill', monospace";
@@ -200,7 +208,12 @@ export const sketch = (p) => {
 
         states = {
             [GameStage.BOOT]: new BootState(ctx, goTo),
-            [GameStage.MENU]: new MenuState(ctx, goTo, startScreenBackground, menuFont),
+            [GameStage.MENU]: new MenuState(
+                ctx,
+                goTo,
+                startScreenBackground,
+                menuFont,
+            ),
             [GameStage.CHAR_SELECT]: new CharSelectState(ctx, goTo),
             [GameStage.MAPMENU]: new MapMenuState(ctx, goTo),
             [GameStage.BUILD]: new BuildState(
@@ -217,7 +230,7 @@ export const sketch = (p) => {
             [GameStage.RESULTS]: new ResultsState(ctx, goTo),
             [GameStage.SHOP]: new ShopState(ctx, goTo),
             [GameStage.TUTORIAL]: new TutorialState(ctx, goTo),
-            [GameStage.WALK_MAP]:  new WalkMapState(ctx, goTo),
+            [GameStage.WALK_MAP]: new WalkMapState(ctx, goTo),
             //            [GameStage.MAP2]: new Map2State(ctx, goTo),
         };
 

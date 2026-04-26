@@ -45,14 +45,14 @@ export class SplashScreen {
 
         this.settingsPanel = {
             w: 380,
-            h: 224,
+            h: 540,
             x: gameWidth / 2 - 190,
-            y: gameHeight / 2 - 76,
+            y: gameHeight / 2 - 270,
         };
         this.displayFitButton = new RectButton(
             p,
             this.settingsPanel.x + 32,
-            this.settingsPanel.y + 96,
+            this.settingsPanel.y + 80,
             140,
             42,
             'STANDARD VIEW',
@@ -60,10 +60,34 @@ export class SplashScreen {
         this.displayStretchButton = new RectButton(
             p,
             this.settingsPanel.x + this.settingsPanel.w - 32 - 140,
-            this.settingsPanel.y + 96,
+            this.settingsPanel.y + 80,
             140,
             42,
             'MAX VIEW',
+        );
+        this.aiOnButton = new RectButton(
+            p,
+            this.settingsPanel.x + 32,
+            this.settingsPanel.y + 310,
+            140,
+            42,
+            'AI ON',
+        );
+        this.aiOffButton = new RectButton(
+            p,
+            this.settingsPanel.x + this.settingsPanel.w - 32 - 140,
+            this.settingsPanel.y + 310,
+            140,
+            42,
+            'AI OFF',
+        );
+        this.apiKeyInputButton = new RectButton(
+            p,
+            this.settingsPanel.x + 32,
+            this.settingsPanel.y + 420,
+            this.settingsPanel.w - 64,
+            42,
+            '',
         );
         this.closeButton = new RoundButton(
             p,
@@ -79,7 +103,16 @@ export class SplashScreen {
      * @param {number} mx - Mouse X position
      * @param {number} my - Mouse Y position
      */
-    render(p, mx, my, showSettings = false, displayMode = 'stretch') {
+    render(
+        p,
+        mx,
+        my,
+        showSettings = false,
+        displayMode = 'stretch',
+        aiMapFlag = 1,
+        apiKey = '',
+        apiKeyFocused = false,
+    ) {
         const scale = Math.min(this.gameWidth / 1920, this.gameHeight / 1080);
         const titleBaseX = 500 * (this.gameWidth / 1920);
         const titleX = titleBaseX;
@@ -112,11 +145,7 @@ export class SplashScreen {
                 GameConfig.PRESS_COLOUR.g,
                 GameConfig.PRESS_COLOUR.b,
             );
-            p.text(
-                'Press Space to Start',
-                promptX,
-                promptY,
-            );
+            p.text('Press Space to Start', promptX, promptY);
         }
         p.noStroke();
 
@@ -136,7 +165,15 @@ export class SplashScreen {
         this.button2.updateCursor(mx, my);
 
         if (showSettings) {
-            this._drawSettingsPanel(p, mx, my, displayMode);
+            this._drawSettingsPanel(
+                p,
+                mx,
+                my,
+                displayMode,
+                aiMapFlag,
+                apiKey,
+                apiKeyFocused,
+            );
         }
     }
 
@@ -150,11 +187,23 @@ export class SplashScreen {
         if (this.closeButton.isHovered(mx, my)) return 'close';
         if (this.displayFitButton.isHovered(mx, my)) return 'fit';
         if (this.displayStretchButton.isHovered(mx, my)) return 'stretch';
+        if (this.aiOnButton.isHovered(mx, my)) return 'ai_on';
+        if (this.aiOffButton.isHovered(mx, my)) return 'ai_off';
+        if (this.apiKeyInputButton.isHovered(mx, my)) return 'focus_api_key';
         return null;
     }
 
-    _drawSettingsPanel(p, mx, my, displayMode) {
+    _drawSettingsPanel(
+        p,
+        mx,
+        my,
+        displayMode,
+        aiMapFlag,
+        apiKey,
+        apiKeyFocused,
+    ) {
         const panel = this.settingsPanel;
+        const uiTextScale = 3;
         p.noStroke();
         p.fill(0, 0, 0, 170);
         p.rect(0, 0, this.gameWidth, this.gameHeight);
@@ -172,9 +221,10 @@ export class SplashScreen {
         p.textFont(GameConfig.FONT, 27.6);
         p.text('SETTINGS', panel.x + panel.w / 2, panel.y + 16);
 
+        // --- DISPLAY MODE ---
         p.fill(120, 144, 188);
         p.textFont(GameConfig.FONT, 17.4);
-        p.text('DISPLAY MODE', panel.x + panel.w / 2, panel.y + 48);
+        p.text('DISPLAY MODE', panel.x + panel.w / 2, panel.y + 42);
 
         this.displayFitButton.textSize = 22.2;
         this.displayStretchButton.textSize = 22.2;
@@ -189,12 +239,88 @@ export class SplashScreen {
                 : 'Current: Standard View';
         p.fill(180, 208, 255);
         p.textFont(GameConfig.FONT, 15.3);
-        p.text(activeText, panel.x + panel.w / 2, panel.y + 160);
+        p.text(activeText, panel.x + panel.w / 2, panel.y + 130);
 
         p.fill(120, 144, 188);
         p.textFont(GameConfig.FONT, 14.7);
-        p.text('Standard View keeps the original fitted framing.', panel.x + panel.w / 2, panel.y + 180);
-        p.text('Max View fills the whole window by stretching the scene.', panel.x + panel.w / 2, panel.y + 194);
+        p.text(
+            'Standard View keeps the original fitted framing.',
+            panel.x + panel.w / 2,
+            panel.y + 180,
+        );
+        p.text(
+            'Max View fills the whole window by stretching the scene.',
+            panel.x + panel.w / 2,
+            panel.y + 194,
+        );
+
+        // --- AI MAP GENERATION ---
+        p.fill(120, 144, 188);
+        p.textFont(GameConfig.FONT, 5.8 * uiTextScale);
+        p.text('AI MAP GENERATION', panel.x + panel.w / 2, panel.y + 270);
+
+        const hasApiKey = apiKey && apiKey.trim().length > 0;
+
+        // Buttons
+        this.aiOnButton.textSize = 7.4 * uiTextScale;
+        this.aiOffButton.textSize = 7.4 * uiTextScale;
+
+        // Style buttons based on state
+        if (!hasApiKey) {
+            this.aiOnButton.defaultColour = { r: 80, g: 80, b: 80 };
+            this.aiOnButton.changedColour = { r: 80, g: 80, b: 80 };
+        } else {
+            this.aiOnButton.defaultColour = { r: 80, g: 220, b: 120 };
+            this.aiOnButton.changedColour = { r: 50, g: 180, b: 90 };
+        }
+        this.aiOffButton.defaultColour = { r: 255, g: 100, b: 100 };
+        this.aiOffButton.changedColour = { r: 200, g: 70, b: 70 };
+
+        this.aiOnButton.drawButton(p, mx, my);
+        this.aiOffButton.drawButton(p, mx, my);
+        if (hasApiKey) this.aiOnButton.updateCursor(mx, my);
+        this.aiOffButton.updateCursor(mx, my);
+
+        const activeAIText =
+            aiMapFlag === 0 ? 'Current: AI Enabled' : 'Current: Procedural';
+        p.fill(180, 208, 255);
+        p.textFont(GameConfig.FONT, 5.1 * uiTextScale);
+        p.text(activeAIText, panel.x + panel.w / 2, panel.y + 360);
+
+        // --- API KEY ---
+        p.fill(120, 144, 188);
+        p.textFont(GameConfig.FONT, 5.8 * uiTextScale);
+        p.text('AIML API KEY', panel.x + panel.w / 2, panel.y + 390);
+
+        this.apiKeyInputButton.textSize = 5.5 * uiTextScale;
+        this.apiKeyInputButton.drawButton(p, mx, my);
+        this.apiKeyInputButton.updateCursor(mx, my);
+
+        // Draw current API key or placeholder
+        const displayKey = apiKeyFocused
+            ? apiKey + (p.frameCount % 60 < 30 ? '|' : '')
+            : apiKey
+              ? '*'.repeat(Math.min(apiKey.length, 15))
+              : 'CLICK TO TYPE';
+
+        p.fill(255);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textFont(GameConfig.FONT, 5 * uiTextScale);
+        p.text(
+            displayKey,
+            panel.x + panel.w / 2,
+            this.apiKeyInputButton.y + this.apiKeyInputButton.h / 2,
+        );
+
+        if (!hasApiKey && aiMapFlag === 0) {
+            p.fill(255, 100, 100);
+            p.textSize(4 * uiTextScale);
+            p.text(
+                'API KEY REQUIRED FOR AI MAPS',
+                panel.x + panel.w / 2,
+                panel.y + 480,
+            );
+        }
 
         this.closeButton.textSize = 21.6;
         this.closeButton.drawButton(p, mx, my);

@@ -21,14 +21,14 @@ export class RectButton extends Button {
     drawButton(p, mx, my) {
         let currentY = this.getRenderY(mx, my);
 
-        if (this.isHovered(mx, my)){
+        if (this.isHovered(mx, my)) {
             this.p.fill(
                 this.defaultColour.r,
                 this.defaultColour.g,
                 this.defaultColour.b,
             );
         } else {
-            p.stroke(0);           
+            p.stroke(0);
             p.strokeWeight(2);
             this.p.fill(
                 this.changedColour.r,
@@ -48,7 +48,11 @@ export class RectButton extends Button {
         );
         this.p.textSize(Math.min(this.textSize, fitByHeight, fitByWidth));
         this.p.textAlign(this.p.CENTER, this.p.CENTER);
-        this.p.text(this.label, this.x + this.w / 2, currentY + this.h / 2 + 0.5);
+        this.p.text(
+            this.label,
+            this.x + this.w / 2,
+            currentY + this.h / 2 + 0.5,
+        );
     }
 
     updateCursor(mx, my) {

@@ -579,7 +579,9 @@ export class TiledMapLoader {
     }
 
     _resolveLayerImagePath(layerImagePath) {
-        if (layerImagePath.startsWith('src/')) return layerImagePath;
+        if (layerImagePath.startsWith('src/')) {
+            return `${import.meta.env.BASE_URL}${layerImagePath}`;
+        }
         return `${this.baseDir}${layerImagePath}`;
     }
 

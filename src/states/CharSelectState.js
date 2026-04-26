@@ -153,11 +153,7 @@ export class CharSelectState extends State {
                 p.fill(...takenCol);
                 p.textSize(5);
                 p.textAlign(p.CENTER, p.CENTER);
-                p.text(
-                    `P${takenBy + 1}`,
-                    cx + CARD_W / 2,
-                    cardY + CARD_H - 20,
-                );
+                p.text(`P${takenBy + 1}`, cx + CARD_W / 2, cardY + CARD_H - 20);
             }
 
             if (
@@ -176,7 +172,14 @@ export class CharSelectState extends State {
 
         // ── Hover details popup ────────────────────────────────────────────
         if (hoveredChar && !this._takenBy(hoveredChar.id)) {
-            this._drawCharacterDetailsPopup(p, hoveredChar, mx, my, gameWidth, gameHeight);
+            this._drawCharacterDetailsPopup(
+                p,
+                hoveredChar,
+                mx,
+                my,
+                gameWidth,
+                gameHeight,
+            );
         }
 
         // ── Player turn indicators ─────
@@ -317,11 +320,16 @@ export class CharSelectState extends State {
             if (p.keyCode === p.ENTER || p.keyCode === 13) {
                 this._confirmCurrentName();
             } else if (p.keyCode === p.BACKSPACE) {
-                this._nicknames[this._currentTurn] =
-                    this._nicknames[this._currentTurn].slice(0, -1);
+                this._nicknames[this._currentTurn] = this._nicknames[
+                    this._currentTurn
+                ].slice(0, -1);
             } else if (p.keyCode === p.ESCAPE) {
                 this._cancelCurrentSelection();
-            } else if (p.key && p.key.length === 1 && /[a-zA-Z0-9 ]/.test(p.key)) {
+            } else if (
+                p.key &&
+                p.key.length === 1 &&
+                /[a-zA-Z0-9 ]/.test(p.key)
+            ) {
                 if (this._nicknames[this._currentTurn].length < 12) {
                     this._nicknames[this._currentTurn] += p.key;
                 }
@@ -350,10 +358,13 @@ export class CharSelectState extends State {
         if (sheet) player.setSprite(sheet, char.animConfig);
 
         // Apply character-specific attributes
-        if (char.speed    !== undefined) player.speed    = char.speed;
-        if (char.jumpVel  !== undefined) player.jumpVel  = char.jumpVel;
-        if (char.maxJumps !== undefined) { player.maxJumps = char.maxJumps; player.jumpsLeft = char.maxJumps; }
-        if (char.gravity  !== undefined) player.gravity  = char.gravity;
+        if (char.speed !== undefined) player.speed = char.speed;
+        if (char.jumpVel !== undefined) player.jumpVel = char.jumpVel;
+        if (char.maxJumps !== undefined) {
+            player.maxJumps = char.maxJumps;
+            player.jumpsLeft = char.maxJumps;
+        }
+        if (char.gravity !== undefined) player.gravity = char.gravity;
 
         this._pendingNameFor = char.id;
     }
@@ -362,7 +373,7 @@ export class CharSelectState extends State {
         const fallback = `Player ${this._currentTurn + 1}`;
         const value = useDefault
             ? fallback
-            : (this._nicknames[this._currentTurn].trim() || fallback);
+            : this._nicknames[this._currentTurn].trim() || fallback;
         this._nicknames[this._currentTurn] = value;
         this.ctx.players[this._currentTurn].nickname = value;
         this._pendingNameFor = null;
@@ -436,7 +447,9 @@ export class CharSelectState extends State {
                 ? char.animConfig.RUN
                 : char.animConfig.IDLE;
         const frameIdx =
-            previewFrames[Math.floor(this._animTick / 160) % previewFrames.length];
+            previewFrames[
+                Math.floor(this._animTick / 160) % previewFrames.length
+            ];
 
         const srcX = frameIdx * fw;
         const frameKey = `${char.id}:${frameIdx}`;
