@@ -4,13 +4,26 @@ import { TileType } from '../config/TileType.js';
 /**
  * Axis-aligned bounding box overlap test.
  * Exported so other modules (e.g. Coin) can import it from one place.
- *
+ * @param ax
+ * @param ay
+ * @param aw
+ * @param ah
+ * @param bx
+ * @param by
+ * @param bw
+ * @param bh
  * @returns {boolean} true if the two rectangles overlap
  */
 export function aabbIntersects(ax, ay, aw, ah, bx, by, bw, bh) {
     return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }
 
+/**
+ *
+ * @param MAP
+ * @param tx
+ * @param ty
+ */
 function getMapTile(MAP, tx, ty) {
     if (!MAP?.length || !MAP[0]?.length) return TileType.SOLID;
     if (ty < 0 || tx < 0 || tx >= MAP[0].length) {
@@ -24,11 +37,23 @@ function getMapTile(MAP, tx, ty) {
     return MAP[ty][tx];
 }
 
+/**
+ *
+ * @param MAP
+ * @param tx
+ * @param ty
+ */
 function isSolid(MAP, tx, ty) {
     const tile = getMapTile(MAP, tx, ty);
     return tile === TileType.SOLID;
 }
 
+/**
+ *
+ * @param MAP
+ * @param tx
+ * @param ty
+ */
 function isSpike(MAP, tx, ty) {
     return getMapTile(MAP, tx, ty) === TileType.SPIKE;
 }
@@ -352,6 +377,11 @@ export function checkSpikeCollision(entity, p, obstacles = [], MAP) {
     return false;
 }
 
+/**
+ *
+ * @param entity
+ * @param gameHeight
+ */
 export function checkFallDeath(entity, gameHeight) {
     return entity.y + entity.h > gameHeight;
 }

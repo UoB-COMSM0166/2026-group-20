@@ -1,9 +1,19 @@
 const PIXEL_CACHE = new WeakMap();
 
+/**
+ *
+ * @param pixelScale
+ */
 function _getScaleKey(pixelScale) {
     return String(Math.max(0.1, Math.min(1, pixelScale)).toFixed(2));
 }
 
+/**
+ *
+ * @param p
+ * @param img
+ * @param pixelScale
+ */
 export function getPixelatedSprite(p, img, pixelScale = 1) {
     if (!img || pixelScale >= 0.99) return img;
 

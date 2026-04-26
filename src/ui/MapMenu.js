@@ -12,6 +12,8 @@ export class MapMenu {
      * @description creates splash screen
      * @param {p5} p - The p5 instance
      * @param {string} stage - Current game stage
+     * @param gameWidth
+     * @param gameHeight
      */
     constructor(p, gameWidth, gameHeight) {
         this.gameWidth = gameWidth;

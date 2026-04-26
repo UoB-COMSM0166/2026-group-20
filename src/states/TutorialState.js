@@ -43,10 +43,10 @@ export class TutorialState extends State {
         p.background(10, 14, 26);
 
         // ── Panel ──────────────────────────────────────────────────────────
-        const panW  = gameWidth  - 60;
-        const panH  = gameHeight - 50;
-        const panX  = 30;
-        const panY  = 20;
+        const panW = gameWidth - 60;
+        const panH = gameHeight - 50;
+        const panX = 30;
+        const panY = 20;
 
         p.noStroke();
         p.fill(18, 22, 38);
@@ -62,14 +62,14 @@ export class TutorialState extends State {
         } else {
             this._renderFlowPage(p, panX, panY, panW, panH, mx, my);
         }
-
     }
 
     mousePressed(mx, my) {
         const { gameWidth, gameHeight } = this.ctx;
 
         // Next / Start buttons
-        const btnW = 140, btnH = 32;
+        const btnW = 140,
+            btnH = 32;
         if (this._page === 0) {
             // "Next →" button
             const bx = gameWidth - 30 - btnW - 10;
@@ -87,13 +87,20 @@ export class TutorialState extends State {
                 if (this._returnStage) {
                     this._returnToTarget();
                 } else {
-                    this.goTo(this.ctx.shopHasRun ? GameStage.BUILD : GameStage.RUN);
+                    this.goTo(
+                        this.ctx.shopHasRun ? GameStage.BUILD : GameStage.RUN,
+                    );
                 }
                 return;
             }
             // "← Back" button
             const backX = 30 + 10;
-            if (mx >= backX && mx <= backX + btnW && my >= by && my <= by + btnH) {
+            if (
+                mx >= backX &&
+                mx <= backX + btnW &&
+                my >= by &&
+                my <= by + btnH
+            ) {
                 this._page = 0;
                 return;
             }
@@ -110,7 +117,9 @@ export class TutorialState extends State {
                 if (this._returnStage) {
                     this._returnToTarget();
                 } else {
-                    this.goTo(this.ctx.shopHasRun ? GameStage.BUILD : GameStage.RUN);
+                    this.goTo(
+                        this.ctx.shopHasRun ? GameStage.BUILD : GameStage.RUN,
+                    );
                 }
             }
         } else if (p.keyCode === p.ESCAPE) {
@@ -145,27 +154,37 @@ export class TutorialState extends State {
         // Two player columns
         const col1X = panX + 30;
         const col2X = panX + panW / 2 + 15;
-        const colW  = panW / 2 - 45;
+        const colW = panW / 2 - 45;
         const startY = panY + 56;
 
-        this._drawPlayerColumn(p, col1X, startY, colW, 1,
+        this._drawPlayerColumn(
+            p,
+            col1X,
+            startY,
+            colW,
+            1,
             'P1 — WASD',
             [90, 170, 255],
             [
-                { keys: ['A', 'D'],        desc: 'Move left / right' },
-                { keys: ['W'],             desc: 'Jump' },
-                { keys: ['W', 'W'],        desc: 'Double jump ✦', highlight: true },
-            ]
+                { keys: ['A', 'D'], desc: 'Move left / right' },
+                { keys: ['W'], desc: 'Jump' },
+                { keys: ['W', 'W'], desc: 'Double jump ✦', highlight: true },
+            ],
         );
 
-        this._drawPlayerColumn(p, col2X, startY, colW, 2,
+        this._drawPlayerColumn(
+            p,
+            col2X,
+            startY,
+            colW,
+            2,
             'P2 — Arrow Keys',
             [255, 200, 80],
             [
-                { keys: ['←', '→'],        desc: 'Move left / right' },
-                { keys: ['↑'],             desc: 'Jump' },
-                { keys: ['↑', '↑'],        desc: 'Double jump ✦', highlight: true },
-            ]
+                { keys: ['←', '→'], desc: 'Move left / right' },
+                { keys: ['↑'], desc: 'Jump' },
+                { keys: ['↑', '↑'], desc: 'Double jump ✦', highlight: true },
+            ],
         );
 
         // Double jump callout box
@@ -192,13 +211,27 @@ export class TutorialState extends State {
         );
 
         // Navigation button
-        this._drawNavButton(p, gameWidth, gameHeight, panX, panW, 'Next  →', [80, 140, 80], mx, my);
+        this._drawNavButton(
+            p,
+            gameWidth,
+            gameHeight,
+            panX,
+            panW,
+            'Next  →',
+            [80, 140, 80],
+            mx,
+            my,
+        );
 
         // Skip hint
         p.fill(60, 70, 100);
         p.textAlign(p.CENTER, p.BOTTOM);
         p.textSize(5.4);
-        p.text('ESC to go back to map menu  ·  SPACE or ENTER to advance', panX + panW / 2, panY + panH - 8);
+        p.text(
+            'ESC to go back to map menu  ·  SPACE or ENTER to advance',
+            panX + panW / 2,
+            panY + panH - 8,
+        );
     }
 
     _renderFlowPage(p, panX, panY, panW, panH, mx, my) {
@@ -222,15 +255,16 @@ export class TutorialState extends State {
         p.text('2 / 2', cx, panY + 42);
 
         // ── 2×2 card grid ─────────────────────────────────────────────────
-        const gridX  = panX + 20;
-        const gridY  = panY + 54;
-        const gap    = 12;
-        const cardW  = (panW - 40 - gap) / 2;
-        const cardH  = (panH - 54 - 42 - gap) / 2; // 42 = buttons+hint area
+        const gridX = panX + 20;
+        const gridY = panY + 54;
+        const gap = 12;
+        const cardW = (panW - 40 - gap) / 2;
+        const cardH = (panH - 54 - 42 - gap) / 2; // 42 = buttons+hint area
 
         const phases = [
             {
-                icon: '🎭', label: 'The Characters',
+                icon: '🎭',
+                label: 'The Characters',
                 colour: [180, 140, 255],
                 lines: [
                     'Each player picks a character in turn.',
@@ -239,7 +273,8 @@ export class TutorialState extends State {
                 ],
             },
             {
-                icon: '🔨', label: 'Trap Settings',
+                icon: '🔨',
+                label: 'Trap Settings',
                 colour: [255, 200, 80],
                 lines: [
                     'P1 places traps first, then P2.',
@@ -249,7 +284,8 @@ export class TutorialState extends State {
                 ],
             },
             {
-                icon: '🏃', label: 'The Race',
+                icon: '🏃',
+                label: 'The Race',
                 colour: [100, 220, 120],
                 lines: [
                     'Race to the GOAL before time runs out.',
@@ -260,7 +296,8 @@ export class TutorialState extends State {
                 ],
             },
             {
-                icon: '🛒', label: 'Powerup Shop',
+                icon: '🛒',
+                label: 'Powerup Shop',
                 colour: [80, 190, 255],
                 lines: [
                     'Spend gold to buy obstacle tokens.',
@@ -272,10 +309,10 @@ export class TutorialState extends State {
         ];
 
         phases.forEach((ph, i) => {
-            const col  = i % 2;
-            const row  = Math.floor(i / 2);
-            const cx2  = gridX + col * (cardW + gap);
-            const cy2  = gridY + row * (cardH + gap);
+            const col = i % 2;
+            const row = Math.floor(i / 2);
+            const cx2 = gridX + col * (cardW + gap);
+            const cy2 = gridY + row * (cardH + gap);
 
             // Card background
             p.noStroke();
@@ -309,7 +346,7 @@ export class TutorialState extends State {
 
             // Bullet lines
             let ly = cy2 + 38;
-            ph.lines.forEach(line => {
+            ph.lines.forEach((line) => {
                 p.fill(185, 198, 220);
                 p.textAlign(p.LEFT, p.TOP);
                 p.textSize(5.2);
@@ -319,14 +356,39 @@ export class TutorialState extends State {
         });
 
         // Navigation buttons
-        this._drawNavButton(p, gameWidth, gameHeight, panX, panW, '← Back', [60, 70, 110], mx, my, true);
+        this._drawNavButton(
+            p,
+            gameWidth,
+            gameHeight,
+            panX,
+            panW,
+            '← Back',
+            [60, 70, 110],
+            mx,
+            my,
+            true,
+        );
         const playLabel = this._returnStage ? '← Back to Game' : 'Play  →';
-        this._drawNavButton(p, gameWidth, gameHeight, panX, panW, playLabel, [60, 130, 70], mx, my);
+        this._drawNavButton(
+            p,
+            gameWidth,
+            gameHeight,
+            panX,
+            panW,
+            playLabel,
+            [60, 130, 70],
+            mx,
+            my,
+        );
 
         p.fill(60, 70, 100);
         p.textAlign(p.CENTER, p.BOTTOM);
         p.textSize(5.4);
-        p.text('ESC to go back to map menu  ·  SPACE or ENTER to start', panX + panW / 2, panY + panH - 8);
+        p.text(
+            'ESC to go back to map menu  ·  SPACE or ENTER to start',
+            panX + panW / 2,
+            panY + panH - 8,
+        );
     }
 
     _drawPlayerColumn(p, x, y, w, playerNo, title, colour, bindings) {
@@ -351,7 +413,7 @@ export class TutorialState extends State {
 
         // Bindings
         let ky = y + 40;
-        bindings.forEach(b => {
+        bindings.forEach((b) => {
             // Key badges
             let kx = x + 14;
             b.keys.forEach((k, i) => {
@@ -388,16 +450,26 @@ export class TutorialState extends State {
         });
     }
 
-    _drawNavButton(p, gameWidth, gameHeight, panX, panW, label, colour, mx, my, isBack = false) {
-        const btnW = 140, btnH = 32;
-        const by   = gameHeight - 20 - btnH - 8;
-        const bx   = isBack
-            ? panX + 10
-            : gameWidth - 30 - btnW - 10;
+    _drawNavButton(
+        p,
+        gameWidth,
+        gameHeight,
+        panX,
+        panW,
+        label,
+        colour,
+        mx,
+        my,
+        isBack = false,
+    ) {
+        const btnW = 140,
+            btnH = 32;
+        const by = gameHeight - 20 - btnH - 8;
+        const bx = isBack ? panX + 10 : gameWidth - 30 - btnW - 10;
 
         const hov = mx >= bx && mx <= bx + btnW && my >= by && my <= by + btnH;
         p.noStroke();
-        p.fill(hov ? colour.map(c => Math.min(255, c + 30)) : colour);
+        p.fill(hov ? colour.map((c) => Math.min(255, c + 30)) : colour);
         p.rect(bx, by, btnW, btnH, 6);
         p.fill(240, 245, 255);
         p.textAlign(p.CENTER, p.CENTER);

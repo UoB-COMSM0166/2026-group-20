@@ -24,6 +24,6 @@ export const ObstacleType = Object.freeze({
     ICE_BLOCK: 'ICE_BLOCK', // applies sliding physics to nearby players
     WIND_ZONE: 'WIND_ZONE', // pushes players in a set direction
     TELEPORTER: 'TELEPORTER', // warps player to linked partner
-    BOMB: 'BOMB',           // terrain-destroying explosive
-    SHADOW: 'SHADOW',       // replays the last few seconds of a player's movement
+    BOMB: 'BOMB', // terrain-destroying explosive
+    SHADOW: 'SHADOW', // replays the last few seconds of a player's movement
 });

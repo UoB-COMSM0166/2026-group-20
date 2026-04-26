@@ -15,7 +15,12 @@ export class GameOverScreen {
                 wallet: scoreManager.getWallet(player),
                 roundRank: scoreManager.getScore(player)?.rank ?? 999,
             }))
-            .sort((a, b) => b.wallet - a.wallet || a.roundRank - b.roundRank || a.player.playerNo - b.player.playerNo);
+            .sort(
+                (a, b) =>
+                    b.wallet - a.wallet ||
+                    a.roundRank - b.roundRank ||
+                    a.player.playerNo - b.player.playerNo,
+            );
 
         const winner = standings[0]?.player ?? null;
 
@@ -41,11 +46,7 @@ export class GameOverScreen {
 
         p.fill(170, 180, 210);
         p.textSize(6);
-        p.text(
-            `After ${scoreManager.maxRounds} rounds`,
-            gw / 2,
-            panelY + 42,
-        );
+        p.text(`After ${scoreManager.maxRounds} rounds`, gw / 2, panelY + 42);
 
         if (winner) {
             p.fill(255, 215, 90);
@@ -92,10 +93,18 @@ export class GameOverScreen {
             p.textAlign(p.CENTER, p.TOP);
             p.textSize(6.3);
             p.fill(idx === 0 ? [255, 215, 0] : [210, 214, 232]);
-            p.text(idx === 0 ? '1ST' : idx === 1 ? '2ND' : `${idx + 1}TH`, cols.rank, y);
+            p.text(
+                idx === 0 ? '1ST' : idx === 1 ? '2ND' : `${idx + 1}TH`,
+                cols.rank,
+                y,
+            );
 
             p.fill(...tint);
-            p.text(player.nickname ?? `Player ${player.playerNo + 1}`, cols.player, y);
+            p.text(
+                player.nickname ?? `Player ${player.playerNo + 1}`,
+                cols.player,
+                y,
+            );
 
             p.fill(110, 220, 180);
             p.text(String(entry.wallet), cols.wallet, y);

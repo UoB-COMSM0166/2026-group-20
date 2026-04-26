@@ -753,8 +753,8 @@ export class BuildState extends State {
 
         BuildState.PALETTE.forEach((item, i) => {
             const row = Math.floor(i / ROW_SZ);
-            const col_i = i % ROW_SZ;
-            const bx = startX + col_i * (btnW + btnGap);
+            const column = i % ROW_SZ;
+            const bx = startX + column * (btnW + btnGap);
             const by = row === 0 ? row0Y : row1Y;
 
             const hovered =
@@ -1102,8 +1102,8 @@ export class BuildState extends State {
         // Obstacle palette buttons
         BuildState.PALETTE.forEach((item, i) => {
             const row = Math.floor(i / ROW_SZ);
-            const col_i = i % ROW_SZ;
-            const bx = startX + col_i * (btnW + btnGap);
+            const column = i % ROW_SZ;
+            const bx = startX + column * (btnW + btnGap);
             const by = row === 0 ? row0Y : row1Y;
 
             if (mx >= bx && mx <= bx + btnW && my >= by && my <= by + btnH) {
@@ -1200,6 +1200,8 @@ export class BuildState extends State {
      *   - the bomb tile itself must be empty
      *   - the tile directly below must be solid ground
      *   - the tile above must also be empty, so the bomb is not tucked into terrain
+     * @param bombX
+     * @param bombY
      */
     _canPlaceBomb(bombX, bombY) {
         const { tiledMap } = this.ctx;

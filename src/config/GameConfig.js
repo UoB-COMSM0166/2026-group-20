@@ -91,9 +91,9 @@ export const GameConfig = {
     },
     SHADOW_RECORD_MS: 5000,
     SHADOW_COOLDOWN_MS: 5000,
-    BOMB_FUSE_MS: 2000,   // ms before bomb explodes after trigger
-    BOMB_RADIUS: 1,       // tile radius of explosion (destroys tiles + obstacles)
-    BOMB_MAX_DEPTH: 1,    // extra tiles below the surface that a bomb can carve out
+    BOMB_FUSE_MS: 2000, // ms before bomb explodes after trigger
+    BOMB_RADIUS: 1, // tile radius of explosion (destroys tiles + obstacles)
+    BOMB_MAX_DEPTH: 1, // extra tiles below the surface that a bomb can carve out
     BOMB_TRIGGER_RADIUS: 1.5, // tile distance to trigger fuse
 
     // MovingPlatform
@@ -118,8 +118,8 @@ export const GameConfig = {
     TELEPORTER_COOLDOWN_MS: 1200, // ms before same player can teleport again
 
     // Developer Mode settings
-    DEV_MODE_UNLIMITED_TIME: true,      // disables time limit
-    DEV_MODE_INSTANT_KILL: true,        // K key to kill current player
-    DEV_MODE_TELEPORT_TO_END: true,     // E key to teleport to finish line
-    DEV_MODE_FREEZE_TIME: true,         // T key to freeze/unfreeze time
+    DEV_MODE_UNLIMITED_TIME: true, // disables time limit
+    DEV_MODE_INSTANT_KILL: true, // K key to kill current player
+    DEV_MODE_TELEPORT_TO_END: true, // E key to teleport to finish line
+    DEV_MODE_FREEZE_TIME: true, // T key to freeze/unfreeze time
 };

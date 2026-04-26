@@ -15,6 +15,7 @@ import { getPixelatedSprite } from './PixelSprite.js';
  * Frame advance rate: every call advances the frame index by 1. At ~60 fps
  * the animation plays at the p5 frame rate. The sprite branch animates on
  * every draw call, so we preserve that behaviour exactly.
+ * @param player
  */
 export function DrawPlayer(player) {
     if (!player.isVisible) return;
@@ -71,7 +72,6 @@ export function DrawPlayer(player) {
 /**
  * Draw a single sprite frame, handling horizontal flip for left-facing.
  * Advances the frame index on every call.
- *
  * @param {Player}   player
  * @param {p5}       p
  * @param {number[]} frames      - array of frame indices into framesArr

@@ -166,7 +166,13 @@ export class Player {
      */
 
     //move
-    update(allPlayers, respawnManager, obstacles = [], MAP, worldHeight = GameConfig.GAME_HEIGHT) {
+    update(
+        allPlayers,
+        respawnManager,
+        obstacles = [],
+        MAP,
+        worldHeight = GameConfig.GAME_HEIGHT,
+    ) {
         if (this.lifeState !== PlayerState.ALIVE) {
             return;
         }

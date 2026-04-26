@@ -176,6 +176,8 @@ export class ScoreManager {
     /**
      * Reset round state. Wallet persists; PlayerScore records are fresh.
      * Call at the start of each new round.
+     * @param root0
+     * @param root0.advanceRound
      */
     resetRound({ advanceRound = true } = {}) {
         if (advanceRound) {

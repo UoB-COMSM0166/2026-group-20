@@ -21,7 +21,10 @@ export class TiledMapLoader {
         this.p = p;
         this.jsonPath = jsonPath;
         this.tilesetPath = tilesetPath;
-        this.baseDir = this.jsonPath.slice(0, this.jsonPath.lastIndexOf('/') + 1);
+        this.baseDir = this.jsonPath.slice(
+            0,
+            this.jsonPath.lastIndexOf('/') + 1,
+        );
 
         this.mapData = null;
         this.tilesetImage = null;
@@ -71,8 +74,12 @@ export class TiledMapLoader {
         for (const layer of this.mapData.layers || []) {
             if (layer.type !== 'imagelayer' || !layer.image) continue;
 
-            const candidatePaths = this._getImageLayerCandidatePaths(layer.image);
-            const candidates = candidatePaths.map((path) => this.p.loadImage(path));
+            const candidatePaths = this._getImageLayerCandidatePaths(
+                layer.image,
+            );
+            const candidates = candidatePaths.map((path) =>
+                this.p.loadImage(path),
+            );
             this.imageLayerAssets.set(layer.id, candidates);
         }
     }
@@ -134,12 +141,19 @@ export class TiledMapLoader {
 
                         // Render from tileset-local index (not global gid index).
                         const srcX = (gidInfo.localId % tilesetCols) * tileW;
-                        const srcY = p.floor(gidInfo.localId / tilesetCols) * tileH;
+                        const srcY =
+                            p.floor(gidInfo.localId / tilesetCols) * tileH;
 
                         p.image(
                             tilesetImage,
-                            destX, destY, tileW, tileH,
-                            srcX, srcY, tileW, tileH,
+                            destX,
+                            destY,
+                            tileW,
+                            tileH,
+                            srcX,
+                            srcY,
+                            tileW,
+                            tileH,
                         );
                     }
                 }
@@ -248,14 +262,7 @@ export class TiledMapLoader {
 
         p.noStroke();
         p.fill(130, 255, 220, 235);
-        p.triangle(
-            cx,
-            markerY,
-            cx - 9,
-            markerY + 13,
-            cx + 9,
-            markerY + 13,
-        );
+        p.triangle(cx, markerY, cx - 9, markerY + 13, cx + 9, markerY + 13);
 
         p.fill(18, 24, 38, 235);
         p.stroke(120, 255, 210, 220);
@@ -278,13 +285,17 @@ export class TiledMapLoader {
     /**
      * Returns the tile character at grid position (tx, ty).
      * Out-of-bounds tiles are treated as solid walls.
-     *
      * @param {number} tx
      * @param {number} ty
      * @returns {string}
      */
     getTile(tx, ty) {
-        if (ty < 0 || ty >= this.MAP.length || tx < 0 || tx >= this.MAP[0].length) {
+        if (
+            ty < 0 ||
+            ty >= this.MAP.length ||
+            tx < 0 ||
+            tx >= this.MAP[0].length
+        ) {
             return TileType.SOLID;
         }
         return this.MAP[ty][tx];
@@ -312,7 +323,6 @@ export class TiledMapLoader {
      * Returns true when a visible map tile occupies this cell, even if the
      * collision layer forgot to mark it solid. Used by BuildState so players
      * cannot place obstacles inside the map's drawn terrain.
-     *
      * @param {number} tx
      * @param {number} ty
      * @returns {boolean}
@@ -332,35 +342,37 @@ export class TiledMapLoader {
     /**
      * Returns coin entities parsed from object layers.
      * Objects named 'coin' are treated as coin spawn points.
-     *
      * @returns {Coin[]}
      */
     /**
      * Returns coin entities from the map's object layer.
      * If a placed obstacle occupies a coin's tile, that coin is relocated
      * to a random free EMPTY tile so the total count never changes.
-     *
-     * @param {object[]} [placedObstacles=[]]
+     * @param {object[]} [placedObstacles]
      * @returns {Coin[]}
      */
     getCoins(placedObstacles = []) {
-        const T    = GameConfig.TILE;
-        const MAP  = this.MAP;
+        const T = GameConfig.TILE;
+        const MAP = this.MAP;
         const cols = MAP[0]?.length ?? 0;
         const rows = MAP.length;
 
         // Build occupied set from placed obstacles
         const occupiedKeys = new Set(
-            placedObstacles.map(obs => `${Math.round(obs.x / T)},${Math.round(obs.y / T)}`)
+            placedObstacles.map(
+                (obs) => `${Math.round(obs.x / T)},${Math.round(obs.y / T)}`,
+            ),
         );
 
         // Candidate relocation tiles: EMPTY with solid directly below
         const candidates = [];
         for (let ty = 0; ty < rows - 1; ty++) {
             for (let tx = 0; tx < cols; tx++) {
-                if (MAP[ty][tx] === TileType.EMPTY &&
+                if (
+                    MAP[ty][tx] === TileType.EMPTY &&
                     MAP[ty + 1][tx] === TileType.SOLID &&
-                    !occupiedKeys.has(`${tx},${ty}`)) {
+                    !occupiedKeys.has(`${tx},${ty}`)
+                ) {
                     candidates.push({ tx, ty });
                 }
             }
@@ -393,7 +405,10 @@ export class TiledMapLoader {
                     }
                     // else: stay in place — count always preserved
                 }
-                const visualOffsetX = this._coinHorizontalOffset(coinTx, coinTy);
+                const visualOffsetX = this._coinHorizontalOffset(
+                    coinTx,
+                    coinTy,
+                );
 
                 coins.push(
                     new Coin(
@@ -454,9 +469,8 @@ export class TiledMapLoader {
         const { mapData } = this;
         const cols = mapData.width;
         const rows = mapData.height;
-        this.visualBlockMap = Array.from(
-            { length: rows },
-            () => Array(cols).fill(false),
+        this.visualBlockMap = Array.from({ length: rows }, () =>
+            Array(cols).fill(false),
         );
 
         for (const layer of mapData.layers) {
@@ -481,7 +495,6 @@ export class TiledMapLoader {
 
     /**
      * Public helper for systems that want gid conversion info.
-     *
      * @param {number} gid
      * @returns {{
      *   rawGid:number,
@@ -502,7 +515,6 @@ export class TiledMapLoader {
 
     /**
      * Convenience helper when only local id is needed.
-     *
      * @param {number} gid
      * @returns {number}
      */
@@ -638,8 +650,12 @@ export class TiledMapLoader {
                     this.endH = obj.height;
                     const startCol = p.floor(obj.x / mapData.tilewidth);
                     const startRow = p.floor(obj.y / mapData.tileheight);
-                    const endCol = p.floor((obj.x + obj.width) / mapData.tilewidth);
-                    const endRow = p.floor((obj.y + obj.height) / mapData.tileheight);
+                    const endCol = p.floor(
+                        (obj.x + obj.width) / mapData.tilewidth,
+                    );
+                    const endRow = p.floor(
+                        (obj.y + obj.height) / mapData.tileheight,
+                    );
 
                     for (let r = startRow; r <= endRow; r++) {
                         for (let c = startCol; c <= endCol; c++) {

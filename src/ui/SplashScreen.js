@@ -13,6 +13,10 @@ export class SplashScreen {
      * @description creates splash screen
      * @param {p5} p - The p5 instance
      * @param {string} stage - Current game stage
+     * @param gameWidth
+     * @param gameHeight
+     * @param bgImage
+     * @param menuFont
      */
     constructor(p, gameWidth, gameHeight, bgImage = null, menuFont = null) {
         this.gameWidth = gameWidth;
@@ -102,6 +106,11 @@ export class SplashScreen {
      * @param {p5} p - The p5 instance
      * @param {number} mx - Mouse X position
      * @param {number} my - Mouse Y position
+     * @param showSettings
+     * @param displayMode
+     * @param aiMapFlag
+     * @param apiKey
+     * @param apiKeyFocused
      */
     render(
         p,

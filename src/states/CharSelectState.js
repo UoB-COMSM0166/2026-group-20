@@ -433,6 +433,12 @@ export class CharSelectState extends State {
     /**
      * Draw an animated sprite preview centred in a card.
      * Uses the idle animation frames, cycling via _animTick.
+     * @param p
+     * @param char
+     * @param spriteSheet
+     * @param cx
+     * @param cardY
+     * @param dimmed
      * @private
      */
     _drawCardSprite(p, char, spriteSheet, cx, cardY, dimmed) {

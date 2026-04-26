@@ -214,6 +214,10 @@ export class AudioManager {
 
     /**
      * Play a short ascending chord (victory / finish sound).
+     * @param ac
+     * @param t
+     * @param freqs
+     * @param vol
      * @private
      */
     _chord(ac, t, freqs, vol) {

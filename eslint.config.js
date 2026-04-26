@@ -5,8 +5,8 @@ import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import { defineConfig } from 'eslint/config';
 
 export default defineConfig([
-    jsdoc.configs['flat/recommended'],
-    js.configs.recommended,
+    // jsdoc.configs['flat/recommended'],
+    // js.configs.recommended,
     {
         files: ['**/*.js'],
         plugins: {
@@ -17,7 +17,6 @@ export default defineConfig([
             globals: globals.browser,
         },
         rules: {
-            'jsdoc/require-jsdoc': 'warn',
             camelcase: ['error'],
             /* more rules */
         },

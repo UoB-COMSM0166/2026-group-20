@@ -81,7 +81,11 @@ export class Scoreboard {
 
         ranked.forEach((score, i) => {
             const rowY = firstRowY + i * rowH;
-            const col = this.playerColours[score.playerNo] ?? { r: 200, g: 200, b: 200 };
+            const col = this.playerColours[score.playerNo] ?? {
+                r: 200,
+                g: 200,
+                b: 200,
+            };
             const isTop = i === 0 && score.finished;
 
             if (isTop) {
@@ -99,12 +103,24 @@ export class Scoreboard {
             p.text(`P${score.playerNo + 1}`, cols.player, rowY + 1);
 
             p.fill(score.finished ? 100 : 220, score.finished ? 220 : 80, 100);
-            p.text(score.finished ? 'FINISHED' : 'FAILED', cols.status, rowY + 1);
+            p.text(
+                score.finished ? 'FINISHED' : 'FAILED',
+                cols.status,
+                rowY + 1,
+            );
 
             p.fill(200, 200, 220);
-            p.text(this._fitText(score.finishTimeFormatted, 9), cols.time, rowY + 1);
+            p.text(
+                this._fitText(score.finishTimeFormatted, 9),
+                cols.time,
+                rowY + 1,
+            );
 
-            p.fill(score.deaths > 0 ? 255 : 180, score.deaths > 0 ? 130 : 180, score.deaths > 0 ? 130 : 200);
+            p.fill(
+                score.deaths > 0 ? 255 : 180,
+                score.deaths > 0 ? 130 : 180,
+                score.deaths > 0 ? 130 : 200,
+            );
             p.text(String(score.deaths), cols.deaths, rowY + 1);
 
             p.fill(255, 215, 0);
@@ -116,7 +132,12 @@ export class Scoreboard {
             if (i < ranked.length - 1) {
                 p.stroke(40, 40, 60);
                 p.strokeWeight(1);
-                p.line(panelX + 16, rowY + rowH - 5, panelX + panelW - 16, rowY + rowH - 5);
+                p.line(
+                    panelX + 16,
+                    rowY + rowH - 5,
+                    panelX + panelW - 16,
+                    rowY + rowH - 5,
+                );
                 p.noStroke();
             }
         });
@@ -136,7 +157,9 @@ export class Scoreboard {
 
     _fitText(text, maxChars) {
         const safe = String(text ?? '');
-        return safe.length <= maxChars ? safe : `${safe.slice(0, maxChars - 1)}…`;
+        return safe.length <= maxChars
+            ? safe
+            : `${safe.slice(0, maxChars - 1)}…`;
     }
 
     _colPositions(panelX, panelW) {

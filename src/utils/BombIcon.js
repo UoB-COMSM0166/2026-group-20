@@ -1,3 +1,11 @@
+/**
+ *
+ * @param p
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ */
 export function drawBombIcon(p, x, y, w, h) {
     const size = Math.min(w, h) - 3;
     const cx = x + w / 2;

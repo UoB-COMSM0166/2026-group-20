@@ -16,8 +16,16 @@ export class Coin {
      * @param {number} y - World y position (pixels, top-left of bounding box)
      * @param {number} value - How many coins this pickup is worth (default 1)
      * @param {p5.Image|null} spriteImage - Optional animated coin spritesheet
+     * @param visualOffsetX
      */
-    constructor(p, x, y, value = GameConfig.COIN_VALUE, spriteImage = null, visualOffsetX = 0) {
+    constructor(
+        p,
+        x,
+        y,
+        value = GameConfig.COIN_VALUE,
+        spriteImage = null,
+        visualOffsetX = 0,
+    ) {
         this.p = p;
         this.x = x;
         this.y = y;

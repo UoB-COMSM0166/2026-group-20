@@ -68,6 +68,9 @@ let ALL_SHOP_ITEMS = Object.entries(GameConfig.SHOP_PRICES).map(
 // Active items shown this round (random subset of 8)
 let SHOP_ITEMS = ALL_SHOP_ITEMS;
 
+/**
+ *
+ */
 function shuffleShopItems() {
     const shuffled = [...ALL_SHOP_ITEMS].sort(() => Math.random() - 0.5);
     SHOP_ITEMS = shuffled.slice(0, Math.min(8, shuffled.length));
@@ -187,10 +190,10 @@ export class ShopState extends State {
         // Item cards
         for (let i = 0; i < SHOP_ITEMS.length; i++) {
             const item = SHOP_ITEMS[i];
-            const col_i = i % GRID_COLS;
-            const row_i = Math.floor(i / GRID_COLS);
-            const rx = gridX + col_i * (CARD_W + CARD_GAP_X);
-            const ry = gridY + row_i * (CARD_H + CARD_GAP_Y);
+            const column = i % GRID_COLS;
+            const row = Math.floor(i / GRID_COLS);
+            const rx = gridX + column * (CARD_W + CARD_GAP_X);
+            const ry = gridY + row * (CARD_H + CARD_GAP_Y);
             const canAfford = wallet >= item.price;
             const iconRect = { x: rx + 12, y: ry + 18, w: 56, h: 56 };
             const buyRect = {
@@ -367,10 +370,10 @@ export class ShopState extends State {
         // Buy button clicks
         for (let i = 0; i < SHOP_ITEMS.length; i++) {
             const item = SHOP_ITEMS[i];
-            const col_i = i % GRID_COLS;
-            const row_i = Math.floor(i / GRID_COLS);
-            const rx = gridX + col_i * (CARD_W + CARD_GAP_X);
-            const ry = gridY + row_i * (CARD_H + CARD_GAP_Y);
+            const column = i % GRID_COLS;
+            const row = Math.floor(i / GRID_COLS);
+            const rx = gridX + column * (CARD_W + CARD_GAP_X);
+            const ry = gridY + row * (CARD_H + CARD_GAP_Y);
             const btnRect = {
                 x: rx + CARD_W - 70,
                 y: ry + CARD_H - 28,

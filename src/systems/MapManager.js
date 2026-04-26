@@ -81,7 +81,9 @@ export class MapManager {
         this._preloadBackgrounds();
 
         const baseUrl = import.meta.env.BASE_URL;
-        this._coinSprite = this.p.loadImage(`${baseUrl}src/assets/obstacles/Coin/coin.png`);
+        this._coinSprite = this.p.loadImage(
+            `${baseUrl}src/assets/obstacles/Coin/coin.png`,
+        );
         this._endPointSprite = this.p.loadImage(
             `${baseUrl}src/assets/obstacles/endpoint/Checkpoint(FlagIdle)(64x64).png`,
         );
@@ -94,17 +96,20 @@ export class MapManager {
 
     _preloadChunkPool() {
         const baseUrl = import.meta.env.BASE_URL;
-        this.p.loadJSON(`${baseUrl}src/assets/maps/chunks/index.json`, (manifest) => {
-            if (!manifest?.files) return;
-            for (const filename of manifest.files) {
-                const base = filename.replace(/\.json$/, '');
-                const key = base.split('_').slice(0, 3).join('_');
-                if (!this._chunkPool.has(key)) {
-                    this._chunkPool.set(key, []);
+        this.p.loadJSON(
+            `${baseUrl}src/assets/maps/chunks/index.json`,
+            (manifest) => {
+                if (!manifest?.files) return;
+                for (const filename of manifest.files) {
+                    const base = filename.replace(/\.json$/, '');
+                    const key = base.split('_').slice(0, 3).join('_');
+                    if (!this._chunkPool.has(key)) {
+                        this._chunkPool.set(key, []);
+                    }
+                    this._chunkPool.get(key).push({ _filename: filename });
                 }
-                this._chunkPool.get(key).push({ _filename: filename });
-            }
-        });
+            },
+        );
     }
 
     _preloadBackgrounds() {
@@ -131,7 +136,8 @@ export class MapManager {
 
         this._preloadPromise = (async () => {
             try {
-                this.preloadedAIMap = await this.aiGenerator.generateMap(apiKey);
+                this.preloadedAIMap =
+                    await this.aiGenerator.generateMap(apiKey);
             } catch (e) {
                 console.error('AI Map Preload failed:', e);
             } finally {
@@ -184,7 +190,6 @@ export class MapManager {
                 this._applyAIMapResult(aiResult, mapKey, ctx);
                 return;
             }
-
         }
         const theme = MapManager.THEME_MAP[mapKey];
         if (!theme) return;
@@ -266,7 +271,8 @@ export class MapManager {
 
         let selectedChunks = [];
         let signature = '';
-        const previousSignature = this._lastGeneratedSignature.get(mapKey) ?? null;
+        const previousSignature =
+            this._lastGeneratedSignature.get(mapKey) ?? null;
         for (let attempt = 0; attempt < 6; attempt++) {
             const candidate = [];
             for (let i = 0; i < total; i++) {
@@ -287,7 +293,10 @@ export class MapManager {
                 .join('|');
             selectedChunks = candidate;
             signature = candidateSignature;
-            if (!previousSignature || candidateSignature !== previousSignature) {
+            if (
+                !previousSignature ||
+                candidateSignature !== previousSignature
+            ) {
                 break;
             }
         }
@@ -297,7 +306,8 @@ export class MapManager {
         const mergedData = gen.mergeGrid();
         const collisionMap = gen.buildCollisionMap();
         const firstChunk = gen.selectedChunks[0];
-        if (!firstChunk || collisionMap.length === 0 || !collisionMap[0]) return;
+        if (!firstChunk || collisionMap.length === 0 || !collisionMap[0])
+            return;
 
         const chunkW = firstChunk.width;
         const chunkH = firstChunk.height;
@@ -354,9 +364,8 @@ export class MapManager {
 
         const coinSprite = this._coinSprite;
         const endpointSprite = this._endPointSprite;
-        const visualBlockMap = Array.from(
-            { length: mergedData.height },
-            () => Array(mergedData.width).fill(false),
+        const visualBlockMap = Array.from({ length: mergedData.height }, () =>
+            Array(mergedData.width).fill(false),
         );
         if (tileLayer?.data) {
             for (let i = 0; i < tileLayer.data.length; i++) {
@@ -435,7 +444,10 @@ export class MapManager {
                 if (!endPoint || !flagSprite) return;
                 const frameW = 64;
                 const frameH = 64;
-                const frames = Math.max(1, Math.floor(flagSprite.width / frameW));
+                const frames = Math.max(
+                    1,
+                    Math.floor(flagSprite.width / frameW),
+                );
                 const frameIdx = Math.floor(p.frameCount / 8) % frames;
                 const endW = endPoint.w || tileW;
                 const endH = endPoint.h || tileH;
@@ -445,7 +457,8 @@ export class MapManager {
                 const glowCx = drawX + frameW / 2;
                 const glowCy = drawY + frameH * 0.56;
                 const baseY = drawY + frameH - 6;
-                const markerY = drawY - 16 + Math.sin(p.frameCount * 0.14) * 2.5;
+                const markerY =
+                    drawY - 16 + Math.sin(p.frameCount * 0.14) * 2.5;
 
                 p.push();
                 p.noStroke();
@@ -505,7 +518,8 @@ export class MapManager {
                 const cx = startPoint.x + T / 2;
                 const cy = startPoint.y + T / 2;
                 const pulse = 0.72 + 0.28 * Math.sin(p.frameCount * 0.08);
-                const markerY = startPoint.y - 10 + Math.sin(p.frameCount * 0.14) * 2.5;
+                const markerY =
+                    startPoint.y - 10 + Math.sin(p.frameCount * 0.14) * 2.5;
 
                 p.push();
                 p.noStroke();
@@ -554,22 +568,18 @@ export class MapManager {
                 p.pop();
             },
             getCoins() {
-                return coinDefs.map(
-                    (coin) => {
-                        const tx = Math.floor((coin.x + tileW * 0.25) / tileW);
-                        const ty = Math.floor((coin.y + tileH * 0.25) / tileH);
-                        return (
-                        new Coin(
-                            p,
-                            coin.x,
-                            coin.y,
-                            GameConfig.COIN_VALUE,
-                            coinSprite,
-                            coinHorizontalOffset(tx, ty),
-                        )
+                return coinDefs.map((coin) => {
+                    const tx = Math.floor((coin.x + tileW * 0.25) / tileW);
+                    const ty = Math.floor((coin.y + tileH * 0.25) / tileH);
+                    return new Coin(
+                        p,
+                        coin.x,
+                        coin.y,
+                        GameConfig.COIN_VALUE,
+                        coinSprite,
+                        coinHorizontalOffset(tx, ty),
                     );
-                    },
-                );
+                });
             },
         };
 
@@ -622,12 +632,11 @@ export class MapManager {
             collisionMap[sr][sc] = TileType.ENDPOINT;
         }
 
-        const visualBlockMap = Array.from(
-            { length: rows },
-            (_, r) => Array.from({ length: cols }, (_, c) => {
+        const visualBlockMap = Array.from({ length: rows }, (_, r) =>
+            Array.from({ length: cols }, (_, c) => {
                 const val = aiResult.map[r * cols + c];
                 return val === 2 || val === 12;
-            })
+            }),
         );
 
         const coinSprite = this._coinSprite;
@@ -652,7 +661,7 @@ export class MapManager {
         };
 
         const coinDefs = [];
-        const spawnProbability = 0.30;
+        const spawnProbability = 0.3;
         for (let i = 0; i < aiResult.map.length; i++) {
             if (aiResult.map[i] === 2) {
                 const col = i % cols;
@@ -661,7 +670,10 @@ export class MapManager {
                     const cx = col * tileW;
                     const cy = (row - 1) * tileH;
                     if (
-                        !((cx === startX && cy === startY) || (cx === endX && cy === endY))
+                        !(
+                            (cx === startX && cy === startY) ||
+                            (cx === endX && cy === endY)
+                        )
                     ) {
                         if (Math.random() < spawnProbability) {
                             coinDefs.push({ x: cx, y: cy });
@@ -685,7 +697,12 @@ export class MapManager {
             gameWidth: cols * tileW,
             gameHeight: rows * tileH,
             hasVisibleTerrain(tx, ty) {
-                if (ty < 0 || ty >= visualBlockMap.length || tx < 0 || tx >= (visualBlockMap[0]?.length ?? 0)) {
+                if (
+                    ty < 0 ||
+                    ty >= visualBlockMap.length ||
+                    tx < 0 ||
+                    tx >= (visualBlockMap[0]?.length ?? 0)
+                ) {
                     return true;
                 }
                 return visualBlockMap[ty][tx];
@@ -718,7 +735,10 @@ export class MapManager {
                 if (!flagSprite) return;
                 const frameW = 64;
                 const frameH = 64;
-                const frames = Math.max(1, Math.floor(flagSprite.width / frameW));
+                const frames = Math.max(
+                    1,
+                    Math.floor(flagSprite.width / frameW),
+                );
                 const frameIdx = Math.floor(p.frameCount / 8) % frames;
                 const drawX = endX + tileW / 2 - frameW / 2;
                 const drawY = endY + tileH - frameH;
@@ -726,7 +746,8 @@ export class MapManager {
                 const glowCx = drawX + frameW / 2;
                 const glowCy = drawY + frameH * 0.56;
                 const baseY = drawY + frameH - 6;
-                const markerY = drawY - 16 + Math.sin(p.frameCount * 0.14) * 2.5;
+                const markerY =
+                    drawY - 16 + Math.sin(p.frameCount * 0.14) * 2.5;
 
                 p.push();
                 p.noStroke();
@@ -750,7 +771,14 @@ export class MapManager {
                 p.rect(drawX - 5, drawY - 5, frameW + 10, frameH + 10, 6);
                 p.fill(255, 240, 170, 230);
                 p.noStroke();
-                p.triangle(glowCx, markerY, glowCx - 9, markerY + 13, glowCx + 9, markerY + 13);
+                p.triangle(
+                    glowCx,
+                    markerY,
+                    glowCx - 9,
+                    markerY + 13,
+                    glowCx + 9,
+                    markerY + 13,
+                );
                 p.fill(18, 24, 38, 235);
                 p.stroke(255, 245, 160, 220);
                 p.strokeWeight(1.7);
@@ -761,14 +789,25 @@ export class MapManager {
                 p.textSize(5.2);
                 p.text('GOAL', glowCx, drawY - 25.5);
                 p.pop();
-                p.image(flagSprite, drawX, drawY, frameW, frameH, frameIdx * frameW, 0, frameW, frameH);
+                p.image(
+                    flagSprite,
+                    drawX,
+                    drawY,
+                    frameW,
+                    frameH,
+                    frameIdx * frameW,
+                    0,
+                    frameW,
+                    frameH,
+                );
             },
             renderStartpoint() {
                 const T = tileW;
                 const cx = startX + T / 2;
                 const cy = startY + T / 2;
                 const pulse = 0.72 + 0.28 * Math.sin(p.frameCount * 0.08);
-                const markerY = startY - 10 + Math.sin(p.frameCount * 0.14) * 2.5;
+                const markerY =
+                    startY - 10 + Math.sin(p.frameCount * 0.14) * 2.5;
 
                 p.push();
                 p.noStroke();
@@ -788,7 +827,14 @@ export class MapManager {
                 p.rect(startX - 4, startY - 4, T + 8, T + 8, 6);
                 p.noStroke();
                 p.fill(130, 255, 220, 235);
-                p.triangle(cx, markerY, cx - 9, markerY + 13, cx + 9, markerY + 13);
+                p.triangle(
+                    cx,
+                    markerY,
+                    cx - 9,
+                    markerY + 13,
+                    cx + 9,
+                    markerY + 13,
+                );
                 p.fill(18, 24, 38, 235);
                 p.stroke(120, 255, 210, 220);
                 p.strokeWeight(1.7);
@@ -904,7 +950,15 @@ export class MapManager {
         return pool[idx] ?? null;
     }
 
-    _findObjectInMergedGrid(chunks, name, chunkW, chunkH, tileW, tileH, gridCols) {
+    _findObjectInMergedGrid(
+        chunks,
+        name,
+        chunkW,
+        chunkH,
+        tileW,
+        tileH,
+        gridCols,
+    ) {
         for (let ci = 0; ci < chunks.length; ci++) {
             const chunk = chunks[ci];
             const gridCol = ci % gridCols;
