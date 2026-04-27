@@ -110,6 +110,7 @@ export class ShopState extends State {
         this._message = '';
         this._msgTimer = 0;
         this._hoveredItem = null;
+        this._generatingMap = false;
         shuffleShopItems(); // Feature 7: random shop each round
     }
 
@@ -360,6 +361,7 @@ export class ShopState extends State {
     }
 
     mousePressed(mx, my) {
+        if (this._generatingMap) return;
         const { gameWidth, gameHeight, players, scoreManager } = this.ctx;
         const player = players[this._currentTurn];
         const panelX = 24;
@@ -407,6 +409,7 @@ export class ShopState extends State {
     }
 
     keyPressed() {
+        if (this._generatingMap) return;
         const { p } = this.ctx;
         if (p.keyCode === p.ENTER || p.keyCode === 13) {
             this._doneTurn();
@@ -442,13 +445,23 @@ export class ShopState extends State {
      * End this player's shopping turn.
      * @private
      */
-    _doneTurn() {
+    async _doneTurn() {
+        if (this._generatingMap) return;
+
         this._message = '';
-        this._currentTurn++;
-        if (this._currentTurn >= this.ctx.players.length) {
-            this.ctx.mapManager?.generateRandomMap?.(this.ctx.mapKey, this.ctx);
+        const nextTurn = this._currentTurn + 1;
+        if (nextTurn >= this.ctx.players.length) {
+            this._generatingMap = true;
+            this._showMessage('Generating next map...');
+            await this.ctx.mapManager?.generateRandomMap?.(
+                this.ctx.mapKey,
+                this.ctx,
+            );
             this.goTo(GameStage.BUILD);
+            return;
         }
+
+        this._currentTurn = nextTurn;
     }
 
     _showMessage(text) {

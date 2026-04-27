@@ -29,6 +29,7 @@ import polarSprite from './public/assets/sprites/polar_all_frames.png';
 
 import saw from './public/assets/obstacles/Saw/On (38x38).png';
 import fire from './public/assets/obstacles/Fire/On (16x32).png';
+import fireOff from './public/assets/obstacles/Fire/Off.png';
 import trampoline from './public/assets/obstacles/Trampoline/Jump (28x28).png';
 import spikedBall from './public/assets/obstacles/Spiked Ball/Spiked Ball.png';
 import cannon from './public/assets/obstacles/Cannon/cannon (30x18).png';
@@ -74,6 +75,7 @@ export const sketch = (p) => {
 
     let sawFrames;
     let fireFrames;
+    let fireOffImg;
     let trampolineBouncing;
     let spikedBallImg;
     let cannonImg;
@@ -109,6 +111,7 @@ export const sketch = (p) => {
         polarSheet = p.loadImage(polarSprite);
         sawFrames = p.loadImage(saw);
         fireFrames = p.loadImage(fire);
+        fireOffImg = p.loadImage(fireOff);
         trampolineBouncing = p.loadImage(trampoline);
         spikedBallImg = p.loadImage(spikedBall);
         cannonImg = p.loadImage(cannon);
@@ -221,6 +224,7 @@ export const sketch = (p) => {
                 goTo,
                 sawFrames,
                 fireFrames,
+                fireOffImg,
                 trampolineBouncing,
                 spikedBallImg,
                 cannonImg,

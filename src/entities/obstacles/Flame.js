@@ -17,16 +17,17 @@ import { aabbIntersects } from '../../systems/PhysicsSystem.js';
  * @extends Obstacle
  */
 export class Flame extends Obstacle {
-    constructor(p, x, y, obstacleSheet) {
+    constructor(p, x, y, obstacleSheet, offImage = null) {
         super(p, x, y);
         this._timer = 0;
         this._active = true; // starts active
         this._age = 0; // used for flicker animation
         this.obstacleSheet = obstacleSheet;
+        this.offImage = offImage;
         this.frameIndex = 0;
-        this.sawWidth = 16;
-        this.sawHeight = 32;
-        this.splitAnimation(this.sawWidth, this.sawHeight);
+        this.frameWidth = 16;
+        this.frameHeight = 32;
+        this.splitAnimation(this.frameWidth, this.frameHeight);
     }
 
     get isSolid() {
@@ -58,14 +59,18 @@ export class Flame extends Obstacle {
         const T = GameConfig.TILE;
         const cx = this.x + T / 2;
         const cy = this.y + T;
-        const frame = this.framesArr[this.frameIndex];
+        const frame = this._active
+            ? this.framesArr[this.frameIndex]
+            : this.offImage;
 
         p.push();
         p.translate(cx, cy);
         if (frame) {
             p.image(frame, -frame.width / 2, -frame.height);
         }
-        this.frameIndex = (this.frameIndex + 1) % this.framesArr.length;
+        if (this._active && this.framesArr.length > 0) {
+            this.frameIndex = (this.frameIndex + 1) % this.framesArr.length;
+        }
 
         p.pop();
     }
