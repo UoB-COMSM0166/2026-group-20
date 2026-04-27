@@ -126,7 +126,6 @@ export class AIMapGenerator {
                 //         responseJsonSchema: z.toJSONSchema(this.responseSchema),
                 //     },
                 // });
-                console.log(apiKey);
                 const response = await fetch(
                     'https://api.aimlapi.com/v1/chat/completions',
                     {
