@@ -17,12 +17,12 @@ export const GameConfig = {
     TITLE_FONTSIZE: 19,
     TITLE_X: 310,
     TITLE_Y: 200,
-    TITLE_COLOUR: { r: 200, g: 232, b: 212 },
+    TITLE_COLOUR: { r: 245, g: 140, b: 265 },
 
     PRESS_FONTSIZE: 7,
     PRESS_X: 350,
     PRESS_Y: 300,
-    PRESS_COLOUR: { r: 108, g: 176, b: 152 },
+    PRESS_COLOUR: { r: 255, g: 215, b: 0 },
 
     BUTTON1_X: 330,
     BUTTON1_Y: 330,
