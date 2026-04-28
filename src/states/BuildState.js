@@ -88,6 +88,7 @@ export class BuildState extends State {
         goTo,
         sawFrames,
         fireFrames,
+        fireOffImg,
         trampolineBouncing,
         spikedBallImg,
         cannonImg,
@@ -96,6 +97,7 @@ export class BuildState extends State {
         super(ctx, goTo);
         this.sawFrames = sawFrames;
         this.fireFrames = fireFrames;
+        this.fireOffImg = fireOffImg;
         this.trampolineBouncing = trampolineBouncing;
         this.spikedBallImg = spikedBallImg;
         this.cannonImg = cannonImg;
@@ -203,13 +205,6 @@ export class BuildState extends State {
     enter() {
         this.ctx.mapManager?.refreshBackground?.(this.ctx);
 
-        if (
-            this.ctx.shopHasRun &&
-            this.ctx.tiledMap === this.ctx.mapManager?.current
-        ) {
-            this.ctx.mapManager?.generateRandomMap?.(this.ctx.mapKey, this.ctx);
-        }
-
         // Round 1: shop has not run yet — skip straight to RUN
         if (!this.ctx.shopHasRun) {
             this.goTo(GameStage.RUN);
@@ -226,6 +221,23 @@ export class BuildState extends State {
 
         // Build blocked placement map based on platform collision geometry
         this._buildBlockedPlacementMap();
+        this._buildCoinPlacementMap();
+    }
+
+    _buildCoinPlacementMap() {
+        const { tiledMap } = this.ctx;
+        const T = GameConfig.TILE;
+        this._coinBlockedTiles = new Set();
+        this._buildCoins = [];
+
+        if (typeof tiledMap?.getCoins !== 'function') return;
+
+        for (const coin of tiledMap.getCoins()) {
+            this._buildCoins.push(coin);
+            const tx = Math.floor((coin.x + coin.w / 2) / T);
+            const ty = Math.floor((coin.y + coin.h / 2) / T);
+            this._coinBlockedTiles.add(`${tx},${ty}`);
+        }
     }
 
     _buildBlockedPlacementMap() {
@@ -401,6 +413,10 @@ export class BuildState extends State {
         tiledMap.render();
         tiledMap.renderStartpoint?.();
         tiledMap.renderEndpoint(this.ctx.endpointFlag);
+
+        for (const coin of this._buildCoins ?? []) {
+            coin.draw();
+        }
 
         for (const obs of this.ctx.placedObstacles) {
             obs.draw();
@@ -1187,6 +1203,7 @@ export class BuildState extends State {
     _canPlaceSelectedAt(px, py) {
         if (this._isTileBlocked(px, py)) return false;
         if (this._obstacleAt(px, py)) return false;
+        if (this._coinAt(px, py)) return false;
 
         if (this._selectedType === ObstacleType.BOMB) {
             return this._canPlaceBomb(px, py);
@@ -1235,6 +1252,13 @@ export class BuildState extends State {
         return this.ctx.placedObstacles.some((o) => o.x === px && o.y === py);
     }
 
+    _coinAt(px, py) {
+        const T = GameConfig.TILE;
+        const tx = Math.floor(px / T);
+        const ty = Math.floor(py / T);
+        return this._coinBlockedTiles?.has(`${tx},${ty}`) ?? false;
+    }
+
     _removeAt(px, py) {
         const arr = this.ctx.placedObstacles;
         const idx = arr.findIndex((o) => o.x === px && o.y === py);
@@ -1272,7 +1296,7 @@ export class BuildState extends State {
                 obs = new Saw(p, x, y, this.sawFrames);
                 break;
             case ObstacleType.FLAME:
-                obs = new Flame(p, x, y, this.fireFrames);
+                obs = new Flame(p, x, y, this.fireFrames, this.fireOffImg);
                 break;
             case ObstacleType.SPIKED_BALL:
                 obs = new SpikedBall(p, x, y, this.spikedBallImg);

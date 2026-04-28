@@ -939,6 +939,9 @@ export class MapManager {
         ctx.tiledMap = this.current;
         ctx.mapKey = this.currentKey;
         ctx.scoreManager = new ScoreManager(players);
+        ctx.placedObstacles = [];
+        ctx.shopHasRun = false;
+        ctx.resumeRunState = false;
         ctx.backgroundImage = this._pickBackgroundFor(this.currentKey);
     }
 
