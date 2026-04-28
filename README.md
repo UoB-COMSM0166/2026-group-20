@@ -8,7 +8,7 @@
 The Incredible ChickenBunny: an exciting multiplayer platformer where players select map obstacles and race to reach the goal.
 </p>
 
-<h3 align="center"> Click <a href="https://uob-comsm0166.github.io/2026-group-20/main-game/"> HERE</a> to play the game (v0.1.0)</h3>
+<h3 align="center"> Click <a href="https://uob-comsm0166.github.io/2026-group-20/main-game/"> HERE</a> to play the latest version of the game </h3>
 
 <hr style="border: none; height: 0.5px; background-color:#ddd;">
 
