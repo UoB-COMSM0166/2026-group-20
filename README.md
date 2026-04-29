@@ -28,7 +28,10 @@ https://github.com/user-attachments/assets/4d740826-4f04-4a33-90aa-97b0868dfc5b
 
 <h3>Group Members</h3>
 
-GROUP PHOTO. Add a group photo here.
+<div align="center">
+  <img src="docs/assets/images/group-photo.jpg" alt="group-photo" width="700">
+</div>
+
 
 | Name       | Email                              | Role                                                     | GitHub Account 
 | ---------- | ---------------------------------- | -------------------------------------------------------- | ----------------
