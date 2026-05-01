@@ -12,15 +12,9 @@ The Incredible ChickenBunny: an exciting multiplayer platformer where players se
 
 <hr style="border: none; height: 0.5px; background-color:#ddd;">
 
-<h3>VIDEO DEMO (v0.1.0)</h3> 
-2-3 mins long no more than 3 mins 
-intro of the game (optional) 
-explain concept of the game and twists
-explain challanges (in the game) 
-team formation 
-explain the process (sprints, kanban board...) 
+<h3>VIDEO DEMO</h3> 
 
-https://github.com/user-attachments/assets/00920bfc-84fc-4969-a731-ab39fba2d5a1
+[![Watch the video](docs/assets/images/video-cover.jpg)](https://youtu.be/pQogMnpL4lI)
 
 <h3>PAPER DEMO</h3>
 
