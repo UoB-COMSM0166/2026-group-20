@@ -84,9 +84,50 @@ https://github.com/user-attachments/assets/4d740826-4f04-4a33-90aa-97b0868dfc5b
 
 <h2 align="center">Project Report</h2>
 
+### Table of Contents
+- [1. Introduction](#1-introduction)
+- [2. Requirements](#2-requirements)
+  - [2.1 Ideation and Game Selection](#21-ideation-and-game-selection)
+  - [2.2 Stakeholders](#22-stakeholders)
+  - [2.3 Epics](#23-epics)
+  - [2.4 System Requirements](#24-system-requirements)
+  - [2.5 User Stories](#25-user-stories)
+  - [2.6 Use Case Diagram](#26-use-case-diagram)
+- [3. Design](#3-design)
+  - [3.1 System Architecture Overview](#31-system-architecture-overview)
+  - [3.2 Entities](#32-entities)
+  - [3.3 Systems](#33-systems)
+  - [3.4 States](#34-states)
+  - [3.5 User Interface](#35-user-interface)
+  - [3.6 Resource Manager](#36-resource-manager)
+- [4. Implementation](#4-implementation)
+  - [4.1 Implementation Overall](#41-implementation-overall)
+  - [4.2 Technical Challenge 1: Random Map Generation](#42-technical-challenge-1-random-map-generation)
+  - [4.3 Technical Challenge 2: Collision and Physics System](#43-technical-challenge-2-collision-and-physics-system)
+- [5. Evaluation](#5-evaluation)
+  - [5.1 Qualitative Evaluation](#51-qualitative-evaluation)
+  - [5.2 Quantitative Evaluation](#52-quantitative-evaluation)
+  - [5.3 Testing](#53-testing)
+- [6. Process](#6-process)
+  - [6.1 Team Organisation](#61-team-organisation)
+  - [6.2 Tools and Communication](#62-tools-and-communication)
+  - [6.3 Development Methodology](#63-development-methodology)
+  - [6.4 Sprint Workflow](#64-sprint-workflow)
+  - [6.5 Branching Strategy](#65-branching-strategy)
+  - [6.6 Reflection on Teamwork](#66-reflection-on-teamwork)
+- [7. Sustainability, Ethics and Accessibility](#7-sustainability-ethics-and-accessibility)
+  - [7.1 Sustainability Awareness Framework](#71-sustainability-awareness-framework)
+  - [7.2 Green Software Foundation Implementation Patterns](#72-green-software-foundation-implementation-patterns)
+- [8. Conclusion](#8-conclusion)
+- [9. Contribution Statement](#9-contribution-statement)
+- [10. AI Statement](#10-ai-statement)
+- [References](#references)
+
+<hr style="border: none; height: 0.5px; background-color:#ddd;">
+
 ## 1. Introduction
 
-<p>
+
 <strong><i>The Incredible ChickenBunny</i></strong> is a newly developed and enhanced adaptation of the multiplayer platformer game <strong><i>Ultimate Chicken Horse</i></strong>. The original game was chosen as inspiration due to its distinctive multiplayer mechanics, in which players strategically select obstacles from an in-game shop and place them on the map to gain an advantage while simultaneously making the course more difficult for their opponents. This gameplay mechanism creates a dynamic balance between cooperation and competition, making the game engaging. The original game also features colourful cartoon-style character sprites that contribute to a visually appealing aesthetic suitable for players of all ages.
 
 During our game development, these core elements were preserved, while introducing new gameplay and visual design enhancing features.
@@ -94,8 +135,6 @@ During our game development, these core elements were preserved, while introduci
 To enhance immersion and variety, two themed environments were designed: a forest and an ice theme, each with their own characters; a chicken and a bunny for the forest, and a polar bear and a penguin for the ice map.
 
 Furthermore, a coin and wallet system was implemented to increase competitiveness and player engagement. During each run, players can collect coins placed throughout the level, which can then be used to purchase better obstacles in subsequent rounds. A compulsory timer was also introduced, replacing the optional timer in the original game, to increase tension and make the game more high-stakes. Finally, each game run generates a new skeleton map and resets all previously placed obstacles. This procedural variation differs from the original, preventing players from predicting the layout and encouraging creative strategies when placing obstacles.
-</p>
-
 
 
 ## 2. Requirements
@@ -302,7 +341,7 @@ PhysicsSystem
 <p><em>Figure 3: Conceptual comparison between object-oriented design and ECS architecture.</em></p>
 </div>
 
-Both architectures have advantages and limitations. Object-Oriented Design is easier to understand and suits smaller projects but can become tightly coupled and limits code reusability [<a href="#reference">9</a>, p.113]. In contrast, ECS improves modularity by separating data from behaviour, allowing systems to process multiple entities using shared logic. This can improve scalability and maintainability, but it may introduce additional design complexity[<a href="#reference">6</a>]. 
+Both architectures have advantages and limitations. Object-Oriented Design is easier to understand and suits smaller projects but can become tightly coupled and limits code reusability [<a href="#reference">9</a>, p.113]. In contrast, ECS improves modularity by separating data from behaviour, allowing systems to process multiple entities using shared logic. This can improve scalability and maintainability, but it may introduce additional design complexity [<a href="#reference">6</a>]. 
 
 Therefore, the system architecture in this project follows a **hybrid approach**, combining both paradigms. The player is an **entity** that stores data, while systems handle mechanics like **physics** and **respawning**. However, some game logic, such as the player movement, remains implemented within the player object itself. 
 
@@ -607,7 +646,7 @@ Overall, our system architecture integrates multiple components, including entit
 
 ## 4. Implementation
 
-## 4.1 Implementaion Overall
+### 4.1 Implementation Overall
 
 The p5.js instance mode [<a href="#reference">8</a>] was chosen at the start of development, as it avoids the global namespace used in standard mode where functions are shared across scripts. Such mode isolates functions by encapsulating the sketch within an object, which reduces naming conflicts and improving code organisation and maintainability in a modular architecture.
 
@@ -623,7 +662,7 @@ Though its implementation was challenging due to the need for correctly coordina
 </div>
 
  
-## 4.2 Technical Challenge 1: Random Map Generation 
+### 4.2 Technical Challenge 1: Random Map Generation 
 
 One of our main challenges in this project was designing a **Random Map Generation** System that produces varied and consistently playable maps. Initially, we explored AI-driven generation using AIML API and experimented with prompt engineering to output JSON layouts. These were then parsed, validated, and used to build in-game levels with textures applied. While this approach offered randomness and aligned with our goal of creating dynamic gameplay, it also revealed some limitations. The AI occasionally produced malformed or incomplete JSON, and some generated maps lacked a valid path between the start and end points, making them unplayable. In addition, dependency on external API calls introduced latency and potential points of failure, meaning the system could not guarantee that a map would always be available when needed.
 
@@ -638,7 +677,7 @@ The challenge was therefore combining AI and procedural generation to ensure the
 <p><em>Figure 8: Map Generation</em></p>
 </div>
 
-## 4.3 Technical Challenge 2: Collision and Physics System
+### 4.3 Technical Challenge 2: Collision and Physics System
 
 Our second technical challenge was implementing a robust **Collision and Physics System** supporting a variety of obstacle behaviours while integrating smoothly with player movement and randomly generated maps. This process was inherently iterative, starting with basic collision handling before gradually introducing more complex obstacle interactions and effects. The difficulty increased when multiple physics effects acted on the player simultaneously, requiring careful coordination to prevent conflicts or unintended behaviour, especially when integrating with existing logic that was already functioning correctly.
 
@@ -695,7 +734,7 @@ The Think-Aloud approach is widely used in usability studies as it provides rich
 
 **B. Heuristic Evaluation**
 
-To complement user testing, we conducted a Nielsen’s heuristic evaluation. This method was selected because it is a well-established and cost-effective approach for identifying usability issues[<a href="#reference">2</a>]. It enabled us to systematically evaluate the interface and identify potential design problems based on recognised usability guidelines. 
+To complement user testing, we conducted a Nielsen’s heuristic evaluation. This method was selected because it is a well-established and cost-effective approach for identifying usability issues [<a href="#reference">2</a>]. It enabled us to systematically evaluate the interface and identify potential design problems based on recognised usability guidelines. 
 
 From Table 6, we could see that the most severe problem identified was unclear visual guidance, as players struggled to understand objectives and key elements. Notably, several players did not realise that the game was designed for two players, nor that they needed to avoid obstacles and reach the goal to finish the level. 
 
@@ -912,7 +951,7 @@ flowchart LR
 </div>
 
 
-### 6.3. Sprint Workflow  
+### 6.4 Sprint Workflow  
 
 | Sprint | Date | Objective | Scrum Master | <div align="center">Key Tasks<div> | Outcome |
 |:---:|:---:|:---:|:---:|:--- |:---:| 
@@ -923,7 +962,7 @@ flowchart LR
 | Sprint 5 | 14 Apr-24 Apr | Final polishing and deployment preparation | Mengxiao | • Final bug fixing <br> • Final testing <br> • Deployment preparation | Added sound effects, improved map desigm, final polished game |  
 
 
-### 6.4. Branching Strategy
+### 6.5 Branching Strategy
 Our repository follows a structured branching strategy to ensure code quality and deployment stability: 
 
 - **Main branch** - The `main` branch hosts production-ready code. Code is only merged into `main` after full testing in the development branch. All merges into `main` require a Pull Request (PR). 
@@ -946,16 +985,15 @@ main
       ...
 ```
 
-### 6.5. Reflection on Teamwork 
+### 6.6 Reflection on Teamwork 
 
 Overall, our group demonstrated strong motivation, consistent participation, and a clear willingness to engage creatively with the project. Communication was a key strength, supported by good meeting attendance and an organised workflow that everyone followed, including the use of pull requests, separate branches, and agreed version control practices. Project management was handled responsibly, with individuals taking ownership of their roles, which helped maintain steady progress. We also managed our time effectively, resolved conflicts constructively, and worked well in pairs. Team members were generally open to feedback and alternative ideas, contributing to a collaborative and supportive environment.
 
 However, the group faced several challenges. Some initial ideas were overly ambitious given the time constraints, and deciding on the project direction took longer than expected, causing some early tension. Progress slowed at times due to uneven availability, and limited upfront architectural planning meant we had to continuously adapt our structure, occasionally leading to confusion. A lack of detailed code comments also made collaboration more difficult, and there were instances where some members relied on AI tools instead of seeking help directly. Despite these issues, we adapted and continued to work effectively as a team. Overall, the experience was highly valuable, reflecting real-world industry challenges and helping us develop both technically and collaboratively.
 
 
-## 7. Subtainability, Ethics and Accessibility
-
-<strong><em>Sustainability Awareness Framework</em></strong>
+## 7. Sustainability, Ethics and Accessibility
+### 7.1 Sustainability Awareness Framework
 
 From the perspective of the Karlskrona Manifesto [<a href="reference">11</a>], our game highlights a range of interconnected sustainability implications across multiple dimensions, prompting reflection on our current design choices and consideration of how these could be improved in future iterations. 
 
@@ -980,7 +1018,7 @@ Overall, while we have taken some initial steps to address sustainability concer
 </div>
 
 
-<strong><em>Green Software Foundation Implementation Patterns</em></strong>
+### 7.2 Green Software Foundation Implementation Patterns
 
 From the perspective of the Green Software Foundation implementation patterns [<a href="reference">12</a>], our design choices for the AI and data components of the game align with three key sustainability principles. To begin with, we follow the pattern of <em>**Select a more energy efficient AI/ML</em> framework** by using Gemini via API calls rather than developing or training our own model. This significantly reduces energy consumption, as it avoids the highly resource-intensive process of training large AI models from scratch, which typically requires extensive GPU/TPU usage and prolonged data centre operation. Instead, we rely on an already optimised system that delivers the required functionality in a more efficient and scalable way.
 In addition, we apply the principle to <em>**Leverage pre-trained models and transfer learning for AI/ML development**</em> by using Gemini as a pre-trained model instead of building or training a custom solution. This means we are reusing an existing, large-scale model that has already been trained and optimised, rather than duplicating that computational effort ourselves. As a result, we reduce unnecessary energy use and benefit from a system that has been refined for efficiency at an industrial level, allowing us to focus on integration rather than model training.
@@ -1012,28 +1050,28 @@ Overall, this project was a valuable learning experience, not only because of th
 
 ## 10. AI Statement 
 
-We acknowledge the use of ChatGPT and Copilot as assistive tools to support our development process. Their primary role was educational, helping us understand unfamiliar concepts, clarify technical approaches, and explain complex sections of code in a more understandable way.
+We acknowledge the use of ChatGPT and Copilot as assistive tools to support our development process. Their primary role was educational, helping us understand unfamiliar concepts, clarify technical approaches and explain complex sections of code in a more understandable way.
 
 In addition to its educational use, ChatGPT was also used selectively for technical assistance. A significant portion of its application involved debugging and refactoring code. Since our project relied heavily on interdependent classes developed by different members, inconsistencies and integration issues were common. In these cases, AI helped us identify potential sources of errors, suggest improvements, and restructure code for better readability and maintainability. All suggestions were reviewed and tested by the team before implementation.
 
-We also used AI-generated content in a limited manner for visual design purposes. Specifically, the background PNG used behind the two maps and the animation in our video demo were AI generated. This was done to enhance the visual presentation of the project.
+We also used AI-generated content in a limited manner for visual design purposes. Specifically, the background PNG used behind the two maps, the animation in our video were AI generated. This was done to enhance the visual presentation of the project. Additionally, an AI-generated dubbing voice was used in the video to maintain cohesion with the chosen animation style.
 
 Additionally, Copilot was occasionally used during the polishing of our README to ensure correct and effective language, as none of our members are native English speakers.
 
-However, we remained cautious and intentional in our use of AI tools. We did not rely on them to produce final, unverified outputs, and all AI-assisted contributions were critically evaluated, adapted, and validated by team members. AI served only as a supportive aid rather than a replacement for our own understanding and development work.
+However, we remained cautious and intentional in our use of AI tools. We did not rely on them to produce final, unverified outputs, and all AI-assisted contributions were critically evaluated, adapted and validated by team members. AI served only as a supportive aid rather than a replacement for our own understanding and development work.
 
 
 ### References
-[1]J. Joe, S. Chaudhuri, T. Le, H. Thompson, and G. Demiris, “The use of think-aloud and instant data analysis in evaluation research: Exemplar and lessons learned,” Journal of Biomedical Informatics, vol. 56, pp. 284–291, Aug. 2015, doi: 10.1016/j.jbi.2015.06.001. (add to why choose think aloud)
+[1]J. Joe, S. Chaudhuri, T. Le, H. Thompson, and G. Demiris, “The use of think-aloud and instant data analysis in evaluation research: Exemplar and lessons learned,” Journal of Biomedical Informatics, vol. 56, pp. 284–291, Aug. 2015, doi: 10.1016/j.jbi.2015.06.001. 
 
-[2]“A comparison of heuristics applied for studying the usability of websites,” Procedia Computer Science, vol. 176, pp. 3571–3580, doi: 10.1016/j.procs.2020.09.029. (add to why we choose heuristics)
+[2]“A comparison of heuristics applied for studying the usability of websites,” Procedia Computer Science, vol. 176, pp. 3571–3580, doi: 10.1016/j.procs.2020.09.029. 
 
-[3]J. Nielsen, “10 Usability Heuristics for User Interface Design,” Nielsen Norman Group, Apr. 24, 1994. Accessed: Mar. 16, 2026. [Online]. Available: https://www.nngroup.com/articles/ten-usability-heuristics/ (heuristics principles for Nielsen)
+[3]J. Nielsen, “10 Usability Heuristics for User Interface Design,” Nielsen Norman Group, Apr. 24, 1994. Accessed: Mar. 16, 2026. [Online]. Available: https://www.nngroup.com/articles/ten-usability-heuristics/ 
   
 
-[4]K. Chaudhary, X. Dai, and J. Grundy, “Experiences in Developing a Micro-payment System for Peer-to-Peer Networks,” International Journal of Information Technology and Web Engineering, vol. 5, no. 1, pp. 23–42, Jan. 2010, doi: 10.4018/jitwe.2010010102. (heurstics format)
+[4]K. Chaudhary, X. Dai, and J. Grundy, “Experiences in Developing a Micro-payment System for Peer-to-Peer Networks,” International Journal of Information Technology and Web Engineering, vol. 5, no. 1, pp. 23–42, Jan. 2010, doi: 10.4018/jitwe.2010010102.
 
-[5]J. Gregory, Game Engine Architecture. CRC Press, 2017. (entity-based)
+[5]J. Gregory, Game Engine Architecture. CRC Press, 2017. 
   
 [6]F. Pouhela, D. Krummacker, and H. D. Schotten, “Entity Component System Architecture for Scalable, Modular, and Power-Efficient IoT-Brokers,” in 2023 IEEE 21st International Conference on Industrial Informatics (INDIN), IEEE, Jul. 2023, pp. 1–6. Accessed: Mar. 30, 2026. [Online]. Available: https://doi.org/10.1109/indin51400.2023.10218094
   
@@ -1042,7 +1080,7 @@ However, we remained cautious and intentional in our use of AI tools. We did not
 [7]J. Brooke , “SUS: A ‘Quick and Dirty’ Usability Scale,” in Usability Evaluation In Industry, CRC Press, 1996, pp. 207–212. Accessed: Apr. 06, 2026. [Online]. Available: https://doi.org/10.1201/9781498710411-35
   
 
-[8] “p5,” p5.js. Accessed: Apr. 12, 2026. [Online]. Available: https://p5js.org/reference/p5/p5/ (instance mode)
+[8] “p5,” p5.js. Accessed: Apr. 12, 2026. [Online]. Available: https://p5js.org/reference/p5/p5/ 
 
 [9] G. Booch, R. Maksimchuk, M. Engle, B. Young, J. Conallen, and K. Houston, Object-Oriented Analysis and Design with Applications, 3rd ed.
 Boston, MA, USA: Addison-Wesley, 2007. [Online]. Available:
@@ -1057,12 +1095,3 @@ doi: 10.4018/jthi.2005010102.
 
 [12] “Green Software Patterns,” Green Software Patterns. Accessed: Apr. 25, 2026. [Online]. Available: https://patterns.greensoftware.foundation/
 
-### Appendix
-
-You can delete this section in your own repo, it's just here for information. in addition to the marks above, we will be marking you on the following two points:
-
-- **Quality** of report writing, presentation, use of figures and visual material (5% of report grade)
-    - Please write in a clear concise manner suitable for an interested layperson. Write as if this repo was publicly available.
-- **Documentation** of code (5% of report grade)
-    - Organise your code so that it could easily be picked up by another team in the future and developed further.
-    - Is your repo clearly organised? Is code well commented throughout?
