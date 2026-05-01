@@ -14,7 +14,7 @@ The Incredible ChickenBunny: an exciting multiplayer platformer where players se
 
 <h3>VIDEO DEMO</h3> 
 
-[![Watch the video](docs/assets/images/video-cover.jpg)](https://youtu.be/pQogMnpL4lI)
+[![Watch the video](docs/assets/images/video-cover.png)](https://youtu.be/pQogMnpL4lI)
 
 <h3>PAPER DEMO</h3>
 
