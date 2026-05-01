@@ -145,7 +145,7 @@ Our team began by brainstorming game ideas and collectively selecting one to dev
 
 Each member of the team brainstormed 5-9 of their faviourite games and brought their ideas to the meeting. During the meeting, everyone presented the core game mechanics of their proposed games.
 
-![Ideathon](docs/assets/gif/ideation.gif)
+![Ideation](docs/assets/images/ideation.png)
 
 As numerous ideas were proposed, we first focused on the two key challenges: **Concurrency** and **AI**. Based on alignment with these challenges, the top six games were selected. 
 
